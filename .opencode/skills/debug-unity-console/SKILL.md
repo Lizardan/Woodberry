@@ -1,6 +1,6 @@
 ---
 name: debug-unity-console
-description: Р”РёР°РіРЅРѕСЃС‚РёРєР° РѕС€РёР±РѕРє РєРѕРјРїРёР»СЏС†РёРё, runtime-РѕС€РёР±РѕРє Рё Missing-СЃРєСЂРёРїС‚РѕРІ РІ Unity С‡РµСЂРµР· MCP. РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ, РєРѕРіРґР° Console РєСЂР°СЃРЅС‹Р№, С‚РµСЃС‚С‹ РїР°РґР°СЋС‚ РёР»Рё СЃР±РѕСЂРєР° РЅРµ СЃРѕР±РёСЂР°РµС‚СЃСЏ.
+description: Диагностика ошибок компиляции, runtime-ошибок и Missing-скриптов в Unity через MCP. Использовать, когда Console красный, тесты падают или сборка не собирается.
 compatibility: opencode
 metadata:
   audience: qa-analyst, unity-tools-engineer, gameplay-engineer
@@ -9,181 +9,184 @@ metadata:
 
 # Debug Unity Console
 
-## РўСЂРёРіРіРµСЂ
+## Триггер
 
-РСЃРїРѕР»СЊР·СѓР№, РєРѕРіРґР°:
-- Console РїРѕРєР°Р·С‹РІР°РµС‚ РѕС€РёР±РєРё
-- `recompile` РЅРµ РґР°С‘С‚ С‡РёСЃС‚РѕР№ РєРѕРјРїРёР»СЏС†РёРё
-- С‚РµСЃС‚С‹ РїР°РґР°СЋС‚
-- `Missing (Mono Script)` РІ СЃС†РµРЅРµ РёР»Рё РїСЂРµС„Р°Р±Рµ
-- MCP РІРѕР·РІСЂР°С‰Р°РµС‚ `No Unity Editor instances found`
+Используй, когда:
+- Console показывает ошибки
+- `refresh_unity` не даёт чистой компиляции
+- тесты падают
+- `Missing (Mono Script)` в сцене или префабе
+- MCP возвращает `No Unity Editor instances found`
 
-## РџСЂР°РІРёР»Рѕ 0: РЅРµ РѕС‚Р»Р°Р¶РёРІР°Р№ РІСЃР»РµРїСѓСЋ
+## Правило 0: не отлаживай вслепую
 
-**РџСЂРё РѕС€РёР±РєР°С… РєРѕРјРїРёР»СЏС†РёРё СЂР°Р±РѕС‚Р° РѕСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ.** РќРµ РІС‹Р·С‹РІР°Р№ Unity-РёРЅСЃС‚СЂСѓРјРµРЅС‚С‹,
-РїРѕРєР° РєРѕРјРїРёР»СЏС†РёСЏ РЅРµ СЃС‚Р°РЅРµС‚ С‡РёСЃС‚РѕР№: С‚РёРїС‹ РЅРµ СЃСѓС‰РµСЃС‚РІСѓСЋС‚ РІ СЃР±РѕСЂРєРµ, СЂРµР·СѓР»СЊС‚Р°С‚ Р±СѓРґРµС‚ РјСѓСЃРѕСЂРѕРј.
+**При ошибках компиляции работа останавливается.** Не вызывай Unity-инструменты,
+пока компиляция не станет чистой: типы не существуют в сборке, результат будет мусором.
 
-## РЁР°Рі 1. РџРѕР»СѓС‡РёС‚СЊ РѕС€РёР±РєРё
+## Шаг 1. Получить ошибки
 
-```
-(вручную: Console)show_errors=true, limit=100)вручную: Console)show_errors=true, show_warnings=true, limit=50)action="get", types=["error","warning"], count="100", include_stacktrace=true)
-```
+read_console(action: "get", types: ["error", "warning"], count: 100, include_stacktrace: true)
 
-РР»Рё РІ СЂРµРґР°РєС‚РѕСЂРµ: **Window в†’ General в†’ Console**, С„РёР»СЊС‚СЂ Errors.
+Или в редакторе: **Window → General → Console**, фильтр Errors.
 
-## РЁР°Рі 2. РљР»Р°СЃСЃРёС„РёС†РёСЂРѕРІР°С‚СЊ
+## Шаг 2. Классифицировать
 
-| РўРёРї | РџСЂРёРјРµСЂ | Р Р°Р·РґРµР» |
+| Тип | Пример | Раздел |
 |---|---|---|
-| РЎРёРЅС‚Р°РєСЃРёСЃ | `; expected` | В§3 |
-| РќРµ РЅР°Р№РґРµРЅ С‚РёРї | `type or namespace 'X' could not be found` | В§4 |
-| РќРµС‚ РґРѕСЃС‚СѓРїР° | `inaccessible due to its protection level` | В§4 |
-| РќРµС‚ assembly reference | РѕС€РёР±РєР° РїСЂРѕ СЃР±РѕСЂРєСѓ | В§5 |
-| РќРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ API | `'X' does not contain a definition for 'Y'` | В§6 |
-| Missing Script | `The referenced script is missing` | В§7 |
-| Runtime NRE | `NullReferenceException` | В§8 |
-| РўРµСЃС‚С‹ РїР°РґР°СЋС‚ | assertion | В§9 |
-| MCP РЅРµРґРѕСЃС‚СѓРїРµРЅ | `No Unity Editor instances found` | В§10 |
+| Синтаксис | `; expected` | §3 |
+| Не найден тип | `type or namespace 'X' could not be found` | §4 |
+| Нет доступа | `inaccessible due to its protection level` | §4 |
+| Нет assembly reference | ошибка про сборку | §5 |
+| Не существует API | `'X' does not contain a definition for 'Y'` | §6 |
+| Missing Script | `The referenced script is missing` | §7 |
+| Runtime NRE | `NullReferenceException` | §8 |
+| Тесты падают | assertion | §9 |
+| MCP недоступен | `No Unity Editor instances found` | §10 |
 
-## РЁР°Рі 3. РЎРёРЅС‚Р°РєСЃРёСЃ
+## Шаг 3. Синтаксис
 
-РќРѕРјРµСЂ СЃС‚СЂРѕРєРё РІ РѕС€РёР±РєРµ С‚РѕС‡РЅС‹Р№. РћС‚РєСЂС‹С‚СЊ С„Р°Р№Р», РїРѕСЃРјРѕС‚СЂРµС‚СЊ.
+Номер строки в ошибке точный. Открыть файл, посмотреть.
 
-Р§Р°СЃС‚С‹Рµ РїСЂРёС‡РёРЅС‹:
-- РџСЂРѕРїСѓС‰РµРЅРЅР°СЏ `;` РёР»Рё `}`
-- РќРµР·Р°РєСЂС‹С‚С‹Р№ Р±Р»РѕРє РїРѕСЃР»Рµ РјР°СЃСЃРѕРІРѕРіРѕ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ
-- РќРµРїР°СЂРЅС‹Рµ СЃРєРѕР±РєРё РїСЂРё РґРѕР±Р°РІР»РµРЅРёРё РјРµС‚РѕРґР°
+Частые причины:
+- Пропущенная `;` или `}`
+- Незакрытый блок после массового редактирования
+- Непарные скобки при добавлении метода
 
-## РЁР°Рі 4. РќРµ РЅР°Р№РґРµРЅ С‚РёРї / РЅРµС‚ РґРѕСЃС‚СѓРїР°
+## Шаг 4. Не найден тип / нет доступа
 
-### РџСЂРѕРІРµСЂСЊ namespace
+### Проверь namespace
 
 ```csharp
-// Р¤Р°Р№Р» РІ Assets/Scripts/Gameplay/Player/PlayerController.cs
-namespace Woodberry.Gameplay.Player   // вњ… СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ РїР°РїРєРµ
+// Файл в Assets/Scripts/Gameplay/Player/PlayerController.cs
+namespace Woodberry.Gameplay.Player   // ✅ соответствует папке
 
-namespace Woodberry.Gameplay           // вќЊ РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚
-namespace Gameplay.Player             // вќЊ РЅРµС‚ РїСЂРµС„РёРєСЃР° Woodberry
+namespace Woodberry.Gameplay           // ❌ не соответствует
+namespace Gameplay.Player             // ❌ нет префикса Woodberry
 ```
 
-### РџСЂРѕРІРµСЂСЊ assembly reference
+### Проверь assembly reference
 
-Р•СЃР»Рё С‚РёРї РІ РґСЂСѓРіРѕР№ СЃР±РѕСЂРєРµ, Р° СЃСЃС‹Р»РєР° РЅРµ РѕР±СЉСЏРІР»РµРЅР° РІ `.asmdef` в†’ `references`.
+Если тип в другой сборке, а ссылка не объявлена в `.asmdef` → `references`.
 
-```
-(вручную)  # или Window → Project
-```
+manage_asset(action: "get_info", path: "Assets/Scripts/.../X.asmdef")
 
-### РџСЂРѕРІРµСЂСЊ, С‡С‚Рѕ С‚РёРї РІРѕРѕР±С‰Рµ РµСЃС‚СЊ
+### Проверь, что тип вообще есть
 
 ```
-(вручную)  # code="return string.Join(\"; \", System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => { try { return a.GetTypes(); } catch { return new Type[0]; } }).Where(x => x.Name == \"TypeName\").Select(x => x.FullName).ToArray());")
-```
-(вручную)  # code="return string.Join(\"; \", System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => { try { return a.GetTypes(); } catch { return new Type[0]; } }).Where(x => x.Name == \"TypeName\").Select(x => x.FullName).ToArray());")
+unity_reflect(action: "search", query: "TypeName")
+unity_reflect(action: "get_type", class_name: "Namespace.TypeName")
 ```
 
-## РЁР°Рі 5. РљРѕРЅС„Р»РёРєС‚ СЃР±РѕСЂРѕРє
+## Шаг 5. Конфликт сборок
 
 ```
 The type 'X' exists in both 'Assembly-A' and 'Assembly-B'
 ```
 
-| РџСЂРёС‡РёРЅР° | Р РµС€РµРЅРёРµ |
+| Причина | Решение |
 |---|---|
-| РўРёРї РІ РїР°РєРµС‚Рµ Рё РІ РїСЂРѕРµРєС‚Рµ | РџРµСЂРµРёРјРµРЅРѕРІР°С‚СЊ СЃРІРѕР№ РёР»Рё РѕС‚РєР»СЋС‡РёС‚СЊ РїР°РєРµС‚ |
-| Р¤Р°Р№Р» РІРЅРµ asmdef РїРѕРїР°Р» РІ РґРІРµ СЃР±РѕСЂРєРё | РџСЂРѕРІРµСЂРёС‚СЊ РіСЂР°РЅРёС†С‹ asmdef |
-| РЎС‚Р°СЂР°СЏ СЃР±РѕСЂРєР° РЅРµ РїРµСЂРµСЃРѕР±СЂР°Р»Р°СЃСЊ | `recompile(focus=false)` |
+| Тип в пакете и в проекте | Переименовать свой или отключить пакет |
+| Файл вне asmdef попал в две сборки | Проверить границы asmdef |
+| Старая сборка не пересобралась | `refresh_unity(compile: "request", wait_for_ready: true)` |
 
-## РЁР°Рі 6. РќРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РёР№ API вЂ” **РЅРµ РіР°РґР°Р№, РїСЂРѕРІРµСЂСЊ**
+## Шаг 6. Несуществующий API — **не гадай, проверь**
 
-Р­С‚Рѕ СЃР°РјР°СЏ С‡Р°СЃС‚Р°СЏ РѕС€РёР±РєР° РїСЂРё СЂР°Р±РѕС‚Рµ СЃ Unity С‡РµСЂРµР· AI. Р’РµСЂСЃРёСЏ `6000.6.3f1` СЃРІРµР¶Р°СЏ,
-РїР°РјСЏС‚СЊ Рѕ Unity API С‡Р°СЃС‚Рѕ СѓСЃС‚Р°СЂРµРІС€Р°СЏ.
-
-```
-(вручную)  # code="return typeof(<Ns>.<ClassName>).GetMember(\"MemberName\").Length;")вручную)  # code="return typeof(<Namespace>.<ClassName>).GetMember(\"MemberName\").Length;")вручную)  # code="var m = typeof(<Namespace>.<ClassName>).GetProperty(\"MemberName\"); return m == null ? \"NULL - не существует\" : m.PropertyType.Name + \" canWrite=\" + m.CanWrite;")
-
-# Ссылка на документацию под версию проекта:
-& "F:\Unity\Unity Hub\resources\unity.exe" docs <ClassName> --url
-
-## РЁР°Рі 7. Missing (Mono Script)
-
-### РЎРЅР°С‡Р°Р»Р° РїСЂРѕРІРµСЂРёС‚СЊ РєРѕРјРїРёР»СЏС†РёСЋ
-
-Р­С‚Рѕ **СЃР°РјР°СЏ С‡Р°СЃС‚Р°СЏ** РїСЂРёС‡РёРЅР°: С‚РёРї РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ в†’ РєРѕРјРїРѕРЅРµРЅС‚ РїРѕРєР°Р·С‹РІР°РµС‚ Missing.
+Это самая частая ошибка при работе с Unity через AI. Версия `6000.6.3f1` свежая,
+память о Unity API часто устаревшая.
 
 ```
-(вручную: Console)show_errors=true, limit=50)
+unity_reflect(action: "get_member", class_name: "UnityEngine.AI.NavMeshAgent", member_name: "speed")
+unity_reflect(action: "get_type",   class_name: "UnityEngine.AI.NavMeshAgent")
+unity_reflect(action: "search",     query: "NavMeshAgent")
+unity_docs(action: "get_doc", class_name: "CharacterController")
 ```
+## Шаг 7. Missing (Mono Script)
 
-### Р•СЃР»Рё РєРѕРјРїРёР»СЏС†РёСЏ С‡РёСЃС‚Р°СЏ
+### Сначала проверить компиляцию
 
-1. РќР°Р№С‚Рё РѕР±СЉРµРєС‚ (Hierarchy РёР»Рё Prefab Mode)
-2. Р’ РёРЅСЃРїРµРєС‚РѕСЂРµ РїРѕР»Рµ `Script` РїСѓСЃС‚РѕРµ
-3. РџРµСЂРµРЅР°Р·РЅР°С‡РёС‚СЊ РїРµСЂРµС‚Р°СЃРєРёРІР°РЅРёРµРј
-4. Р•СЃР»Рё СЃРєСЂРёРїС‚ СѓРґР°Р»С‘РЅ РЅР°РјРµСЂРµРЅРЅРѕ вЂ” СѓРґР°Р»РёС‚СЊ РєРѕРјРїРѕРЅРµРЅС‚
-5. `File в†’ Save`
+Это **самая частая** причина: тип не существует → компонент показывает Missing.
 
-### Р§РµРіРѕ РќР• РґРµР»Р°С‚СЊ
+read_console(action: "get", types: ["error"], count: 50)
 
-- вќЊ РЈРґР°Р»СЏС‚СЊ `.meta` РІСЂСѓС‡РЅСѓСЋ
-- вќЊ РџСЂР°РІРёС‚СЊ YAML `.unity`/`.prefab`
-- вќЊ РџРµСЂРµРёРјРµРЅРѕРІС‹РІР°С‚СЊ `.meta`
+### Если компиляция чистая
 
-## РЁР°Рі 8. NullReferenceException
+1. Найти объект (Hierarchy или Prefab Mode)
+2. В инспекторе поле `Script` пустое
+3. Переназначить перетаскиванием
+4. Если скрипт удалён намеренно — удалить компонент
+5. `File → Save`
 
-| РџСЂРёС‡РёРЅР° | РљР°Рє РЅР°Р№С‚Рё |
+### Чего НЕ делать
+
+- ❌ Удалять `.meta` вручную
+- ❌ Править YAML `.unity`/`.prefab`
+- ❌ Переименовывать `.meta`
+
+## Шаг 8. NullReferenceException
+
+| Причина | Как найти |
 |---|---|
-| РќРµ РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅ РІ `Awake` | РџСЂРѕРІРµСЂРёС‚СЊ РїРѕСЂСЏРґРѕРє `Awake` в†’ `Start` |
-| `GetComponent` РІРµСЂРЅСѓР» null | РџСЂРѕРІРµСЂРёС‚СЊ РЅР°Р»РёС‡РёРµ РєРѕРјРїРѕРЅРµРЅС‚Р° |
-| Р Р°Р·С‹РјРµРЅРѕРІР°РЅРёРµ СѓРЅРёС‡С‚РѕР¶РµРЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° | РџСЂРѕРІРµСЂРёС‚СЊ `!= null` (Unity overload!) |
-| РЎРѕР±С‹С‚РёРµ Р±РµР· РїРѕРґРїРёСЃРєРё | РџСЂРѕРІРµСЂРёС‚СЊ РїРѕСЂСЏРґРѕРє `OnEnable` |
-| РџРѕСЂСЏРґРѕРє РјРµР¶РґСѓ РѕР±СЉРµРєС‚Р°РјРё | РќРµ РїРѕР»Р°РіР°С‚СЊСЃСЏ РЅР° РїРѕСЂСЏРґРѕРє `Start` |
+| Не инициализирован в `Awake` | Проверить порядок `Awake` → `Start` |
+| `GetComponent` вернул null | Проверить наличие компонента |
+| Разыменование уничтоженного объекта | Проверить `!= null` (Unity overload!) |
+| Событие без подписки | Проверить порядок `OnEnable` |
+| Порядок между объектами | Не полагаться на порядок `Start` |
 
-**Р’Р°Р¶РЅРѕ:** РґР»СЏ Unity-РѕР±СЉРµРєС‚РѕРІ РїСЂРѕРІРµСЂСЏР№ `if (obj != null)`, Р° РЅРµ `if (obj is not null)`.
-Unity РїРµСЂРµРѕРїСЂРµРґРµР»СЏРµС‚ РѕРїРµСЂР°С‚РѕСЂ `==` РґР»СЏ СѓРЅРёС‡С‚РѕР¶РµРЅРЅС‹С… РѕР±СЉРµРєС‚РѕРІ.
+**Важно:** для Unity-объектов проверяй `if (obj != null)`, а не `if (obj is not null)`.
+Unity переопределяет оператор `==` для уничтоженных объектов.
 
-## РЁР°Рі 9. РџР°РґР°СЋС‰РёРµ С‚РµСЃС‚С‹
+## Шаг 9. Падающие тесты
 
-РЎРј. `docs/runbooks/test-workflow.md`. Р‘С‹СЃС‚СЂР°СЏ РґРёР°РіРЅРѕСЃС‚РёРєР°:
+См. `docs/runbooks/test-workflow.md`. Быстрая диагностика:
 
-| РЎРёРјРїС‚РѕРј | РџСЂРёС‡РёРЅР° |
+| Симптом | Причина |
 |---|---|
-| РџР°РґР°РµС‚ РІ В«Run AllВ», РїСЂРѕС…РѕРґРёС‚ РѕС‚РґРµР»СЊРЅРѕ | РћР±С‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ |
-| Flaky | `WaitForSeconds`, РІСЂРµРјСЏ, СЃР»СѓС‡Р°Р№РЅРѕСЃС‚СЊ |
-| Р—РµР»С‘РЅС‹Р№, РЅРѕ РІ Р»РѕРіРµ РѕС€РёР±РєРё | РќРµ РїСЂРѕРІРµСЂСЏРµС‚СЃСЏ Р»РѕРі |
-| EditMode Р·РµР»С‘РЅС‹Р№, PlayMode РєСЂР°СЃРЅС‹Р№ | РќСѓР¶РµРЅ PlayMode РґР»СЏ Р¶РёР·РЅРµРЅРЅРѕРіРѕ С†РёРєР»Р° |
+| Падает в «Run All», проходит отдельно | Общее состояние |
+| Flaky | `WaitForSeconds`, время, случайность |
+| Зелёный, но в логе ошибки | Не проверяется лог |
+| EditMode зелёный, PlayMode красный | Нужен PlayMode для жизненного цикла |
 
-## РЁР°Рі 10. MCP РЅРµРґРѕСЃС‚СѓРїРµРЅ
+## Шаг 9. Падающие тесты
 
-РЎРёРјРїС‚РѕРј: `No Unity Editor instances found`
+См. `docs/runbooks/test-workflow.md`.
 
-1. Unity Editor Р·Р°РїСѓС‰РµРЅ?
-2. MCP server Р·Р°РїСѓС‰РµРЅ (**Window в†’ MCP for Unity**)?
-3. РџРѕСЂС‚ СЃРѕРІРїР°РґР°РµС‚ СЃ РєРѕРЅС„РёРіРѕРј?
-4. РќРµ Р·Р°РїСѓС‰РµРЅРѕ Р»Рё РЅРµСЃРєРѕР»СЊРєРѕ РёРЅСЃС‚Р°РЅСЃРѕРІ (С‚РѕРіРґР° РЅСѓР¶РµРЅ `set_active_instance`)?
-
-Р•СЃР»Рё Unity РЅРµ Р·Р°РїСѓС‰РµРЅ вЂ” СЌС‚Рѕ **РЅРµ Р±Р»РѕРєРµСЂ** РґР»СЏ РЅР°РїРёСЃР°РЅРёСЏ РєРѕРґР°,
-РЅРѕ **Р±Р»РѕРєРµСЂ** РґР»СЏ РІРµСЂРёС„РёРєР°С†РёРё. РџРёС€Рё С‡РµСЃС‚РЅРѕ:
-
+Запуск через MCP:
 ```
-Not verified: Unity Editor РЅРµ Р·Р°РїСѓС‰РµРЅ, РєРѕРјРїРёР»СЏС†РёСЏ Рё С‚РµСЃС‚С‹ РЅРµ РІС‹РїРѕР»РЅСЏР»РёСЃСЊ.
+run_tests(mode: "EditMode", include_failed_tests: true)
+-> get_test_job(job_id: ..., include_failed_tests: true, wait_timeout: 60)
 ```
 
-## Р—РѕР»РѕС‚РѕР№ С†РёРєР» РїСЂРѕРІРµСЂРєРё
+## Шаг 10. MCP недоступен
+
+Симптом: `No Unity Editor instances found`
+
+1. Unity Editor запущен?
+2. Окно Unity MCP открыто?
+3. Порт совпадает с конфигом?
+4. Проверить ресурс `mcpforunity://instances`; при нескольких инстансах —
+   вызвать `set_active_instance` с точным `Name@hash`.
+
+Если Unity не запущен — это **не блокер** для написания кода, но **блокер**
+для верификации. Пиши честно:
+```
+Not verified: Unity Editor не запущен, компиляция и тесты не выполнены.
+```
+
+## Золотой цикл проверки
 
 ```
-(вручную: Edit → Clear))вручную)вручную: Console)show_errors=true, show_warnings=true, limit=50)
+1. read_console(action: "clear")
+2. refresh_unity(mode: "if_dirty", compile: "request", wait_for_ready: true)
+3. read_console(action: "get", types: ["error", "warning"], count: 50)
 ```
 
-`clear` **РґРѕ** РїСЂРѕРІРµСЂРєРё вЂ” РёРЅР°С‡Рµ СЃС‚Р°СЂС‹Рµ РѕС€РёР±РєРё РІС‹РіР»СЏРґСЏС‚ РєР°Рє РЅРѕРІС‹Рµ.
+## Критерии успеха
 
-## РљСЂРёС‚РµСЂРёРё СѓСЃРїРµС…Р°
+- [ ] Причина найдена, а не обойдена
+- [ ] Ошибок в Console: 0
+- [ ] Тесты проходят (EditMode + PlayMode)
+- [ ] Проверено, что проблема не вернулась (регрессия)
+- [ ] Указано, что проверено, а что — нет
+- [ ] Ничего не «подавлено» ради зелёного результата
 
-- [ ] РџСЂРёС‡РёРЅР° РЅР°Р№РґРµРЅР°, Р° РЅРµ РѕР±РѕР№РґРµРЅР°
-- [ ] РћС€РёР±РѕРє РІ Console: 0
-- [ ] РўРµСЃС‚С‹ РїСЂРѕС…РѕРґСЏС‚ (EditMode + PlayMode)
-- [ ] РџСЂРѕРІРµСЂРµРЅРѕ, С‡С‚Рѕ РїСЂРѕР±Р»РµРјР° РЅРµ РІРµСЂРЅСѓР»Р°СЃСЊ (СЂРµРіСЂРµСЃСЃРёСЏ)
-- [ ] РЈРєР°Р·Р°РЅРѕ, С‡С‚Рѕ РїСЂРѕРІРµСЂРµРЅРѕ, Р° С‡С‚Рѕ вЂ” РЅРµС‚
-- [ ] РќРёС‡РµРіРѕ РЅРµ В«РїРѕРґР°РІР»РµРЅРѕВ» СЂР°РґРё Р·РµР»С‘РЅРѕРіРѕ СЂРµР·СѓР»СЊС‚Р°С‚Р°
-
-РџРѕРґСЂРѕР±РЅРµРµ: `docs/runbooks/incident-compile-errors.md`
+Подробнее: `docs/runbooks/incident-compile-errors.md`

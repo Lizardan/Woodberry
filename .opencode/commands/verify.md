@@ -1,38 +1,45 @@
 ---
-description: Р’РµСЂРёС„РёС†РёСЂРѕРІР°С‚СЊ РїСЂРѕРµРєС‚ вЂ” РєРѕРјРїРёР»СЏС†РёСЏ, РѕС€РёР±РєРё, EditMode/PlayMode С‚РµСЃС‚С‹
+description: Верифицировать проект — компиляция, ошибки, EditMode/PlayMode тесты
 agent: build
 subtask: false
 ---
 
-РџСЂРѕРІРµСЂСЊ С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РїСЂРѕРµРєС‚Р° Рё С‡РµСЃС‚РЅРѕ СЃРѕРѕР±С‰Рё СЂРµР·СѓР»СЊС‚Р°С‚.
+Проверь текущее состояние проекта и честно сообщи результат.
 
 Scope: $ARGUMENTS
 
-Р’С‹РїРѕР»РЅРё СЃС‚СЂРѕРіРѕ РїРѕ РїРѕСЂСЏРґРєСѓ:
+Выполни строго по порядку:
 
 ```
-1. (вручную: Edit → Clear))
-2. (вручную)
-3. (вручную: Console)show_errors=true, show_warnings=true, limit=50)
-4. Test Runner → EditMode → Run All (вручную)
-5. (вручную: Console)search_term="TESTS_DONE")
-6. Test Runner → PlayMode → Run All (вручную)
-7. (вручную: Console)search_term="TESTS_DONE")
+1. read_console(action: "clear")
+
+2. refresh_unity(mode: "if_dirty", compile: "request", wait_for_ready: true)
+
+3. read_console(action: "get", types: ["error", "warning"], count: 50)
+
+4. ТОЛЬКО если ошибок нет:
+   run_tests(mode: "EditMode", include_failed_tests: true)
+   -> get_test_job(job_id: ..., include_failed_tests: true, wait_timeout: 60)
+   -> дождись статуса succeeded/failed
+
+5. ТОЛЬКО если ошибок нет:
+   run_tests(mode: "PlayMode", include_failed_tests: true, init_timeout: 120000)
+   -> get_test_job(job_id: ..., include_failed_tests: true, wait_timeout: 120)
 ```
 
-`clear` РёРґС‘С‚ **РґРѕ** РїСЂРѕРІРµСЂРєРё вЂ” РёРЅР°С‡Рµ СЃС‚Р°СЂС‹Рµ РѕС€РёР±РєРё РІС‹РіР»СЏРґСЏС‚ РєР°Рє РЅРѕРІС‹Рµ.
+`clear` идёт **до** проверки — иначе старые ошибки выглядят как новые.
 
-Р’С‹РІРµРґРё С‚Р°Р±Р»РёС†Сѓ:
+Выведи таблицу:
 
-| РЁР°Рі | РљРѕРјР°РЅРґР° | Р РµР·СѓР»СЊС‚Р°С‚ | Р”РµС‚Р°Р»Рё |
+| Шаг | Команда | Результат | Детали |
 |-----|---------|-----------|--------|
 | 1 | ... | passed / failed / not-run | ... |
 
-**РљСЂРёС‚РёС‡РЅРѕ:** РµСЃР»Рё Unity Editor РЅРµ Р·Р°РїСѓС‰РµРЅ РёР»Рё MCP РЅРµРґРѕСЃС‚СѓРїРµРЅ вЂ” РќР• РІС‹РґСѓРјС‹РІР°Р№ СЂРµР·СѓР»СЊС‚Р°С‚.
-РќР°РїРёС€Рё СЂРѕРІРЅРѕ:
+**Критично:** если Unity Editor не запущен или MCP недоступен — НЕ выдумывай результат.
+Напиши ровно:
 
 ```
-Not verified: Unity Editor РЅРµ Р·Р°РїСѓС‰РµРЅ, РєРѕРјРїРёР»СЏС†РёСЏ Рё С‚РµСЃС‚С‹ РЅРµ РІС‹РїРѕР»РЅСЏР»РёСЃСЊ.
+Not verified: Unity Editor не запущен, компиляция и тесты не выполнялись.
 ```
 
-Рё Р·Р°РІРµСЂС€Рё. РћС‚РјРµС‚РєР° `not-run` РІ С‚Р°Р±Р»РёС†Рµ С‡РµСЃС‚РЅРµРµ, С‡РµРј РІС‹РґСѓРјР°РЅРЅС‹Р№ `passed`.
+и заверши. Отметка `not-run` в таблице честнее, чем выдуманный `passed`.

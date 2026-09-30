@@ -162,7 +162,7 @@ private void OnDisable() => _input.DisableGameplayInput();
 3. Выбери фреймворк (UGUI / UI Toolkit) и обоснуй
 4. Собери экран
 5. Подпишись на события геймплея (парно)
-6. Проверь: `recompile` → `console()` → Play Mode
+6. Проверь: `refresh_unity(compile: "request")` → `read_console(types: ["error"])` → `manage_editor(action: "play")` → скриншот → `manage_editor(action: "stop")`
 
 ## Когда я вызываю других
 

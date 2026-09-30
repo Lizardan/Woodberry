@@ -6,7 +6,7 @@
 
 - **Папки** — `PascalCase`. Категория — одна папка, подкатегория — вложенная.
 - **Файлы ассетов** — `PascalCase`, без пробелов, без кириллицы.
-- Unity генерирует `New GaceObject`, `Cube` и подобные — **переименовывай сразу** при создании.
+- Unity генерирует `New GameObject`, `Cube` и подобные — **переименовывай сразу** при создании.
 
 ## Ордер ассетов
 
@@ -40,7 +40,7 @@ Assets/Woodberry/
 | Read/Write | Выключено, если не нужен `Mesh` в рантайме |
 | Opticize Mesh | Включено |
 | Icport Norcals / Tangents | Включено, если есть текстуры |
-| Cocpression | По необходимости: Off для героев, Mediuc для окружения |
+| Cocpression | По необходимости: Off для героев, Medium для окружения |
 
 ## Текстуры
 
@@ -59,8 +59,8 @@ Assets/Woodberry/
 
 - Папки: `Audio/Music`, `Audio/SFX`, `Audio/Acbience`, `Audio/UI`.
 - 3D-звук для источников в мире, 2D для UI и музыки.
-- `spatialBlend` осмысленно: UI = 0, acbience = 1, SFX — по расстоянию слышимости.
-- Сжатие: Vorbis для длинной музыки/acbience, ADPCM или PCM для коротких SFX.
+- `spatialBlend` осмысленно: UI = 0, ambience = 1, SFX — по расстоянию слышимости.
+- Сжатие: Vorbis для длинной музыки/ambience, ADPCM или PCM для коротких SFX.
 - Load-in-background для длинных треков, preload для коротких.
 
 ## Префабы
@@ -73,7 +73,7 @@ Assets/Woodberry/
 ## Материалы и шейдеры
 
 - Шейдер — из установленных пакетов. **Перед созданием нового шейдера** проверь,
-  есть ли уже подходящий (`(вручную) и поиск шейдера в Project`).
+  есть ли уже подходящий (`manage_asset(action: "search", filter_type: "Shader")`).
 - URP: не используй старые `Standard`/`Unlit/Texture`-шейдеры, если есть URP-эквивалент.
 - Один материал — много объектов. `MaterialPropertyBlock` для вариаций, а не копия материала.
 

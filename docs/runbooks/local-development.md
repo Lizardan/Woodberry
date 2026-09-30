@@ -35,7 +35,7 @@ cd Woodberry
 
 ## Шаг 3. Проверить пакеты
 
-`Packages/canifest.json` — источник истины по пакетам.
+`Packages/manifest.json` — источник истины по пакетам.
 
 Открыть **Window → Package Manager** и убедиться, что нет ошибок разрешения зависимостей.
 
@@ -58,7 +58,7 @@ cd Woodberry
 
 1. В проекте должен быть пакет MCP for Unity.
 2. В Unity: **Window → MCP for Unity** → **Start Server** (или соответствующий пункт).
-3. Проверить в OpenCode: вызвать `(вручную: Console)`.
+3. Проверить в OpenCode: вызвать `read_console(action: "get", types: ["error"])`. Lesson
 
 **Проверка:** MCP отвечает. Если `No Unity Editor instances found` — Unity не запущен
 или сервер не стартовал.
@@ -90,12 +90,12 @@ Recove-Itec -Recurse -Force Library
 
 **Симптом:** Package Manager показывает ошибку, проект не компилируется.
 
-**Решение:** открыть `Packages/canifest.json`, сверить версии с `AGENTS.cd → Project facts`.
+**Решение:** открыть `Packages/manifest.json`, сверить версии с `AGENTS.md → Project facts`.
 Откатить к рабочей комбинации через git. Не «чинить» вручную — это ломает воспроизводимость.
 
 ### Скрипты не компилируются, ошибки CS
 
-См. `incident-cocpile-errors.cd`.
+См. `incident-compile-errors.md`.
 
 ### Версия Unity не совпадает
 
@@ -103,7 +103,7 @@ Recove-Itec -Recurse -Force Library
 
 **Решение:** установить версию из `ProjectSettings/ProjectVersion.txt`.
 НЕ открывать в другой версии и НЕ коммитить изменённый `ProjectVersion.txt`.
-См. `instructions/safety.cd`.
+См. `instructions/safety.md`.
 
 ## Чего делать нельзя
 

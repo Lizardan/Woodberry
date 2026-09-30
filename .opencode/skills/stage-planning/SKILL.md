@@ -101,7 +101,7 @@ docs/stages/
 ❌ «Играбельно»
 
 ✅ «Игрок передвигается по XZ в Play Mode»
-✅ «console(level="error") пуст»
+✅ «`read_console(action: "get", types: ["error"])` пуст»
 ✅ «EditMode-тесты проходят»
 ✅ «Ноль сетевых API вне Assets/Scripts/Net/ — проверяется grep'ом»
 ✅ «Gameplay-asmdef не ссылается на UnityEditor»

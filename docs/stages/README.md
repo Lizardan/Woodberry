@@ -37,7 +37,7 @@ Stage — это единица поставки, а не единица код�
 2. Отдать stage агенту в режиме `plan` → получить implementation plan.
 3. Согласовать plan и уменьшить scope.
 4. Отдать в `build` → реализовать строго по file.
-5. `verify` → прогнать тесты и `console(level="error")`.
+5. `verify` → прогнать тесты и `read_console(action: "get", types: ["error"])`.
 6. `review` → отдельный проход, найти drift.
 7. Создать report в `docs/reports/`.
 8. Перейти к следующему stage.

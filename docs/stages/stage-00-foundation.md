@@ -77,7 +77,7 @@
 
 ## Acceptance criteria
 
-- [ ] Проект компилируется без ошибок (`console(level="error")` чист)
+- [ ] Проект компилируется без ошибок (`read_console(action: "get", types: ["error"])` чист)
 - [ ] Player assembly **не ссылается** на `UnityEditor`
 - [ ] `Woodberry.Core` **не ссылается** на `Woodberry.Gameplay.*` (направление зависимостей вниз)
 - [ ] Игрок передвигается по XZ в Play Mode
@@ -94,7 +94,7 @@
 
 - **EditMode:** вектор движения, нормализация диагонали, нулевой ввод → ноль движения
 - **PlayMode:** контроллер инициализируется, работает, корректно отключается
-- **Компиляция:** `console(level="error")` пуст
+- **Компиляция:** `read_console(action: "get", types: ["error"])` пуст
 
 ## Risks
 

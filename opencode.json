@@ -1,120 +1,147 @@
-﻿{
-    "$schema":  "https://opencode.ai/config.json",
-    "instructions":  [
-                         "AGENTS.md",
-                         "instructions/*.md",
-                         "docs/specs/*.md"
-                     ],
-    "permission":  {
-                       "skill":  {
-                                     "*":  "deny",
-                                     "unity-architecture-review":  "allow",
-                                     "unity-test-strategy":  "allow",
-                                     "unity-prefab-safety":  "allow",
-                                     "coop-networking-model":  "allow",
-                                     "horror-level-design":  "allow",
-                                     "urp-visual-tuning":  "allow",
-                                     "stage-planning":  "allow",
-                                     "stage-report":  "allow",
-                                     "debug-unity-console":  "allow",
-                                     "code-review-checklist":  "allow",
-                                     "git-diff-analysis":  "allow"
-                                 },
-                       "bash":  {
-                                    "*":  "ask",
-                                    "git status*":  "allow",
-                                    "git diff*":  "allow",
-                                    "git log*":  "allow",
-                                    "git add*":  "ask",
-                                    "git commit*":  "ask",
-                                    "git push*":  "deny",
-                                    "git reset --hard*":  "deny",
-                                    "git checkout .*":  "deny",
-                                    "git clean*":  "deny",
-                                    "rm -rf*":  "deny",
-                                    "Remove-Item -Recurse*":  "deny",
-                                    "git checkout*":  "deny"
-                                },
-                       "edit":  "allow",
-                       "webfetch":  "allow"
-                   },
-    "agent":  {
-                  "build":  {
-                                "permission":  {
-                                                   "task":  {
-                                                                "*":  "deny",
-                                                                "system-analyst":  "allow",
-                                                                "gameplay-engineer":  "allow",
-                                                                "scene-level-designer":  "allow",
-                                                                "ui-engineer":  "allow",
-                                                                "technical-artist":  "allow",
-                                                                "unity-tools-engineer":  "allow",
-                                                                "qa-analyst":  "allow",
-                                                                "code-reviewer":  "allow",
-                                                                "explore":  "allow",
-                                                                "general":  "allow"
-                                                            },
-                                                   "bash":  {
-                                                                "*":  "allow",
-                                                                "git push*":  "deny",
-                                                                "git commit*":  "ask",
-                                                                "git reset --hard*":  "deny",
-                                                                "git clean*":  "deny",
-                                                                "rm -rf*":  "deny",
-                                                                "Remove-Item -Recurse*":  "deny"
-                                                            }
-                                               }
-                            },
-                  "plan":  {
-                               "permission":  {
-                                                  "edit":  "deny",
-                                                  "task":  {
-                                                               "*":  "deny",
-                                                               "code-reviewer":  "allow",
-                                                               "explore":  "allow"
-                                                           },
-                                                  "bash":  {
-                                                               "*":  "ask",
-                                                               "git status*":  "allow",
-                                                               "git diff*":  "allow",
-                                                               "git log*":  "allow"
-                                                           }
-                                              }
-                           },
-                  "gameplay-engineer":  {
-                                            "permission":  {
-                                                               "edit":  "allow"
-                                                           }
-                                        },
-                  "qa-analyst":  {
-                                     "permission":  {
-                                                        "edit":  "allow"
-                                                    }
-                                 },
-                  "system-analyst":  {
-                                         "permission":  {
-                                                            "edit":  "allow"
-                                                        }
-                                     },
-                  "unity-tools-engineer":  {
-                                               "permission":  {
-                                                                  "edit":  "allow"
-                                                              }
-                                           },
-                  "scene-level-designer":  {
-                                               "permission":  {
-                                                                  "edit":  "allow"
-                                                              }
-                                           },
-                  "ui-engineer":  {
-                                      "permission":  {
-                                                         "edit":  "allow"
-                                                     }
-                                  },
-                  "technical-artist":  {
-                                           "permission":  {
-                                                              "edit":  "allow"
-                                                          }
-                                       }
-              }
+{
+    "$schema": "https://opencode.ai/config.json",
+    "instructions": [
+        "AGENTS.md",
+        "instructions/*.md",
+        "docs/specs/*.md"
+    ],
+    "model": "opencode/big-pickle",
+    "mcp": {
+        "unityMCP": {
+            "type": "local",
+            "command": [
+                "uvx",
+                "--from",
+                "mcpforunityserver==10.2.0",
+                "mcp-for-unity",
+                "--transport",
+                "stdio"
+            ],
+            "enabled": true
+        }
+    },
+    "permission": {
+        "skill": {
+            "*": "deny",
+            "unity-architecture-review": "allow",
+            "unity-test-strategy": "allow",
+            "unity-prefab-safety": "allow",
+            "coop-networking-model": "allow",
+            "horror-level-design": "allow",
+            "urp-visual-tuning": "allow",
+            "stage-planning": "allow",
+            "stage-report": "allow",
+            "debug-unity-console": "allow",
+            "code-review-checklist": "allow",
+            "git-diff-analysis": "allow"
+        },
+        "bash": {
+            "*": "ask",
+            "git status*": "allow",
+            "git diff*": "allow",
+            "git log*": "allow",
+            "git add*": "ask",
+            "git commit*": "ask",
+            "git push*": "deny",
+            "git reset --hard*": "deny",
+            "git checkout .*": "deny",
+            "git clean*": "deny",
+            "rm -rf*": "deny",
+            "Remove-Item -Recurse*": "deny",
+            "git checkout*": "deny"
+        },
+        "edit": "allow",
+        "webfetch": "allow"
+    },
+    "agent": {
+        "build": {
+            "max_tokens": 32000,
+            "permission": {
+                "task": {
+                    "*": "deny",
+                    "system-analyst": "allow",
+                    "gameplay-engineer": "allow",
+                    "scene-level-designer": "allow",
+                    "ui-engineer": "allow",
+                    "technical-artist": "allow",
+                    "unity-tools-engineer": "allow",
+                    "qa-analyst": "allow",
+                    "code-reviewer": "allow",
+                    "explore": "allow",
+                    "general": "allow"
+                },
+                "bash": {
+                    "*": "allow",
+                    "git push*": "deny",
+                    "git commit*": "ask",
+                    "git reset --hard*": "deny",
+                    "git clean*": "deny",
+                    "rm -rf*": "deny",
+                    "Remove-Item -Recurse*": "deny"
+                }
+            }
+        },
+        "plan": {
+            "max_tokens": 16000,
+            "permission": {
+                "edit": "deny",
+                "task": {
+                    "*": "deny",
+                    "code-reviewer": "allow",
+                    "explore": "allow"
+                },
+                "bash": {
+                    "*": "ask",
+                    "git status*": "allow",
+                    "git diff*": "allow",
+                    "git log*": "allow"
+                }
+            }
+        },
+        "gameplay-engineer": {
+            "max_tokens": 24000,
+            "permission": {
+                "edit": "allow"
+            }
+        },
+        "qa-analyst": {
+            "max_tokens": 16000,
+            "permission": {
+                "edit": "allow"
+            }
+        },
+        "system-analyst": {
+            "max_tokens": 16000,
+            "permission": {
+                "edit": "allow"
+            }
+        },
+        "unity-tools-engineer": {
+            "max_tokens": 16000,
+            "permission": {
+                "edit": "allow"
+            }
+        },
+        "scene-level-designer": {
+            "max_tokens": 16000,
+            "permission": {
+                "edit": "allow"
+            }
+        },
+        "ui-engineer": {
+            "max_tokens": 20000,
+            "permission": {
+                "edit": "allow"
+            }
+        },
+        "technical-artist": {
+            "max_tokens": 16000,
+            "permission": {
+                "edit": "allow"
+            }
+        },
+        "code-reviewer": {
+            "max_tokens": 20000
+        }
+    }
 }

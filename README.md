@@ -1,268 +1,270 @@
 # Woodberry
 
-РљРѕРѕРїРµСЂР°С‚РёРІРЅС‹Р№ С…РѕСЂСЂРѕСЂ СЃ РІРёРґРѕРј СЃРІРµСЂС…Сѓ (СЂРµС„РµСЂРµРЅСЃ РєР°РјРµСЂС‹ Рё С‡РёС‚Р°РµРјРѕСЃС‚Рё: GTA 2) РІ РјСЂР°С‡РЅРѕР№ Р°С‚РјРѕСЃС„РµСЂРµ.
+Кооперативный хоррор с видом сверху (референс камеры и читаемости: GTA 2) в мрачной атмосфере.
 
-Unity `6000.6.3f1` В· URP `17.6.0` В· Input System В· AI Navigation В· Test Framework
-
----
-
-## РЎС‚Р°С‚СѓСЃ РїСЂРѕРµРєС‚Р°
-
-**Stage 0 вЂ” Foundation** РіРѕС‚РѕРІ Рє СЂР°Р±РѕС‚Рµ. РљРѕРґ РµС‰С‘ РЅРµ РЅР°РїРёСЃР°РЅ, РЅРѕ РёРЅС„СЂР°СЃС‚СЂСѓРєС‚СѓСЂР°
-РїСЂРѕРµРєС‚Р° Рё OpenCode-СЃР»РѕР№ СЂР°Р·РІС‘СЂРЅСѓС‚С‹.
-
-РђРєС‚РёРІРЅС‹Р№ СЌС‚Р°Рї: [`docs/stages/stage-00-foundation.md`](docs/stages/stage-00-foundation.md)
-
-Р‘Р»РѕРєРµСЂ РґР»СЏ Stage 03: [ADR 0003 вЂ” РІС‹Р±РѕСЂ СЃРµС‚РµРІРѕРіРѕ СЃС‚РµРєР°](docs/adr/0003-networking-stack.md)
-РёРјРµРµС‚ СЃС‚Р°С‚СѓСЃ `Proposed`. РќСѓР¶РЅРѕ РїСЂРёРЅСЏС‚СЊ СЂРµС€РµРЅРёРµ.
+Unity `6000.6.3f1` · URP `17.6.0` · Input System · AI Navigation · Test Framework
 
 ---
 
-## Р‘С‹СЃС‚СЂС‹Р№ СЃС‚Р°СЂС‚
+## Статус проекта
 
-### Р”Р»СЏ СЂР°Р·СЂР°Р±РѕС‚С‡РёРєР°
+**Stage 0 — Foundation** готов к работе. Код ещё не написан, но инфраструктура
+проекта и OpenCode-слой развёрнуты.
+
+Активный этап: [`docs/stages/stage-00-foundation.md`](docs/stages/stage-00-foundation.md)
+
+Блокер для Stage 03: [ADR 0003 — выбор сетевого стека](docs/adr/0003-networking-stack.md)
+имеет статус `Proposed`. Нужно принять решение.
+
+---
+
+## Быстрый старт
+
+### Для разработчика
 
 ```powershell
-# РћС‚РєСЂС‹С‚СЊ РїСЂРѕРµРєС‚
-# Unity Hub в†’ Add в†’ РІС‹Р±СЂР°С‚СЊ РїР°РїРєСѓ в†’ Open
-# РўСЂРµР±СѓРµС‚СЃСЏ РІРµСЂСЃРёСЏ 6000.6.3f1 СЂРѕРІРЅРѕ
+# Открыть проект
+# Unity Hub → Add → выбрать папку → Open
+# Требуется версия 6000.6.3f1 ровно
 
-# РџСЂРѕРІРµСЂРёС‚СЊ, С‡С‚Рѕ РІСЃС‘ РєРѕРјРїРёР»РёСЂСѓРµС‚СЃСЏ
-# Р’ Unity: Window в†’ General в†’ Console, С„РёР»СЊС‚СЂ Errors
+# Проверить, что всё компилируется
+# В Unity: Window → General → Console, фильтр Errors
 ```
 
-РџРѕРґСЂРѕР±РЅР°СЏ РёРЅСЃС‚СЂСѓРєС†РёСЏ: [`docs/runbooks/local-development.md`](docs/runbooks/local-development.md)
+Подробная инструкция: [`docs/runbooks/local-development.md`](docs/runbooks/local-development.md)
 
-### Р”Р»СЏ OpenCode-Р°РіРµРЅС‚Р°
+### Для OpenCode-агента
 
-**1. РџСЂРѕС‡РёС‚Р°Р№ СЃРЅР°С‡Р°Р»Р°** вЂ” Р±РµР· СЌС‚РѕРіРѕ СЂР°Р±РѕС‚Р°С‚СЊ РЅРµР»СЊР·СЏ:
+**1. Прочитай сначала** — без этого работать нельзя:
 
-| Р¤Р°Р№Р» | Р—Р°С‡РµРј |
+| Файл | Зачем |
 |---|---|
-| [`AGENTS.md`](AGENTS.md) | РџСЂРѕРµРєС‚РЅС‹Р№ РєРѕРЅС‚СЂР°РєС‚: СЃР»РѕРё, РїСЂР°РІРёР»Р°, Р·Р°РїСЂРµС‚С‹, DoD |
-| [`opencode.json`](opencode.json) | Control plane: РёРЅСЃС‚СЂСѓРєС†РёРё, permissions, РјР°СЂС€СЂСѓС‚РёР·Р°С†РёСЏ СЂРѕР»РµР№ |
-| [`instructions/safety.md`](instructions/safety.md) | Р§С‚Рѕ РЅРµР»СЊР·СЏ РґРµР»Р°С‚СЊ РЅРёРєРѕРіРґР° |
-| РђРєС‚РёРІРЅС‹Р№ stage file | Р Р°РјРєР° С‚РµРєСѓС‰РµР№ СЂР°Р±РѕС‚С‹ |
+| [`AGENTS.md`](AGENTS.md) | Проектный контракт: слои, правила, запреты, DoD |
+| [`opencode.json`](opencode.json) | Control plane: инструкции, permissions, маршрутизация ролей |
+| [`instructions/safety.md`](instructions/safety.md) | Что нельзя делать никогда |
+| Активный stage file | Рамка текущей работы |
 
-**2. РќР°С‡РЅРё СЃ `plan`**, Р° РЅРµ СЃ РєРѕРґР°. РџР»Р°РЅ вЂ” СЌС‚Рѕ РЅРµ С„РѕСЂРјР°Р»СЊРЅРѕСЃС‚СЊ, Р° СЃРїРѕСЃРѕР±
-РЅРµ Р·Р°РєРѕРґРёСЂРѕРІР°С‚СЊ РЅРµРѕРїСЂРµРґРµР»С‘РЅРЅРѕСЃС‚СЊ.
+**2. Начни с `plan`**, а не с кода. План — это не формальность, а способ
+не закодировать неопределённость.
 
-**3. Р¦РёРєР» СЂР°Р±РѕС‚С‹:**
+**3. Цикл работы:**
 
 ```
-Plan в†’ Spec (РµСЃР»Рё РјРµРЅСЏРµС‚СЃСЏ РєРѕРЅС‚СЂР°РєС‚) в†’ Build в†’ Verify в†’ Review в†’ Report
+Plan → Spec (если меняется контракт) → Build → Verify → Review → Report
 ```
 
-**4. РљРѕРіРѕ Р·РІР°С‚СЊ:**
+**4. Кого звать:**
 
-| Р—Р°РґР°С‡Р° | РђРіРµРЅС‚ |
+| Задача | Агент |
 |---|---|
-| РР·РјРµРЅРёС‚СЊ С‚СЂРµР±РѕРІР°РЅРёСЏ, СЂР°СЃРїР»С‹РІС‡Р°С‚Р°СЏ Р·Р°РґР°С‡Р° | `system-analyst` |
-| РРіСЂРѕРІР°СЏ Р»РѕРіРёРєР°, РјРµС…Р°РЅРёРєРё, С„РёР·РёРєР° | `gameplay-engineer` |
-| РЎС†РµРЅР°, СЃРІРµС‚, РєР°РјРµСЂР°, level flow | `scene-level-designer` |
-| РРЅС‚РµСЂС„РµР№СЃ, HUD, РјРµРЅСЋ | `ui-engineer` |
-| Р’РёР·СѓР°Р», РјР°С‚РµСЂРёР°Р»С‹, С€РµР№РґРµСЂС‹, VFX | `technical-artist` |
-| РЎР±РѕСЂРєР°, CI, РїР°РєРµС‚С‹, Editor-СѓС‚РёР»РёС‚С‹ | `unity-tools-engineer` |
-| РќР°РїРёСЃР°С‚СЊ С‚РµСЃС‚С‹, СЂРµРіСЂРµСЃСЃРёРѕРЅРЅС‹Р№ РїСЂРѕРіРѕРЅ, Р±Р°Рі-СЂРµРїРѕСЂС‚ | `qa-analyst` |
-| **Р РµРІСЊСЋ РёР·РјРµРЅРµРЅРёР№, Р°СЂС…РёС‚РµРєС‚СѓСЂРЅС‹Р№ Р°СѓРґРёС‚, contract drift** | **`code-reviewer`** (read-only) |
+| Изменить требования, расплывчатая задача | `system-analyst` |
+| Игровая логика, механики, физика | `gameplay-engineer` |
+| Сцена, свет, камера, level flow | `scene-level-designer` |
+| Интерфейс, HUD, меню | `ui-engineer` |
+| Визуал, материалы, шейдеры, VFX | `technical-artist` |
+| Сборка, CI, пакеты, Editor-утилиты | `unity-tools-engineer` |
+| Написать тесты, регрессионный прогон, баг-репорт | `qa-analyst` |
+| **Ревью изменений, архитектурный аудит, contract drift** | **`code-reviewer`** (read-only) |
 
-РњР°СЂС€СЂСѓС‚РёР·Р°С†РёСЏ СѓР¶Рµ РЅР°СЃС‚СЂРѕРµРЅР° РІ `opencode.json в†’ agent.build.permission.task`.
+Маршрутизация уже настроена в `opencode.json → agent.build.permission.task`.
 
-**Р Р°Р·РґРµР»РµРЅРёРµ build Рё review:** Р°РіРµРЅС‚, РєРѕС‚РѕСЂС‹Р№ С‚РѕР»СЊРєРѕ С‡С‚Рѕ РЅР°РїРёСЃР°Р» РєРѕРґ, РїР»РѕС…Рѕ РµРіРѕ
-РїСЂРѕРІРµСЂСЏРµС‚. РџРѕСЌС‚РѕРјСѓ `code-reviewer` вЂ” РѕС‚РґРµР»СЊРЅР°СЏ **read-only** СЂРѕР»СЊ (`edit: deny`,
-С‚РѕР»СЊРєРѕ git-РєРѕРјР°РЅРґС‹ РЅР° С‡С‚РµРЅРёРµ), РєРѕС‚РѕСЂР°СЏ Р·Р°РїСѓСЃРєР°РµС‚СЃСЏ *РїРѕСЃР»Рµ* build-Р°РіРµРЅС‚Р°, Р° РЅРµ РІРјРµСЃС‚Рѕ РЅРµРіРѕ.
-РќР°Р№РґРµРЅРЅСѓСЋ РїСЂРѕР±Р»РµРјСѓ РїСЂР°РІРёС‚ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ builder-Р°РіРµРЅС‚ вЂ” РѕС‚РґРµР»СЊРЅС‹Рј РІС‹Р·РѕРІРѕРј.
+**Разделение build и review:** агент, который только что написал код, плохо его
+проверяет. Поэтому `code-reviewer` — отдельная **read-only** роль (`edit: deny`,
+только git-команды на чтение), которая запускается *после* build-агента, а не вместо него.
+Найденную проблему правит соответствующий builder-агент — отдельным вызовом.
 
 ```powershell
-@code-reviewer СЃРґРµР»Р°Р№ review С‚РµРєСѓС‰РёС… РёР·РјРµРЅРµРЅРёР№
-@code-reviewer РїСЂРѕРІРµСЂСЊ РёР·РјРµРЅРµРЅРёСЏ РІ Assets/Scripts/Gameplay/Player/
+@code-reviewer сделай review текущих изменений
+@code-reviewer проверь изменения в Assets/Scripts/Gameplay/Player/
 ```
 
-**5. Skills** вЂ” РїРѕРґРіСЂСѓР¶Р°Р№ РїРѕ Р·Р°РґР°С‡Рµ, РЅРµ Р·Р°СЂР°РЅРµРµ:
+**5. Skills** — подгружай по задаче, не заранее:
 
-| Skill | РљРѕРіРґР° |
+| Skill | Когда |
 |---|---|
-| `stage-planning` | РќР°С‡Р°Р»Рѕ РЅРµС‚СЂРёРІРёР°Р»СЊРЅРѕР№ Р·Р°РґР°С‡Рё |
-| `unity-test-strategy` | РќРѕРІР°СЏ Р»РѕРіРёРєР°, РїР°РґР°СЋС‰РёРµ С‚РµСЃС‚С‹ |
-| `code-review-checklist` | Р§РµРєР»РёСЃС‚С‹ РїРѕ СЃР»РѕСЏРј РґР»СЏ `code-reviewer` |
-| `git-diff-analysis` | РђРЅР°Р»РёР· РґРёС„С„Р° Рё РіСЂСѓРїРїРёСЂРѕРІРєР° РїРѕ СЃР»РѕСЏРј |
-| `unity-architecture-review` | Р‘С‹СЃС‚СЂС‹Рµ grep-РїСЂРѕРІРµСЂРєРё Р°СЂС…РёС‚РµРєС‚СѓСЂС‹ |
-| `unity-prefab-safety` | РџСЂРµС„Р°Р±С‹, СЃС†РµРЅС‹, `.meta` |
-| `coop-networking-model` | РџРµСЂРµРґ Stage 03 РёР»Рё СЃРµС‚РµРІС‹Рј РєРѕРґРѕРј |
-| `horror-level-design` | РЎС†РµРЅС‹, СЃРІРµС‚, В«СЃР»РёС€РєРѕРј С‚РµРјРЅРѕВ» |
-| `urp-visual-tuning` | Р’РёР·СѓР°Р», draw calls, frame time |
-| `stage-report` | Р—Р°РІРµСЂС€РµРЅРёРµ СЌС‚Р°РїР° |
-| `debug-unity-console` | РћС€РёР±РєРё РєРѕРјРїРёР»СЏС†РёРё, РїР°РґР°СЋС‰РёРµ С‚РµСЃС‚С‹ |
+| `stage-planning` | Начало нетривиальной задачи |
+| `unity-test-strategy` | Новая логика, падающие тесты |
+| `code-review-checklist` | Чеклисты по слоям для `code-reviewer` |
+| `git-diff-analysis` | Анализ диффа и группировка по слоям |
+| `unity-architecture-review` | Быстрые grep-проверки архитектуры |
+| `unity-prefab-safety` | Префабы, сцены, `.meta` |
+| `coop-networking-model` | Перед Stage 03 или сетевым кодом |
+| `horror-level-design` | Сцены, свет, «слишком темно» |
+| `urp-visual-tuning` | Визуал, draw calls, frame time |
+| `stage-report` | Завершение этапа |
+| `debug-unity-console` | Ошибки компиляции, падающие тесты |
 
-`code-review-checklist` Рё `git-diff-analysis` РґРѕСЃС‚СѓРїРЅС‹ **С‚РѕР»СЊРєРѕ** `code-reviewer` вЂ”
-Сѓ РЅРµРіРѕ РІ СЃРєРёР»Р»Р°С… `*: deny`, РєСЂРѕРјРµ СЌС‚РёС… РґРІСѓС…. Р­С‚Рѕ РіР°СЂР°РЅС‚РёСЂСѓРµС‚, С‡С‚Рѕ read-only СЂРѕР»СЊ
-РЅРµ РїРѕРґРіСЂСѓР¶Р°С‚ Р»РёС€РЅРµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°.
+`code-review-checklist` и `git-diff-analysis` доступны **только** `code-reviewer` —
+у него в скиллах `*: deny`, кроме этих двух. Это гарантирует, что read-only роль
+не подгружат лишнего контекста.
 
-**6. Р“РѕС‚РѕРІС‹Рµ РїСЂРѕРјРїС‚С‹** (РІС‹Р·С‹РІР°СЋС‚СЃСЏ РєР°Рє `/plan-stage`, `/review` Рё С‚.Рґ.):
+**6. Готовые промпты** (вызываются как `/plan-stage`, `/review` и т.д.):
 
-| РљРѕРјР°РЅРґР° | Р§С‚Рѕ РґРµР»Р°РµС‚ |
+| Команда | Что делает |
 |---|---|
-| `/onboard` | РЎРІРѕРґРєР° РїРѕ РїСЂРѕРµРєС‚Сѓ РґР»СЏ РЅРѕРІРѕРіРѕ СЂР°Р·СЂР°Р±РѕС‚С‡РёРєР° РёР»Рё Р°РіРµРЅС‚Р° |
-| `/plan-stage <Р·Р°РґР°С‡Р°>` | РЎРїР»Р°РЅРёСЂРѕРІР°С‚СЊ СЌС‚Р°Рї (СЂРµР¶РёРј `plan`, С„Р°Р№Р»С‹ РЅРµ РјРµРЅСЏСЋС‚СЃСЏ) |
-| `/build-stage <РїР»Р°РЅ>` | Р РµР°Р»РёР·РѕРІР°С‚СЊ СЃРѕРіР»Р°СЃРѕРІР°РЅРЅС‹Р№ РїР»Р°РЅ |
-| `/verify` | РљРѕРјРїРёР»СЏС†РёСЏ + EditMode/PlayMode С‚РµСЃС‚С‹, С‡РµСЃС‚РЅС‹Р№ РѕС‚С‡С‘С‚ |
-| `/review` | РЎС‚СЂРѕРіРёР№ review РёР·РјРµРЅРµРЅРёР№ |
-| `/debug <РїСЂРѕР±Р»РµРјР°>` | Р Р°СЃСЃР»РµРґРѕРІР°С‚СЊ Р±Р°Рі РёР»Рё РѕС€РёР±РєСѓ РєРѕРјРїРёР»СЏС†РёРё |
-| `/stage-report <stage>` | РЎРѕР·РґР°С‚СЊ stage report |
-| `/healthcheck` | РџСЂРѕРІРµСЂРєР° С†РµР»РѕСЃС‚РЅРѕСЃС‚Рё СЂРµРїРѕР·РёС‚РѕСЂРёСЏ |
+| `/onboard` | Сводка по проекту для нового разработчика или агента |
+| `/plan-stage <задача>` | Спланировать этап (режим `plan`, файлы не меняются) |
+| `/build-stage <план>` | Реализовать согласованный план |
+| `/verify` | Компиляция + EditMode/PlayMode тесты, честный отчёт |
+| `/review` | Строгий review изменений |
+| `/debug <проблема>` | Расследовать баг или ошибку компиляции |
+| `/stage-report <stage>` | Создать stage report |
+| `/healthcheck` | Проверка целостности репозитория |
 
 ---
 
-## РўСЂРё РІРµС‰Рё, РєРѕС‚РѕСЂС‹Рµ РЅСѓР¶РЅРѕ Р·РЅР°С‚СЊ СЃСЂР°Р·Сѓ
+## Три вещи, которые нужно знать сразу
 
-### 1. РљРѕРѕРїРµСЂР°С‚РёРІ вЂ” СЌС‚Рѕ Р°СЂС…РёС‚РµРєС‚СѓСЂРЅРѕРµ РѕРіСЂР°РЅРёС‡РµРЅРёРµ, Р° РЅРµ С„РёС‡Р°
+### 1. Кооператив — это архитектурное ограничение, а не фича
 
-РЎРµС‚РµРІРѕР№ seam РІРІРѕРґРёС‚СЃСЏ СЃ РїРµСЂРІРѕРіРѕ РґРЅСЏ, РґР°Р¶Рµ РµСЃР»Рё СЃРµС‚РµРІРѕРіРѕ РєРѕРґР° РµС‰С‘ РЅРµС‚.
-Р“РµР№РјРїР»РµР№ РѕР±С‰Р°РµС‚СЃСЏ СЃ РјРёСЂРѕРј С‚РѕР»СЊРєРѕ С‡РµСЂРµР· `INetworkService` РёР· `Core`.
-РЎРµС‚РµРІС‹Рµ API Р¶РёРІСѓС‚ **С‚РѕР»СЊРєРѕ** РІ `Assets/Scripts/Net/`.
+Сетевой seam вводится с первого дня, даже если сетевого кода ещё нет.
+Геймплей общается с миром только через `INetworkService` из `Core`.
+Сетевые API живут **только** в `Assets/Scripts/Net/`.
 
-Р•СЃР»Рё Р°СЂС…РёС‚РµРєС‚СѓСЂСѓ РїСЂРѕРµРєС‚РёСЂРѕРІР°С‚СЊ Р±РµР· СѓС‡С‘С‚Р° СЃРµС‚Рё, РїРѕС‚РѕРј РїСЂРёРґС‘С‚СЃСЏ РїРµСЂРµРїРёСЃР°С‚СЊ РІСЃС‘.
+Если архитектуру проектировать без учёта сети, потом придётся переписать всё.
 
-### 2. РџСЂР°РІРёР»Р° РіСЂР°РЅРёС† вЂ” РєРѕРјРїРёР»РёСЂСѓРµРјС‹Р№ РєРѕРЅС‚СЂР°РєС‚, Р° РЅРµ СЃРѕРіР»Р°С€РµРЅРёРµ
+### 2. Правила границ — компилируемый контракт, а не соглашение
 
 ```
-UI  в”Ђв”Ђв”Ђв”Ђв”Ђв–є  Gameplay  в”Ђв”Ђв”Ђв”Ђв”Ђв–є  Core
-                в–І
-AI  в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”
+UI  ─────►  Gameplay  ─────►  Core
+                ▲
+AI  ────────────┘
 
-Net в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв–є  Core   (РѕР±СЂР°С‚РЅРѕ вЂ” С‚РѕР»СЊРєРѕ С‡РµСЂРµР· РёРЅС‚РµСЂС„РµР№СЃС‹)
+Net ───────────►  Core   (обратно — только через интерфейсы)
 
-Editor в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв–є  РІСЃС‘ (С‚РѕР»СЊРєРѕ РІ СЂРµРґР°РєС‚РѕСЂРµ)
+Editor ────────►  всё (только в редакторе)
 ```
 
-РќР°СЂСѓС€РµРЅРёРµ Р»РѕРІРёС‚СЃСЏ РєРѕРјРїРёР»СЏС‚РѕСЂРѕРј Рё grep'РѕРј, Р° РЅРµ РїР°РјСЏС‚СЊСЋ Р°РІС‚РѕСЂР°.
+Нарушение ловится компилятором и grep'ом, а не памятью автора.
 
-### 3. Unity-Р°СЃСЃРµС‚С‹ РЅРµ СЂРµРґР°РєС‚РёСЂСѓСЋС‚СЃСЏ РєР°Рє С‚РµРєСЃС‚
+### 3. Unity-ассеты не редактируются как текст
 
-`.unity` Рё `.prefab` вЂ” С‚РѕР»СЊРєРѕ С‡РµСЂРµР· СЂРµРґР°РєС‚РѕСЂ РёР»Рё Unity MCP.
-`.meta` РєРѕРјРјРёС‚СЏС‚СЃСЏ РІСЃРµРіРґР°, СѓРґР°Р»СЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ С‡РµСЂРµР· Unity.
+`.unity` и `.prefab` — только через редактор или Unity MCP.
+`.meta` коммитятся всегда, удаляются только через Unity.
 
-Р СѓС‡РЅРѕР№ YAML-СЂРµРґР°РєС‚РёС‚ Unity-Р°СЃСЃРµС‚РѕРІ вЂ” СЃР°РјР°СЏ С‡Р°СЃС‚Р°СЏ РїСЂРёС‡РёРЅР° С‚РёС…РѕР№ РїРѕР»РѕРјРєРё РїСЂРѕРµРєС‚Р°.
+Ручной YAML-редактит Unity-ассетов — самая частая причина тихой поломки проекта.
 
 ---
 
-## РЎС‚СЂСѓРєС‚СѓСЂР°
+## Структура
 
 ```
 Woodberry/
-в”њв”Ђ AGENTS.md                     в†ђ РїСЂРѕРµРєС‚РЅС‹Р№ РєРѕРЅС‚СЂР°РєС‚
-в”њв”Ђ opencode.json                 в†ђ control plane
-в”њв”Ђ instructions/                 в†ђ РґРѕР»РіРѕР¶РёРІСѓС‰РёРµ РїСЂР°РІРёР»Р°
-в”њв”Ђ docs/
-в”‚  в”њв”Ђ specs/                     в†ђ С‡С‚Рѕ РґРµР»Р°РµРј (durable РєРѕРЅС‚СЂР°РєС‚С‹)
-в”‚  в”њв”Ђ stages/                    в†ђ СЂР°РјРєР° СЌС‚Р°РїР°
-в”‚  в”њв”Ђ reports/                   в†ђ С‡С‚Рѕ СЂРµР°Р»СЊРЅРѕ СЃРґРµР»Р°Р»Рё
-в”‚  в”њв”Ђ adr/                       в†ђ РїРѕС‡РµРјСѓ С‚Р°Рє
-в”‚  в””в”Ђ runbooks/                  в†ђ РєР°Рє Р·Р°РїСѓСЃРєР°С‚СЊ/С‡РёРЅРёС‚СЊ
-в”њв”Ђ .opencode/
-в”‚  в”њв”Ђ agents/                    в†ђ 7 СЂРѕР»РµР№
-в”‚  в”њв”Ђ skills/                    в†ђ 9 playbooks
-в”‚  в”њв”Ђ patterns/                  в†ђ whitelist / blacklist
-в”‚  в”њв”Ђ templates/                 в†ђ С€Р°Р±Р»РѕРЅС‹ РѕС‚С‡С‘С‚РѕРІ
-в”‚  в””в”Ђ commands/                  в†ђ РіРѕС‚РѕРІС‹Рµ РїСЂРѕРјРїС‚С‹
-в””в”Ђ Assets/
-   в”њв”Ђ Scenes/                    в†ђ СЃР»СѓР¶РµР±РЅС‹Рµ СЃС†РµРЅС‹ Unity
-   в”њв”Ђ Settings/                  в†ђ URP assets
-   в””в”Ђ Woodberry/                 в†ђ Р’Р•РЎР¬ РёРіСЂРѕРІРѕР№ РєРѕРЅС‚РµРЅС‚
-      в””в”Ђ Art/ Audio/ Materials/ Models/ Prefabs/ Scenes/ Settings/ UI/ VFX/
-   в”њв”Ђ Scripts/                   в†ђ Р’Р•РЎР¬ C# РєРѕРґ
-   в”‚  в””в”Ђ Core/ Gameplay/ AI/ Net/ UI/ CameraRig/ Audio/ Save/ Editor/
-   в””в”Ђ Tests/
-      в””в”Ђ EditMode/ PlayMode/
+├─ AGENTS.md                     ← проектный контракт
+├─ opencode.json                 ← control plane
+├─ instructions/                 ← долгоживущие правила
+├─ docs/
+│  ├─ specs/                     ← что делаем (durable контракты)
+│  ├─ stages/                    ← рамка этапа
+│  ├─ reports/                   ← что реально сделали
+│  ├─ adr/                       ← почему так
+│  └─ runbooks/                  ← как запускать/чинить
+├─ .opencode/
+│  ├─ agents/                    ← 7 ролей
+│  ├─ skills/                    ← 9 playbooks
+│  ├─ patterns/                  ← whitelist / blacklist
+│  ├─ templates/                 ← шаблоны отчётов
+│  └─ commands/                  ← готовые промпты
+└─ Assets/
+   ├─ Scenes/                    ← служебные сцены Unity
+   ├─ Settings/                  ← URP assets
+   └─ Woodberry/                 ← ВЕСЬ игровой контент
+      └─ Art/ Audio/ Materials/ Models/ Prefabs/ Scenes/ Settings/ UI/ VFX/
+   ├─ Scripts/                   ← ВЕСЬ C# код
+   │  └─ Core/ Gameplay/ AI/ Net/ UI/ CameraRig/ Audio/ Save/ Editor/
+   └─ Tests/
+      └─ EditMode/ PlayMode/
 ```
 
 ---
 
-## Р”РѕРєСѓРјРµРЅС‚Р°С†РёСЏ
+## Документация
 
-### Р§С‚Рѕ РіРґРµ РёСЃРєР°С‚СЊ
+### Что где искать
 
-| Р’РѕРїСЂРѕСЃ | Р¤Р°Р№Р» |
+| Вопрос | Файл |
 |---|---|
-| Р§С‚Рѕ СЌС‚Рѕ Р·Р° РїСЂРѕРµРєС‚? | [`docs/specs/game-vision.md`](docs/specs/game-vision.md) |
-| РљР°РєРёРµ РїСЂР°РІРёР»Р° Р°СЂС…РёС‚РµРєС‚СѓСЂС‹? | [`AGENTS.md`](AGENTS.md) |
-| Р§С‚Рѕ СЃС‚СЂРѕРёРј СЃРµР№С‡Р°СЃ? | [`docs/stages/`](docs/stages/) |
-| РџРѕС‡РµРјСѓ С‚Р°РєРѕР№ СЃС‚РµРє? | [`docs/adr/`](docs/adr/) |
-| РљР°Рє Р·Р°РїСѓСЃС‚РёС‚СЊ? | [`docs/runbooks/local-development.md`](docs/runbooks/local-development.md) |
-| РљР°Рє Р·Р°РїСѓСЃС‚РёС‚СЊ С‚РµСЃС‚С‹? | [`docs/runbooks/test-workflow.md`](docs/runbooks/test-workflow.md) |
-| РљР°Рє СЂР°Р±РѕС‚Р°С‚СЊ С‡РµСЂРµР· MCP? | [`docs/runbooks/unity-automation.md`](docs/runbooks/unity-automation.md) |
-| РљР°Рє РґРѕР±Р°РІРёС‚СЊ РєРѕРЅС‚РµРЅС‚? | [`docs/runbooks/adding-content.md`](docs/runbooks/adding-content.md) |
-| РљР°Рє РєРѕРјРјРёС‚РёС‚СЊ? | [`docs/runbooks/git-workflow.md`](docs/runbooks/git-workflow.md) |
-| РљР°Рє СЃРѕР±СЂР°С‚СЊ СЂРµР»РёР·? | [`docs/runbooks/build-and-release.md`](docs/runbooks/build-and-release.md) |
-| РћС€РёР±РєРё РєРѕРјРїРёР»СЏС†РёРё? | [`docs/runbooks/incident-compile-errors.md`](docs/runbooks/incident-compile-errors.md) |
+| Что это за проект? | [`docs/specs/game-vision.md`](docs/specs/game-vision.md) |
+| Какие правила архитектуры? | [`AGENTS.md`](AGENTS.md) |
+| Что строим сейчас? | [`docs/stages/`](docs/stages/) |
+| Почему такой стек? | [`docs/adr/`](docs/adr/) |
+| Как запустить? | [`docs/runbooks/local-development.md`](docs/runbooks/local-development.md) |
+| Как запустить тесты? | [`docs/runbooks/test-workflow.md`](docs/runbooks/test-workflow.md) |
+| Как работать через MCP? | [`docs/runbooks/unity-automation.md`](docs/runbooks/unity-automation.md) |
+| Как добавить контент? | [`docs/runbooks/adding-content.md`](docs/runbooks/adding-content.md) |
+| Как коммитить? | [`docs/runbooks/git-workflow.md`](docs/runbooks/git-workflow.md) |
+| Как собрать релиз? | [`docs/runbooks/build-and-release.md`](docs/runbooks/build-and-release.md) |
+| Ошибки компиляции? | [`docs/runbooks/incident-compile-errors.md`](docs/runbooks/incident-compile-errors.md) |
 
-### РЎРїРµС†РёС„РёРєР°С†РёРё
+### Спецификации
 
-| Р¤Р°Р№Р» | Рћ С‡С‘Рј |
+| Файл | О чём |
 |---|---|
-| [`game-vision.md`](docs/specs/game-vision.md) | РљРѕРЅС†РµРїС†РёСЏ, Р°С‚РјРѕСЃС„РµСЂР°, РїРµС‚Р»СЏ РіРµР№РјРїР»РµСЏ |
-| [`core-gameplay.md`](docs/specs/core-gameplay.md) | Р”РІРёР¶РµРЅРёРµ, СЂРµСЃСѓСЂСЃС‹, РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёРµ |
-| [`coop-networking.md`](docs/specs/coop-networking.md) | Authority-РјРѕРґРµР»СЊ, С‡С‚Рѕ СЂРµРїР»РёС†РёСЂСѓРµС‚СЃСЏ |
-| [`save-system.md`](docs/specs/save-system.md) | Р¤РѕСЂРјР°С‚ Рё РІРµСЂСЃРёРѕРЅРёСЂРѕРІР°РЅРёРµ СЃРµР№РІРѕРІ |
-| [`performance-budget.md`](docs/specs/performance-budget.md) | FPS, draw calls, РїР°РјСЏС‚СЊ |
-| [`asset-standards.md`](docs/specs/asset-standards.md) | РРјРµРЅР°, РёРјРїРѕСЂС‚, РјР°СЃС€С‚Р°Р±С‹ |
+| [`game-vision.md`](docs/specs/game-vision.md) | Концепция, атмосфера, петля геймплея |
+| [`core-gameplay.md`](docs/specs/core-gameplay.md) | Движение, ресурсы, взаимодействие |
+| [`coop-networking.md`](docs/specs/coop-networking.md) | Authority-модель, что реплицируется |
+| [`save-system.md`](docs/specs/save-system.md) | Формат и версионирование сейвов |
+| [`performance-budget.md`](docs/specs/performance-budget.md) | FPS, draw calls, память |
+| [`asset-standards.md`](docs/specs/asset-standards.md) | Имена, импорт, масштабы |
 
-### РђСЂС…РёС‚РµРєС‚СѓСЂРЅС‹Рµ СЂРµС€РµРЅРёСЏ
+### Архитектурные решения
 
-| Р¤Р°Р№Р» | Р РµС€РµРЅРёРµ | РЎС‚Р°С‚СѓСЃ |
+| Файл | Решение | Статус |
 |---|---|---|
-| [ADR 0001](docs/adr/0001-layer-and-assembly-architecture.md) | РЎР»РѕРё Рё asmdef | Accepted |
-| [ADR 0002](docs/adr/0002-save-data-format.md) | Р¤РѕСЂРјР°С‚ СЃРµР№РІРѕРІ | Proposed |
-| [ADR 0003](docs/adr/0003-networking-stack.md) | РЎРµС‚РµРІРѕР№ СЃС‚РµРє | **Proposed вЂ” Р±Р»РѕРєРёСЂСѓРµС‚ Stage 03** |
-| [ADR 0004](docs/adr/0004-scriptable-objects-for-design-data.md) | SO РґР»СЏ РґРёР·Р°Р№РЅ-РґР°РЅРЅС‹С… | Accepted |
+| [ADR 0001](docs/adr/0001-layer-and-assembly-architecture.md) | Слои и asmdef | Accepted |
+| [ADR 0002](docs/adr/0002-save-data-format.md) | Формат сейвов | Proposed |
+| [ADR 0003](docs/adr/0003-networking-stack.md) | Сетевой стек | **Proposed — блокирует Stage 03** |
+| [ADR 0004](docs/adr/0004-scriptable-objects-for-design-data.md) | SO для дизайн-данных | Accepted |
 | [ADR 0005](docs/adr/0005-input-abstraction.md) | `IInputReader` | Accepted |
 
 ---
 
-## Р’РµСЂРёС„РёРєР°С†РёСЏ
+## Верификация
 
 ```powershell
-# РљРѕРјРїРёР»СЏС†РёСЏ
-(вручную)вручную: Console)show_errors=true, show_warnings=true, limit=50)
-
-# РўРµСЃС‚С‹
-Test Runner → EditMode → Run All (вручную)
-Test Runner → PlayMode → Run All (вручную)
+```
+1. read_console(action: "clear")
+2. refresh_unity(mode: "if_dirty", compile: "request", wait_for_ready: true)
+3. read_console(action: "get", types: ["error", "warning"], count: 50)
+4. run_tests(mode: "EditMode", include_failed_tests: true)
+5. get_test_job(job_id: ..., include_failed_tests: true, wait_timeout: 60)
+6. run_tests(mode: "PlayMode", include_failed_tests: true, init_timeout: 120000)
+7. get_test_job(job_id: ..., include_failed_tests: true, wait_timeout: 120)
 ```
 
-**РџСЂР°РІРёР»Рѕ:** В«РџСЂРµРґРїРѕР»РѕР¶РёС‚РµР»СЊРЅРѕ СЂР°Р±РѕС‚Р°РµС‚В» вЂ” РЅРµ РІРµСЂРёС„РёРєР°С†РёСЏ.
-Р•СЃР»Рё Unity Editor РЅРµ Р·Р°РїСѓС‰РµРЅ, РїРёС€Рё `Not verified: Unity Editor РЅРµ Р·Р°РїСѓС‰РµРЅ`.
+**Правило:** «Предположительно работает» — не верификация.
+Если Unity Editor не запущен, пиши `Not verified: Unity Editor не запущен`.
 
 ---
 
 ## Definition of Done
 
-Stage Р·Р°РІРµСЂС€С‘РЅ, С‚РѕР»СЊРєРѕ РµСЃР»Рё:
+Stage завершён, только если:
 
-- [ ] scope СЂРµР°Р»РёР·РѕРІР°РЅ РїРѕР»РЅРѕСЃС‚СЊСЋ
-- [ ] acceptance criteria РёР· stage file РІС‹РїРѕР»РЅРµРЅС‹
-- [ ] С‚РµСЃС‚С‹ РґРѕР±Р°РІР»РµРЅС‹ РёР»Рё РѕР±РЅРѕРІР»РµРЅС‹
-- [ ] РїСЂРѕРІРµСЂРєРё Р·Р°РїСѓС‰РµРЅС‹ (РєРѕРјРїРёР»СЏС†РёСЏ, С‚РµСЃС‚С‹)
-- [ ] `console(level="error")` С‡РёСЃС‚ РѕС‚ РѕС€РёР±РѕРє
-- [ ] РіСЂР°РЅРёС†С‹ СЃР»РѕС‘РІ РЅРµ РЅР°СЂСѓС€РµРЅС‹
-- [ ] specs РѕР±РЅРѕРІР»РµРЅС‹, РµСЃР»Рё РјРµРЅСЏР»РёСЃСЊ РєРѕРЅС‚СЂР°РєС‚С‹
-- [ ] known issues РїРµСЂРµС‡РёСЃР»РµРЅС‹ СЏРІРЅРѕ
-- [ ] РґРѕРїСѓС‰РµРЅРёСЏ РїРµСЂРµС‡РёСЃР»РµРЅС‹ СЏРІРЅРѕ
-- [ ] manual QA steps РїСЂРµРґРѕСЃС‚Р°РІР»РµРЅС‹
-- [ ] stage report СЃРѕР·РґР°РЅ РІ `docs/reports/`
-- [ ] РѕС‚РґРµР»СЊРЅС‹Р№ review-РїСЂРѕС…РѕРґ РїСЂРѕРІРµРґС‘РЅ
+- [ ] scope реализован полностью
+- [ ] acceptance criteria из stage file выполнены
+- [ ] тесты добавлены или обновлены
+- [ ] проверки запущены (компиляция, тесты)
+- [ ] `read_console(action: "get", types: ["error"])` чист от ошибок
+- [ ] границы слоёв не нарушены
+- [ ] specs обновлены, если менялись контракты
+- [ ] known issues перечислены явно
+- [ ] допущения перечислены явно
+- [ ] manual QA steps предоставлены
+- [ ] stage report создан в `docs/reports/`
+- [ ] отдельный review-проход проведён
 
 ---
 
 ## Git
 
-Р РµРїРѕР·РёС‚РѕСЂРёР№ РїРѕРґ git, `.gitignore` РёР· Unity-С€Р°Р±Р»РѕРЅР°.
+Репозиторий под git, `.gitignore` из Unity-шаблона.
 
-| Р”РµР№СЃС‚РІРёРµ | РЎС‚Р°С‚СѓСЃ |
+| Действие | Статус |
 |---|---|
-| `git status` / `diff` / `log` | вњ… |
-| `git add` / `commit` | вљ пёЏ С‚РѕР»СЊРєРѕ РїРѕ СЏРІРЅРѕР№ РїСЂРѕСЃСЊР±Рµ |
-| `git push` | вќЊ |
-| `git reset --hard` / `clean` | вќЊ |
+| `git status` / `diff` / `log` | ✅ |
+| `git add` / `commit` | ⚠️ только по явной просьбе |
+| `git push` | ❌ |
+| `git reset --hard` / `clean` | ❌ |
 
-РџРѕРґСЂРѕР±РЅРµРµ: [`docs/runbooks/git-workflow.md`](docs/runbooks/git-workflow.md)
+Подробнее: [`docs/runbooks/git-workflow.md`](docs/runbooks/git-workflow.md)
