@@ -1,5 +1,16 @@
 # Stage Report — Stage 00 Foundation
 
+> **Примечание (Stage 01, 2026-09-30).** Этот отчёт описывает состояние на момент
+> Stage 00 и не редактировался по существу. С тех пор изменилось:
+> - сцена `Woodberry_Prototype.unity` разделена на `Bootstrap.unity`, `Menu.unity`
+>   и `Game.unity` — см. `docs/adr/0006-scene-architecture-and-service-registry.md`;
+> - `GameBootstrap` переехал в отдельную персистентную сцену `Bootstrap`;
+> - поле `PlayerController._bootstrap` удалено, ввод берётся из `ServiceRegistry`.
+>
+> Ссылки на старые пути ниже оставлены как есть, чтобы отчёт оставался
+> достоверной записью о том, что было сделано тогда. Актуальные пути —
+> в `docs/specs/asset-standards.md`.
+
 ## Stage
 
 Stage 00 — Foundation. Дата: 2026-09-30.

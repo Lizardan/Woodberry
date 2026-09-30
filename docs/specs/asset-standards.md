@@ -26,8 +26,19 @@ Assets/Woodberry/
 ```
 
 `Assets/Settings` — только URP/рендер-ассеты шаблона Unity.
-Новый игровой контент туда не клади: сцены уровней — в `Assets/Woodberry/Scenes/`,
+Новый игровой контент туда не клади: сцены — в `Assets/Woodberry/Scenes/`,
 ассеты оформления — в `Assets/Woodberry/{Art,Materials,Models,Prefabs,UI,VFX}/`.
+
+## Сцены
+
+| Файл | Назначение | Индекс в Build Settings |
+|---|---|---|
+| `Assets/Woodberry/Scenes/Bootstrap.unity` | Сборка и регистрация глобальных сервисов | 0 |
+| `Assets/Woodberry/Scenes/Menu.unity` | Главное меню | 1 |
+| `Assets/Woodberry/Scenes/Game.unity` | Геймплей | 2 |
+
+Имена файлов — **без префикса `Woodberry_`**: папка `Assets/Woodberry/Scenes/`
+уже задаёт контекст. Префикс в имени файла дублировал бы её.
 
 Скриншоты и прочие артефакты проверки в `Assets/` не кладутся: они попадут
 в импорт и в сборку. `manage_camera(action: "screenshot")` кладёт их в

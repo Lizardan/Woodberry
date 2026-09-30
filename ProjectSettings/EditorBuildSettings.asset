@@ -6,7 +6,13 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Woodberry/Scenes/Woodberry_Prototype.unity
+    path: Assets/Woodberry/Scenes/Bootstrap.unity
+    guid: 5ad5bc2f735d59b4b9e0e7cd33806046
+  - enabled: 1
+    path: Assets/Woodberry/Scenes/Menu.unity
+    guid: dec4645184d68cf4f938ad0fb742c669
+  - enabled: 1
+    path: Assets/Woodberry/Scenes/Game.unity
     guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}

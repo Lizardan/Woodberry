@@ -21,10 +21,6 @@ namespace Woodberry.Gameplay.Player
         [SerializeField]
         private float _sprintMultiplier = DefaultSprintMultiplier;
 
-        [Tooltip("Composition root сцены. Нужен, чтобы взять IInputReader в Start.")]
-        [SerializeField]
-        private GameBootstrap _bootstrap;
-
         private CharacterController _controller;
         private IInputReader _input;
         private Vector3 _facing = Vector3.forward;
@@ -43,9 +39,10 @@ namespace Woodberry.Gameplay.Player
         public Vector3 Facing => _facing;
 
         /// <summary>
-        /// Единственная точка внедрения зависимости. Тесты вызывают её напрямую;
-        /// сцена полагается на <see cref="_bootstrap"/>. Компонент не ищет сервисы
-        /// в сцене сам — это держит правило «никаких FindObjectOfType» проверяемым.
+        /// Единственная точка внедрения зависимости. Тесты вызывают её напрямую.
+        /// Если её не вызвали, <see cref="Start"/> берёт ввод из глобального
+        /// <see cref="ServiceRegistry"/> — так сцена не зависит от того, в какой
+        /// сцене живёт composition root.
         /// </summary>
         public void Initialize(IInputReader input)
         {
@@ -59,9 +56,9 @@ namespace Woodberry.Gameplay.Player
 
         private void Start()
         {
-            if (_input == null && _bootstrap != null)
+            if (_input == null)
             {
-                _input = _bootstrap.Input;
+                ServiceRegistry.TryGet(out _input);
             }
         }
 
@@ -76,8 +73,8 @@ namespace Woodberry.Gameplay.Player
                 {
                     _warnedAboutMissingInput = true;
                     Debug.LogWarning(
-                        $"{nameof(PlayerController)}: IInputReader не назначен. " +
-                        "Либо вызови Initialize, либо укажи GameBootstrap в инспекторе. " +
+                        $"{nameof(PlayerController)}: IInputReader недоступен. " +
+                        "Вызови Initialize или запусти сцену через Bootstrap. " +
                         "Игрок не будет двигаться.",
                         this);
                 }

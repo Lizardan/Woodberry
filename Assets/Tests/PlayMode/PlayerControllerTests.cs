@@ -40,9 +40,13 @@ namespace Woodberry.Tests.PlayMode
         [SetUp]
         public void SetUp()
         {
-            // Глобальный статический флаг: если его не сбросить, он утечёт
-            // в остальные тесты прогона и отключит проверку логов у всех.
+            // Два утверждения об изоляции, а не одно:
+            // ignoreFailingMessages — глобальный статический флаг, он утекает
+            // в остальные тесты прогона и отключает проверку логов у всех.
+            // Реестр — тоже глобальное состояние: если SceneFlowTests отработал
+            // раньше и оставил сервис, тест «без ввода» перестал бы быть таким.
             LogAssert.ignoreFailingMessages = false;
+            Woodberry.Core.ServiceRegistry.Clear();
         }
 
         [TearDown]
@@ -59,19 +63,6 @@ namespace Woodberry.Tests.PlayMode
             }
 
             _spawned.Clear();
-        }
-
-        [UnityTest]
-        public IEnumerator PlayerController_WithoutInitialize_DoesNotThrowAndStaysPut()
-        {
-            PlayerController controller = CreatePlayer("NoDepsPlayer");
-            Vector3 before = controller.transform.position;
-
-            yield return null;
-
-            Assert.That(
-                controller.transform.position,
-                Is.EqualTo(before).Using(Vector3ComparerWithEqualsOperator.Instance));
         }
 
         [UnityTest]
@@ -140,28 +131,34 @@ namespace Woodberry.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator PlayerController_WithBootstrapInput_MovesOnInput()
+        public IEnumerator PlayerController_ResolvesInputFromServiceRegistry_WhenNotInitialized()
         {
-            var bootstrapGo = new GameObject("BootstrapForTest");
-            _spawned.Add(bootstrapGo);
+            // Путь, которым реально пользуется игровая сцена: Initialize не
+            // вызывали, ввод приходит из реестра. Раньше здесь создавался
+            // GameBootstrap, но он уводит приложение в меню и выгружает
+            // сцену — в тесте это ломало прогон.
+            var reader = new Woodberry.Core.Input.InputSystemReader(
+                new Woodberry.Core.Input.InputSystem_Actions());
+            Woodberry.Core.ServiceRegistry.Register<Woodberry.Core.Input.IInputReader>(reader);
 
-            var bootstrap = bootstrapGo.AddComponent<Woodberry.Core.GameBootstrap>();
-            yield return null;
+            try
+            {
+                PlayerController controller = CreatePlayer("RegistryDrivenPlayer");
+                yield return null;
 
-            Assert.That(bootstrap.Input, Is.Not.Null, "bootstrap должен создать читателя ввода в Awake");
+                var field = typeof(PlayerController).GetField(
+                    "_input",
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
-            PlayerController controller = CreatePlayer("BootstrapWiredPlayer");
-            controller.Initialize(bootstrap.Input);
-
-            var input = new FakeInputReader { Move = Vector2.up };
-            controller.Initialize(input);
-
-            yield return null;
-
-            Assert.That(
-                controller.CurrentSpeed,
-                Is.GreaterThan(0f),
-                "после Initialize контроллер должен читать ввод и двигаться");
+                Assert.That(
+                    field.GetValue(controller),
+                    Is.SameAs(reader),
+                    "без явного Initialize контроллер обязан взять ввод из реестра");
+            }
+            finally
+            {
+                Woodberry.Core.ServiceRegistry.Unregister<Woodberry.Core.Input.IInputReader>();
+            }
         }
     }
 }

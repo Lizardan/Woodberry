@@ -42,6 +42,7 @@ ADR пишется, когда решение:
 | `0003-networking-stack.md` | Сетевой стек для кооператива | **Proposed — блокирует Stage 03** |
 | `0004-scriptable-objects-for-design-data.md` | SO для дизайн-данных | Accepted |
 | `0005-input-abstraction.md` | `IInputReader` как единственная точка ввода | Accepted |
+| `0006-scene-architecture-and-service-registry.md` | Три сцены + `ServiceRegistry` вместо межсценовых ссылок | Accepted |
 
 ## Правило
 
