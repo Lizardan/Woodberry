@@ -1,0 +1,16 @@
+{
+    "name": "Woodberry.Gameplay",
+    "rootNamespace": "Woodberry.Gameplay",
+    "references": [
+        "Woodberry.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "autoReferenced": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

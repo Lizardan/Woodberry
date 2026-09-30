@@ -1,0 +1,25 @@
+{
+    "name": "Woodberry.Tests.EditMode",
+    "rootNamespace": "Woodberry.Tests.EditMode",
+    "references": [
+        "UnityEngine.TestRunner",
+        "Woodberry.Core",
+        "Woodberry.Gameplay",
+        "Woodberry.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -103,10 +103,9 @@ Woodberry/
 │  ├─ templates/                 # шаблоны ответов и отчётов
 │  └─ commands/                  # готовые промпты-шаблоны (/plan-stage, /review, ...)
 └─ Assets/
-   ├─ Scenes/                    # служебные сцены (bootstrap), НЕ игровые уровни
    ├─ Settings/                  # URP assets, volume profiles
    ├─ Plugins/                   # сторонние бинарники (Roslyn для execute_code)
-   ├─ Woodberry/                 # ВЕСЬ игровой контент
+   ├─ Woodberry/                 # ВЕСЬ игровой контент, включая игровые сцены
    │  ├─ Art/
    │  ├─ Audio/
    │  ├─ Materials/
@@ -324,9 +323,15 @@ Awake → OnEnable → Start → FixedUpdate/Update → LateUpdate → OnDisable
 - Пути в `Application.dataPath` не хардкодить.
 
 ### Ассембли
-- Игровой код должен лежать в asmdef. Это делает границы слоёв компилируемым контрактом, а не соглашением.
-- Минимум: `Woodberry.Runtime`, `Woodberry.Editor`, `Woodberry.Tests.EditMode`, `Woodberry.Tests.PlayMode`.
-- Если asmdef'ов нет — создай их до того, как появится существенный объём кода. Это Stage 0.
+- Игровой код должен лежать в asmdef. Это делает границы слоёв компиляемым контрактом, а не соглашением.
+- **Одна сборка на слой.** Имена совпадают с папками: `Woodberry.Core`, `Woodberry.Gameplay`,
+  `Woodberry.AI`, `Woodberry.Net`, `Woodberry.UI`, `Woodberry.CameraRig`, `Woodberry.Audio`,
+  `Woodberry.Save`, плюс `Woodberry.Editor` и два тестовых.
+- `Woodberry.Core` не ссылается ни на одну сборку `Woodberry.*` — это проверяется компилятором.
+- `Woodberry.Editor.asmdef` обязан иметь `includePlatforms: ["Editor"]`.
+- Ссылки между слоями объявляй явно в `references` asmdef. На автоссылку (`autoReferenced`) не полагайся: она не даёт нужного направления зависимостей.
+- Проверка: **Woodberry → Validate Runtime Layers** в меню, плюс EditMode-тесты.
+- Если сборки нет — создай её до того, как в папке появится код.
 
 ---
 

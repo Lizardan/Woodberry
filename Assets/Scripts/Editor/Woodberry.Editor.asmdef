@@ -1,0 +1,25 @@
+{
+    "name": "Woodberry.Editor",
+    "rootNamespace": "Woodberry.Editor",
+    "references": [
+        "Woodberry.Core",
+        "Woodberry.Gameplay",
+        "Woodberry.CameraRig",
+        "Woodberry.Audio",
+        "Woodberry.Save",
+        "Woodberry.Net",
+        "Woodberry.UI",
+        "Woodberry.AI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "autoReferenced": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

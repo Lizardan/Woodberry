@@ -1,0 +1,17 @@
+{
+    "name": "Woodberry.AI",
+    "rootNamespace": "Woodberry.AI",
+    "references": [
+        "Woodberry.Core",
+        "Woodberry.Gameplay"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "autoReferenced": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

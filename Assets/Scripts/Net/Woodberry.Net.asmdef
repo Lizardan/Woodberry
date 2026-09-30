@@ -1,0 +1,16 @@
+{
+    "name": "Woodberry.Net",
+    "rootNamespace": "Woodberry.Net",
+    "references": [
+        "Woodberry.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "autoReferenced": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

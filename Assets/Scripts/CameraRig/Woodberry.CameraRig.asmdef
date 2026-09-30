@@ -1,0 +1,16 @@
+{
+    "name": "Woodberry.CameraRig",
+    "rootNamespace": "Woodberry.CameraRig",
+    "references": [
+        "Woodberry.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "autoReferenced": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

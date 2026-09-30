@@ -25,9 +25,13 @@ Assets/Woodberry/
 └─ VFX/
 ```
 
-`Assets/Scenes` — только служебные сцены инфраструктуры (bootstrap, тестовые).
 `Assets/Settings` — только URP/рендер-ассеты шаблона Unity.
-Новый игровой контент туда не клади: уровни — в `Assets/Woodberry/Scenes/`.
+Новый игровой контент туда не клади: сцены уровней — в `Assets/Woodberry/Scenes/`,
+ассеты оформления — в `Assets/Woodberry/{Art,Materials,Models,Prefabs,UI,VFX}/`.
+
+Скриншоты и прочие артефакты проверки в `Assets/` не кладутся: они попадут
+в импорт и в сборку. `manage_camera(action: "screenshot")` кладёт их в
+`Assets/Screenshots/` — после проверки папку нужно удалить.
 
 ## Модели
 
