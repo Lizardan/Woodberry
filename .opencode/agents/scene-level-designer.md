@@ -108,9 +108,7 @@ level flow, РЅР°РІРёРіР°С†РёСЋ. РћС‚РІРµС‡Р°С�
 
 РўРѕР»СЊРєРѕ СЂРµРґР°РєС‚РѕСЂ РёР»Рё MCP:
 ```
-mcp__coplay__list_game_objects_in_hierarchy()
-mcp__coplay__open_scene(path="Assets/Woodberry/Scenes/...")
-mcp__coplay__save_scene()
+(вручную: иерархия сцены))вручную)вручную)
 ```
 
 Р СѓС‡РЅРѕР№ YAML-СЂРµРґР°РєС‚РёС‚ Unity-СЃС†РµРЅ РїРѕС‡С‚Рё РІСЃРµРіРґР° РїСЂРёРІРѕРґРёС‚ Рє РїРѕР»РѕРјРєРµ.
@@ -148,7 +146,7 @@ mcp__coplay__save_scene()
 ### РЎРєСЂРёРЅС€РѕС‚
 
 ```
-mcp__coplay__capture_scene_object(name="Main Camera")
+(вручную)
 ```
 
 ### Р¦РёРєР» В«С‚РµРјРЅРѕС‚Р°В»

@@ -15,7 +15,7 @@
 - docs/specs/core-gameplay.md
 
 ## Verification performed
-- mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)types=["error"]) вЂ” 0 РѕС€РёР±РѕРє
+- (вручную: Console)show_errors=true, show_warnings=true, limit=50)types=["error"]) вЂ” 0 РѕС€РёР±РѕРє
 - Test Runner → EditMode → Run All вЂ” 12/12 passed
 
 ## Not verified

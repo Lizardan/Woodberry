@@ -13,18 +13,18 @@ subtask: false
 Р—Р°РґР°С‡Р°:
 1. РџРѕР»СѓС‡РёС‚СЊ РѕС€РёР±РєРё:
    ```
-   mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)action="get", types=["error","warning"], count="100", include_stacktrace=true)
+   (вручную: Console)show_errors=true, show_warnings=true, limit=50)action="get", types=["error","warning"], count="100", include_stacktrace=true)
    ```
 2. РљР»Р°СЃСЃРёС„РёС†РёСЂРѕРІР°С‚СЊ: СЃРёРЅС‚Р°РєСЃРёСЃ / РЅРµ РЅР°Р№РґРµРЅ С‚РёРї / РЅРµС‚ РґРѕСЃС‚СѓРїР° / assembly reference /
    РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РёР№ API / Missing Script / runtime / С‚РµСЃС‚С‹
 3. РћРїСЂРµРґРµР»РёС‚СЊ РІРµСЂРѕСЏС‚РЅСѓСЋ РїСЂРёС‡РёРЅСѓ
 4. Если ошибка про отсутствующий Unity API — **проверить, не гадать**. Живая рефлексия через `eval`:
    ```
-   mcp__coplay__execute_script(filePath="<временный .cs>")  # code="return typeof(UnityEngine.AI.NavMeshAgent).GetProperty(\"speed\") != null;")
+   (вручную)  # code="return typeof(UnityEngine.AI.NavMeshAgent).GetProperty(\"speed\") != null;")
    ```
    Поиск типа по имени:
    ```
-   mcp__coplay__execute_script(filePath="<временный .cs>")  # code="return string.Join(\"; \", System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => { try { return a.GetTypes(); } catch { return new Type[0]; } }).Where(x => x.Name == \"NavMeshAgent\").Select(x => x.FullName).ToArray());")
+   (вручную)  # code="return string.Join(\"; \", System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => { try { return a.GetTypes(); } catch { return new Type[0]; } }).Where(x => x.Name == \"NavMeshAgent\").Select(x => x.FullName).ToArray());")
    ```
    Ссылка на документацию под версию проекта:
    ```powershell

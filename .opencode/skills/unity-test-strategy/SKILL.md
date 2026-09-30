@@ -163,13 +163,9 @@ Assert.That(controller.CurrentSpeed, Is.EqualTo(0f));
 ## РЁР°Рі 6. Р—Р°РїСѓСЃРє
 
 ```
-(вручную: Edit → Clear)()
-mcp__coplay__check_compile_errors()
-mcp__coplay__get_unity_logs(show_errors=true, limit=50)
-Test Runner → EditMode → Run All (вручную)
-mcp__coplay__get_unity_logs(search_term="TESTS_DONE")
-Test Runner → PlayMode → Run All (вручную)
-mcp__coplay__get_unity_logs(search_term="TESTS_DONE")
+(вручную: Edit → Clear))вручную)вручную: Console)show_errors=true, limit=50)
+Test Runner → EditMode → Run All (вручную)вручную: Console)search_term="TESTS_DONE")
+Test Runner → PlayMode → Run All (вручную)вручную: Console)search_term="TESTS_DONE")
 ```
 
 ## Р Р°Р·Р±РѕСЂ РїСЂРѕР±Р»РµРј

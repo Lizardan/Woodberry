@@ -108,9 +108,7 @@ Unity РѕР±РЅРѕРІРёС‚ `.meta` Рё РІСЃРµ СЃСЃС‹Р»�
 ### РџСЂР°РІРёР»СЊРЅС‹Р№ РїСѓС‚СЊ
 
 ```
-mcp__coplay__open_scene(path="Assets/Woodberry/Scenes/Woodberry_X.unity")
-mcp__coplay__list_game_objects_in_hierarchy()
-mcp__coplay__save_scene()
+(вручную)вручную: иерархия сцены))вручную)
 ```
 
 ### РћР±СЏР·Р°С‚РµР»СЊРЅРѕРµ СЃРѕРґРµСЂР¶РёРјРѕРµ
@@ -139,7 +137,7 @@ mcp__coplay__save_scene()
 **РЎРЅР°С‡Р°Р»Р°** РїСЂРѕРІРµСЂРёС‚СЊ РєРѕРјРїРёР»СЏС†РёСЋ вЂ” СЌС‚Рѕ С‡Р°С‰Рµ РІСЃРµРіРѕ РїСЂРёС‡РёРЅР°:
 
 ```
-mcp__coplay__get_unity_logs(show_errors=true, limit=50)
+(вручную: Console)show_errors=true, limit=50)
 ```
 
 Р•СЃР»Рё РєРѕРјРїРёР»СЏС†РёСЏ С‡РёСЃС‚Р°СЏ:

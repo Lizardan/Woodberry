@@ -30,7 +30,7 @@
 Прежде чем оптимизировать — профайл. Оптимизация наугад тратит время и ухудшает код.
 
 Инструменты: Unity Profiler, Profiler Deep Profile (только точечно), Frace Debugger,
-`mcp__coplay__get_worst_cpu_frames() / mcp__coplay__get_worst_gc_frames()`.
+`(вручную) / (вручную)`.
 
 ### Горячие пути
 

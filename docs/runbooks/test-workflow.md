@@ -86,20 +86,20 @@ namespace Woodberry.Tests.EditMode
 
 **Run All** РЅР° РєР°Р¶РґРѕР№ РІРєР»Р°РґРєРµ.
 
-## Запуск через MCP — ограничение Coplay
+## Запуск через MCP — ограничение Unity MCP
 
-**Coplay не умеет запускать тесты.** Инструмента `run_tests` в нём нет.
+**Unity MCP пока не установлен запускать тесты.** Инструмента `run_tests` в нём нет.
 Это осознанное ограничение, а не баг конфигурации. Поэтому прогон тестов —
 **ручная операция**, и её результат вносится в stage report честно.
 
 ```
 # EditMode
 1. Test → Test Runner → EditMode → Run All
-2. mcp__coplay__get_unity_logs(show_errors=true, search_term="test")
+2. (вручную: Console)show_errors=true, search_term="test")
 
 # PlayMode
 3. Test → Test Runner → PlayMode → Run All
-4. mcp__coplay__get_unity_logs(show_errors=true, search_term="test")
+4. (вручную: Console)show_errors=true, search_term="test")
 ```
 
 **Полуавтоматический вариант для EditMode** — через `execute_script` с
@@ -112,14 +112,14 @@ PlayMode так не запустить: он перезапускает дом�
 - Debug / EditMode / PlayMode, поиск по имени теста
 - Дерево по сборкам и по namespace
 
-Через `run_tests` при его наличии в будущей версии Coplay:
+Через `run_tests` при его наличии в будущей версии Unity MCP:
 ```
 mode="EditMode", filter="Woodberry.Tests.EditMode.PlayerStaminaTests"
 ```
 
 ## Честность отчёта
 
-Раз Coplay не запускает тесты автоматически, **заявление «тесты прошли»
+Раз Unity MCP не запускает тесты автоматически, **заявление «тесты прошли»
 должно сопровождаться указанием, как именно они были прогнаны**:
 
 | Как прогнано | Как записать в отчёте |

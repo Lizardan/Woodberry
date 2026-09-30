@@ -356,66 +356,44 @@ Awake в†’ OnEnable в†’ Start в†’ FixedUpdate/Update в†’ Late
 
 ## Verification commands
 
-Р—Р°РїСѓСЃРєР°Р№ РјРёРЅРёРјР°Р»СЊРЅС‹Р№ РґРѕСЃС‚Р°С‚РѕС‡РЅС‹Р№ РЅР°Р±РѕСЂ РїСЂРѕРІРµСЂРѕРє РґР»СЏ С‚РµРєСѓС‰РµРіРѕ scope.
+Запускай минимально достаточный набор проверок для текущего scope.
 
-```powershell
-# РљРѕРјРїРёР»СЏС†РёСЏ вЂ” Unity СЃР°Рј РєРѕРјРїРёР»РёСЂСѓРµС‚ РїСЂРё С„РѕРєСѓСЃРµ; РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕ:
-# Assets в†’ Refresh (Ctrl+R), Р·Р°С‚РµРј СЃРјРѕС‚СЂРµС‚СЊ Console
+### Статус автоматизации
 
-# РўРµСЃС‚С‹ EditMode вЂ” РёР· Unity Test Runner
-# Test в†’ Test Runner в†’ EditMode в†’ Run All
+**MCP-сервер для Unity в проекте не установлен.** `opencode.json` не содержит
+секции `mcp`. Все операции с Editor-ом выполняются вручную через UI.
 
-# РўРµСЃС‚С‹ PlayMode
-# Test в†’ Test Runner в†’ PlayMode в†’ Run All
+Ожидается Unity MCP (`CoplayDev/unity-mcp`). После установки имена инструментов
+должны быть сверены с фактическим `tools/list`, а не взяты из памяти.
+Подробности: `docs/runbooks/unity-automation.md`.
 
-# РџСЂРѕРІРµСЂРєР°, С‡С‚Рѕ Editor-СЃР»РѕР№ РЅРµ РїРѕРїР°Р» РІ player-СЃР±РѕСЂРєСѓ
-# File в†’ Build Settings в†’ Build And Run
-```
-
-**Агентский способ** (предпочтительный). Мост — MCP-сервер **Coplay**,
-он работает, пока открыт Unity и Coplay авторизован в редакторе:
+### Ручной режим (пока нет MCP)
 
 ```
-mcp__coplay__check_compile_errors()
-mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
+# Компиляция
+Assets -> Refresh (Ctrl+R), затем Window -> General -> Console (фильтр Errors)
+
+# Тесты EditMode
+Test -> Test Runner -> EditMode -> Run All
+
+# Тесты PlayMode
+Test -> Test Runner -> PlayMode -> Run All
+
+# Сборка player
+File -> Build Settings -> Build And Run
+
+# Очистка консоли
+Edit -> Clear
 ```
-
-Проверить, что мост жив:
-
-```
-mcp__coplay__get_unity_editor_state()
-```
-
-Если не отвечает — логи сервера:
-```powershell
-Get-Content "C:\Users\Lizardan\AppData\Local\Coplay\Logs\coplay_mcp_*.log" -Tail 40
-```
-
-Полный справочник из 96 инструментов — `docs/runbooks/unity-automation.md`.
-Не выдумывай инструменты: сверяйся с этим файлом.
-
-### Чего Coplay не умеет
-
-Это ограничения инструмента, а не правила проекта. Планируй с учётом:
-
-| Задача | Как делать |
-|---|---|
-| Запуск тестов | **вручную** через Test Runner, затем `get_unity_logs(search_term="TESTS_DONE")` |
-| Сборка player | вручную: File → Build Settings |
-| Очистка консоли | вручную: Edit → Clear |
-| Рефлексия Unity API | через `execute_script` с временным .cs — см. runbook |
-| Запекание света / NavMesh | вручную через окна Unity |
-
-**Следствие:** этап нельзя объявить «готово», пока тесты фактически
-не прогнаны. Coplay их не запускает — это делает человек.
 
 **Правила:**
-- После любого изменения скриптов — `check_compile_errors()`. Не продолжай работу при ошибках компиляции.
-- Очистки консоли через MCP нет — вместо неё используй `get_unity_logs(search_term=...)` для точечной выборки.
+- После любого изменения скриптов - `Ctrl+R` и проверить Console. Не продолжай при ошибках компиляции.
 - Перед тем как заявить «готово», прогони релевантные тесты и приведи **фактический** результат.
-- Если Unity Editor не запущен — честно скажи это в отчёте как «Not verified».
-
----
+- Если проверка не выполнялась - честно пиши это в отчёте как `Not verified`.
+- Не приписывай агенту инструменты, которых у него нет. Если мост не установлен -
+  операция делается вручную и отмечается как `Manual check`.
+- Не доверяй памяти о Unity API: проверяй по документации под версию проекта
+  (docs.unity3d.com/6000.6/Documentation/ScriptReference/).
 
 ## Art & asset rules
 
@@ -639,7 +617,7 @@ runtime-РєРѕРґ СЃ `UnityEditor`, СЂСѓС‡РЅРѕР№ YAML-СЂР�
 
 ## References
 
-- Основы Unity: `mcp__coplay__execute_script(filePath="<временный .cs>")` — единственный способ живой рефлексии по API Editor'а. Рецепт пробника — `docs/runbooks/unity-automation.md`. **Не полагайся на память о Unity API** — версии меняются, и устаревшие API — частая причина ошибок компиляции. Всегда проверяй через `execute_script` перед использованием незнакомого API.
+- Основы Unity: `(вручную)` — единственный способ живой рефлексии по API Editor'а. Рецепт пробника — `docs/runbooks/unity-automation.md`. **Не полагайся на память о Unity API** — версии меняются, и устаревшие API — частая причина ошибок компиляции. Всегда проверяй через `execute_script` перед использованием незнакомого API.
 - РЁР°Р±Р»РѕРЅС‹ OpenCode: https://opencode.ai/docs/ru/
 - РЎРїРµС†РёС„РёРєР°С†РёРё: `docs/specs/`
 - Р РµС€РµРЅРёСЏ: `docs/adr/`

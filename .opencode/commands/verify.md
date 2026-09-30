@@ -11,13 +11,13 @@ Scope: $ARGUMENTS
 Р’С‹РїРѕР»РЅРё СЃС‚СЂРѕРіРѕ РїРѕ РїРѕСЂСЏРґРєСѓ:
 
 ```
-1. (вручную: Edit → Clear)()
-2. mcp__coplay__check_compile_errors()
-3. mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
+1. (вручную: Edit → Clear))
+2. (вручную)
+3. (вручную: Console)show_errors=true, show_warnings=true, limit=50)
 4. Test Runner → EditMode → Run All (вручную)
-5. mcp__coplay__get_unity_logs(search_term="TESTS_DONE")
+5. (вручную: Console)search_term="TESTS_DONE")
 6. Test Runner → PlayMode → Run All (вручную)
-7. mcp__coplay__get_unity_logs(search_term="TESTS_DONE")
+7. (вручную: Console)search_term="TESTS_DONE")
 ```
 
 `clear` РёРґС‘С‚ **РґРѕ** РїСЂРѕРІРµСЂРєРё вЂ” РёРЅР°С‡Рµ СЃС‚Р°СЂС‹Рµ РѕС€РёР±РєРё РІС‹РіР»СЏРґСЏС‚ РєР°Рє РЅРѕРІС‹Рµ.

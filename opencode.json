@@ -1,147 +1,120 @@
-{
-  "$schema": "https://opencode.ai/config.json",
-
-  "instructions": [
-    "AGENTS.md",
-    "instructions/*.md",
-    "docs/specs/*.md"
-  ],
-
-  "permission": {
-    "skill": {
-      "*": "deny",
-      "unity-architecture-review": "allow",
-      "unity-test-strategy": "allow",
-      "unity-prefab-safety": "allow",
-      "coop-networking-model": "allow",
-      "horror-level-design": "allow",
-      "urp-visual-tuning": "allow",
-      "stage-planning": "allow",
-      "stage-report": "allow",
-      "debug-unity-console": "allow",
-      "code-review-checklist": "allow",
-      "git-diff-analysis": "allow"
-    },
-    "bash": {
-      "*": "ask",
-      "git status*": "allow",
-      "git diff*": "allow",
-      "git log*": "allow",
-      "git add*": "ask",
-      "git commit*": "ask",
-      "git push*": "deny",
-      "git reset --hard*": "deny",
-      "git checkout .*": "deny",
-      "git clean*": "deny",
-      "rm -rf*": "deny",
-      "Remove-Item -Recurse*": "deny",
-      "git checkout*": "deny"
-    },
-    "edit": "allow",
-    "webfetch": "allow"
-  },
-
-  "mcp": {
-    "coplay": {
-      "type": "local",
-      "command": [
-        "C:\\Users\\Lizardan\\.local\\bin\\uvx.exe",
-        "--python",
-        ">=3.11",
-        "coplay-mcp-server@latest"
-      ],
-      "environment": {
-        "MCP_TOOL_TIMEOUT": "720000"
-      },
-      "enabled": true
-    }
-  },
-
-  "agent": {
-    "build": {
-      "permission": {
-        "task": {
-          "*": "deny",
-          "system-analyst": "allow",
-          "gameplay-engineer": "allow",
-          "scene-level-designer": "allow",
-          "ui-engineer": "allow",
-          "technical-artist": "allow",
-          "unity-tools-engineer": "allow",
-          "qa-analyst": "allow",
-          "code-reviewer": "allow",
-          "explore": "allow",
-          "general": "allow"
-        },
-        "bash": {
-          "*": "allow",
-          "git push*": "deny",
-          "git commit*": "ask",
-          "git reset --hard*": "deny",
-          "git clean*": "deny",
-          "rm -rf*": "deny",
-          "Remove-Item -Recurse*": "deny"
-        }
-      }
-    },
-
-    "plan": {
-      "permission": {
-        "edit": "deny",
-        "task": {
-          "*": "deny",
-          "code-reviewer": "allow",
-          "explore": "allow"
-        },
-        "bash": {
-          "*": "ask",
-          "git status*": "allow",
-          "git diff*": "allow",
-          "git log*": "allow"
-        }
-      }
-    },
-
-    "gameplay-engineer": {
-      "permission": {
-        "edit": "allow"
-      }
-    },
-
-    "qa-analyst": {
-      "permission": {
-        "edit": "allow"
-      }
-    },
-
-    "system-analyst": {
-      "permission": {
-        "edit": "allow"
-      }
-    },
-
-    "unity-tools-engineer": {
-      "permission": {
-        "edit": "allow"
-      }
-    },
-
-    "scene-level-designer": {
-      "permission": {
-        "edit": "allow"
-      }
-    },
-
-    "ui-engineer": {
-      "permission": {
-        "edit": "allow"
-      }
-    },
-
-    "technical-artist": {
-      "permission": {
-        "edit": "allow"
-      }
-    }
-  }
+﻿{
+    "$schema":  "https://opencode.ai/config.json",
+    "instructions":  [
+                         "AGENTS.md",
+                         "instructions/*.md",
+                         "docs/specs/*.md"
+                     ],
+    "permission":  {
+                       "skill":  {
+                                     "*":  "deny",
+                                     "unity-architecture-review":  "allow",
+                                     "unity-test-strategy":  "allow",
+                                     "unity-prefab-safety":  "allow",
+                                     "coop-networking-model":  "allow",
+                                     "horror-level-design":  "allow",
+                                     "urp-visual-tuning":  "allow",
+                                     "stage-planning":  "allow",
+                                     "stage-report":  "allow",
+                                     "debug-unity-console":  "allow",
+                                     "code-review-checklist":  "allow",
+                                     "git-diff-analysis":  "allow"
+                                 },
+                       "bash":  {
+                                    "*":  "ask",
+                                    "git status*":  "allow",
+                                    "git diff*":  "allow",
+                                    "git log*":  "allow",
+                                    "git add*":  "ask",
+                                    "git commit*":  "ask",
+                                    "git push*":  "deny",
+                                    "git reset --hard*":  "deny",
+                                    "git checkout .*":  "deny",
+                                    "git clean*":  "deny",
+                                    "rm -rf*":  "deny",
+                                    "Remove-Item -Recurse*":  "deny",
+                                    "git checkout*":  "deny"
+                                },
+                       "edit":  "allow",
+                       "webfetch":  "allow"
+                   },
+    "agent":  {
+                  "build":  {
+                                "permission":  {
+                                                   "task":  {
+                                                                "*":  "deny",
+                                                                "system-analyst":  "allow",
+                                                                "gameplay-engineer":  "allow",
+                                                                "scene-level-designer":  "allow",
+                                                                "ui-engineer":  "allow",
+                                                                "technical-artist":  "allow",
+                                                                "unity-tools-engineer":  "allow",
+                                                                "qa-analyst":  "allow",
+                                                                "code-reviewer":  "allow",
+                                                                "explore":  "allow",
+                                                                "general":  "allow"
+                                                            },
+                                                   "bash":  {
+                                                                "*":  "allow",
+                                                                "git push*":  "deny",
+                                                                "git commit*":  "ask",
+                                                                "git reset --hard*":  "deny",
+                                                                "git clean*":  "deny",
+                                                                "rm -rf*":  "deny",
+                                                                "Remove-Item -Recurse*":  "deny"
+                                                            }
+                                               }
+                            },
+                  "plan":  {
+                               "permission":  {
+                                                  "edit":  "deny",
+                                                  "task":  {
+                                                               "*":  "deny",
+                                                               "code-reviewer":  "allow",
+                                                               "explore":  "allow"
+                                                           },
+                                                  "bash":  {
+                                                               "*":  "ask",
+                                                               "git status*":  "allow",
+                                                               "git diff*":  "allow",
+                                                               "git log*":  "allow"
+                                                           }
+                                              }
+                           },
+                  "gameplay-engineer":  {
+                                            "permission":  {
+                                                               "edit":  "allow"
+                                                           }
+                                        },
+                  "qa-analyst":  {
+                                     "permission":  {
+                                                        "edit":  "allow"
+                                                    }
+                                 },
+                  "system-analyst":  {
+                                         "permission":  {
+                                                            "edit":  "allow"
+                                                        }
+                                     },
+                  "unity-tools-engineer":  {
+                                               "permission":  {
+                                                                  "edit":  "allow"
+                                                              }
+                                           },
+                  "scene-level-designer":  {
+                                               "permission":  {
+                                                                  "edit":  "allow"
+                                                              }
+                                           },
+                  "ui-engineer":  {
+                                      "permission":  {
+                                                         "edit":  "allow"
+                                                     }
+                                  },
+                  "technical-artist":  {
+                                           "permission":  {
+                                                              "edit":  "allow"
+                                                          }
+                                       }
+              }
 }

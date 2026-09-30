@@ -21,9 +21,7 @@ subtask: false
 
 РћР±СЏР·Р°С‚РµР»СЊРЅС‹Р№ Р·РѕР»РѕС‚РѕР№ С†РёРєР» РїРѕСЃР»Рµ РёР·РјРµРЅРµРЅРёР№:
 ```
-(вручную: Edit → Clear)()
-mcp__coplay__check_compile_errors()
-mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
+(вручную: Edit → Clear))вручную)вручную: Console)show_errors=true, show_warnings=true, limit=50)
 ```
 РџСЂРё РѕС€РёР±РєР°С… РєРѕРјРїРёР»СЏС†РёРё **РѕСЃС‚Р°РЅРѕРІРёСЃСЊ** Рё РїРѕС‡РёРЅРё РёС…. РќРµ РїСЂРѕРґРѕР»Р¶Р°Р№ СЂР°Р±РѕС‚Сѓ РІСЃР»РµРїСѓСЋ.
 

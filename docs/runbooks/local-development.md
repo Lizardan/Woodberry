@@ -58,7 +58,7 @@ cd Woodberry
 
 1. В проекте должен быть пакет MCP for Unity.
 2. В Unity: **Window → MCP for Unity** → **Start Server** (или соответствующий пункт).
-3. Проверить в OpenCode: вызвать `mcp__coplay__get_unity_logs`.
+3. Проверить в OpenCode: вызвать `(вручную: Console)`.
 
 **Проверка:** MCP отвечает. Если `No Unity Editor instances found` — Unity не запущен
 или сервер не стартовал.

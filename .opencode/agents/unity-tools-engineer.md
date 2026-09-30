@@ -46,8 +46,8 @@ permission:
 
 ```
 1. РР·РјРµРЅРёС‚СЊ С„Р°Р№Р»С‹
-2. mcp__coplay__check_compile_errors()
-3. mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
+2. (вручную)
+3. (вручную: Console)show_errors=true, show_warnings=true, limit=50)
 4. РџСЂРѕРґРѕР»Р¶Р°С‚СЊ С‚РѕР»СЊРєРѕ РµСЃР»Рё РѕС€РёР±РѕРє РЅРµС‚
 ```
 
@@ -57,9 +57,7 @@ permission:
 ## Р—РѕР»РѕС‚РѕР№ С†РёРєР» РїСЂРѕРІРµСЂРєРё РїРµСЂРµРґ В«РіРѕС‚РѕРІРѕВ»
 
 ```
-(вручную: Edit → Clear)()
-mcp__coplay__check_compile_errors()
-mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
+(вручную: Edit → Clear))вручную)вручную: Console)show_errors=true, show_warnings=true, limit=50)
 Test Runner → EditMode → Run All (вручную)
 Test Runner → PlayMode → Run All (вручную)
 ```
@@ -92,7 +90,7 @@ Runtime-СЃР±РѕСЂРєР° **РЅРµ РґРѕР»Р¶РЅР°** СЃРѕ�
 
 ```powershell
 # РџСЂРѕРІРµСЂРёС‚СЊ РїРµСЂРµРґ СѓСЃС‚Р°РЅРѕРІРєРѕР№
-mcp__coplay__list_packages()
+(вручную)
 ```
 
 РЈСЃС‚Р°РЅРѕРІРєР°/СѓРґР°Р»РµРЅРёРµ РїР°РєРµС‚Р° РјРµРЅСЏРµС‚ `Packages/manifest.json` Рё С‚СЂРёРіРіРµСЂРёС‚
@@ -103,14 +101,14 @@ mcp__coplay__list_packages()
 
 | Р—Р°РґР°С‡Р° | РРЅСЃС‚СЂСѓРјРµРЅС‚ |
 |---|---|
-| РљРѕРјРїРёР»СЏС†РёСЏ | `mcp__coplay__check_compile_errors()` |
-| РћС€РёР±РєРё | `mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)action="get", types=["error","warning"])` |
+| РљРѕРјРїРёР»СЏС†РёСЏ | `(вручную)` |
+| РћС€РёР±РєРё | `(вручную: Console)show_errors=true, show_warnings=true, limit=50)action="get", types=["error","warning"])` |
 | РўРµСЃС‚С‹ | `Test Runner → Run All (вручную)` |
-| РЎРѕСЃС‚РѕСЏРЅРёРµ СЂРµРґР°РєС‚РѕСЂР° | `mcp__coplay__get_unity_editor_state()()` |
+| РЎРѕСЃС‚РѕСЏРЅРёРµ СЂРµРґР°РєС‚РѕСЂР° | `(вручную))` |
 | РЎР±РѕСЂРєР° | `(вручную: File → Build Settings → Build)` |
-| РџР°РєРµС‚С‹ | `mcp__coplay__install_unity_package(identifier="...")` |
-| РџРѕРёСЃРє Р°СЃСЃРµС‚РѕРІ | `mcp__coplay__search_files(query="...")  # или Window → Project` |
-| РџСЂРѕС„Р°Р№Р»РµСЂ | `mcp__coplay__get_worst_cpu_frames() / get_worst_gc_frames()` |
+| РџР°РєРµС‚С‹ | `(вручную)` |
+| РџРѕРёСЃРє Р°СЃСЃРµС‚РѕРІ | `(вручную)  # или Window → Project` |
+| РџСЂРѕС„Р°Р№Р»РµСЂ | `(вручную) / get_worst_gc_frames()` |
 | РњРµРЅСЋ СЂРµРґР°РєС‚РѕСЂР° | `(вручную: меню Unity)` |
 
 ### РџСЂР°РІРёР»Р° РїР°РіРёРЅР°С†РёРё

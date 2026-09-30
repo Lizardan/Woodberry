@@ -50,13 +50,9 @@ contract drift Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РёР·
 ## Р—РѕР»РѕС‚РѕР№ С†РёРєР» РїСЂРѕРіРѕРЅР°
 
 ```
-(вручную: Edit → Clear)()
-mcp__coplay__check_compile_errors()
-mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
-Test Runner → EditMode → Run All (вручную)
-mcp__coplay__get_unity_logs(search_term="TESTS_DONE")
-Test Runner → PlayMode → Run All (вручную)
-mcp__coplay__get_unity_logs(search_term="TESTS_DONE")
+(вручную: Edit → Clear))вручную)вручную: Console)show_errors=true, show_warnings=true, limit=50)
+Test Runner → EditMode → Run All (вручную)вручную: Console)search_term="TESTS_DONE")
+Test Runner → PlayMode → Run All (вручную)вручную: Console)search_term="TESTS_DONE")
 ```
 
 `clear` **РґРѕ** РїСЂРѕРІРµСЂРєРё вЂ” РёРЅР°С‡Рµ СЃС‚Р°СЂС‹Рµ РѕС€РёР±РєРё РІС‹РіР»СЏРґСЏС‚ РєР°Рє РЅРѕРІС‹Рµ.

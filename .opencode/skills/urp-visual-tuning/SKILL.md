@@ -23,13 +23,13 @@ Unity `6000.6.3f1`, URP `17.6.0`. API РјРµРЅСЏРµС‚СЃСЏ РјРµ
 **РќРµ РїРѕР»Р°РіР°Р№СЃСЏ РЅР° РїР°РјСЏС‚СЊ.**
 
 ```
-mcp__coplay__execute_script(filePath="<временный .cs>")  # return typeof(UnityEngine.Rendering.VolumeManager).FullName;
-mcp__coplay__execute_script(filePath="<временный .cs>")  # return typeof(UnityEngine.Rendering.Volume).FullName;
-mcp__coplay__execute_script(filePath="<временный .cs>")  # code="return string.Join(\"; \", typeof(UnityEngine.Rendering.Volume).GetProperties().Select(p => p.Name).ToArray());")
+(вручную)  # return typeof(UnityEngine.Rendering.VolumeManager).FullName;
+(вручную)  # return typeof(UnityEngine.Rendering.Volume).FullName;
+(вручную)  # code="return string.Join(\"; \", typeof(UnityEngine.Rendering.Volume).GetProperties().Select(p => p.Name).ToArray());")
 & "F:\Unity\Unity Hub\resources\unity.exe" docs Volume --url
 # РџРѕРёСЃРє С€РµР№РґРµСЂРѕРІ РІ РїСЂРѕРµРєС‚Рµ вЂ” РґРѕ СЃРѕР·РґР°РЅРёСЏ РЅРѕРІРѕРіРѕ
-mcp__coplay__search_all_packages()  # шейдеры: поиск в проекте
-mcp__coplay__get_unity_editor_state()
+(вручную)  # шейдеры: поиск в проекте
+(вручную)
 ```
 
 ## РџСЂР°РІРёР»Рѕ 1: URP, РЅРµ Standard
@@ -54,17 +54,14 @@ mcp__coplay__get_unity_editor_state()
 ### РџСЂРѕРІРµСЂРёС‚СЊ С‚РµРєСѓС‰РёРµ РЅР°СЃС‚СЂРѕР№РєРё
 
 ```
-(вручную: Window → Rendering → Lighting)
-mcp__coplay__get_game_object_info(name="Global Volume")  # или вручную
-mcp__coplay__get_game_object_info(name="Global Volume")
+(вручную: Window → Rendering → Lighting)вручную)  # или вручную
+(вручную)
 ```
 
 ### Р—Р°РїРµРєР°РЅРёРµ
 
 ```
-(вручную: Window → AI → Navigation)
-(вручную: Window → Rendering → Lighting → Generate Lighting)
-(вручную: окно Lighting)
+(вручную: Window → AI → Navigation)вручную: Window → Rendering → Lighting → Generate Lighting)вручную: окно Lighting)
 ```
 
 Р—Р°РїРµС‡С‘РЅРЅС‹Р№ СЃРІРµС‚ **Р±РµСЃРїР»Р°С‚РЅС‹Р№**. РќРµ Р·Р°РїРµРєР°Р№ С‚Рѕ, С‡С‚Рѕ РґРІРёРіР°РµС‚СЃСЏ.
@@ -72,9 +69,7 @@ mcp__coplay__get_game_object_info(name="Global Volume")
 ## Volume: РЅР°Р±РѕСЂ РґР»СЏ С…РѕСЂСЂРѕСЂР°
 
 ```
-(вручную: Create → Volume Profile)
-(вручную: Volume Profile → Add Override)
-(вручную: Volume Profile → Vignette → параметры)
+(вручную: Create → Volume Profile)вручную: Volume Profile → Add Override)вручную: Volume Profile → Vignette → параметры)
   parameters={...})
 ```
 
@@ -97,7 +92,7 @@ mcp__coplay__get_game_object_info(name="Global Volume")
 | РћРґРёРЅР°РєРѕРІС‹Р№ РјР°С‚РµСЂРёР°Р» | РџРµСЂРµРёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ |
 
 ```
-mcp__coplay__set_property(name="Obj", properties={...})
+(вручную)
 ```
 
 РњР°С‚РµСЂРёР°Р» РЅР° РѕР±СЉРµРєС‚ = СЃР»РѕРјР°РЅРЅС‹Р№ Р±Р°С‚С‡РёРЅРі + СѓС‚РµС‡РєР° РїР°РјСЏС‚Рё.
@@ -113,8 +108,7 @@ mcp__coplay__set_property(name="Obj", properties={...})
 Р¦РµР»СЊ: **< 800**, Р¶С‘СЃС‚РєРёР№ РїСЂРµРґРµР» 1500.
 
 ```
-mcp__coplay__get_worst_cpu_frames() / mcp__coplay__get_worst_gc_frames()
-mcp__coplay__get_worst_cpu_frames()
+(вручную) / (вручную)вручную)
 ```
 
 ### РљР°Рє СЃРЅРёР¶Р°С‚СЊ
@@ -135,9 +129,7 @@ mcp__coplay__get_worst_cpu_frames()
 Р¦РµР»СЊ: **16.6 ms** (60 FPS), Р¶С‘СЃС‚РєРёР№ РїСЂРµРґРµР» 22 ms.
 
 ```
-mcp__coplay__get_worst_cpu_frames()
-mcp__coplay__get_worst_gc_frames()
-mcp__coplay__get_worst_gc_frames()
+(вручную)вручную)вручную)
 ```
 
 Р§С‚Рѕ СЃРјРѕС‚СЂРµС‚СЊ РІ РїРѕСЂСЏРґРєРµ СѓР±С‹РІР°РЅРёСЏ РІР»РёСЏРЅРёСЏ:

@@ -223,8 +223,7 @@ Woodberry/
 
 ```powershell
 # РљРѕРјРїРёР»СЏС†РёСЏ
-mcp__coplay__check_compile_errors()
-mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
+(вручную)вручную: Console)show_errors=true, show_warnings=true, limit=50)
 
 # РўРµСЃС‚С‹
 Test Runner → EditMode → Run All (вручную)
