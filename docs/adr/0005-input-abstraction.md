@@ -1,0 +1,103 @@
+# ADR 0005 — Input Abstraction
+
+## Status
+
+Accepted
+
+## Date
+
+2026-09-30
+
+## Context
+
+Используется `com.unity.inputsystem` 1.20.0, legacy input выключен.
+В кооперативной игре у каждого игрока разный источник ввода:
+
+- **Local player** — реальный ввод с клавиатуры/гмы
+- **Remote player** — ввода нет вообще, состояние приходит из сети
+
+Если `PlayerController` читает `InputSystem` напрямую, он по определению не может
+работать как remote player. Значит, чтение ввода должно быть абстракцией.
+
+Дополнительно: `PlayerController` должен тестироваться в EditMode без реального устройства
+ввода. Прямая зависимость от `InputSystem` этого не позволяет.
+
+## Decision
+
+### `IInputReader` — единственная точка доступа к вводу
+
+Интерфейс живёт в `Assets/Scripts/Core/`. Реализация — тоже в `Core`.
+**Ни один класс в `Gameplay/`, `AI/`, `CameraRig/` не ссылается на `UnityEngine.InputSystem`.**
+
+### Контракт
+
+```csharp
+namespace Woodberry.Core
+{
+    public interface IInputReader
+    {
+        Vector2 Move { get; }
+        bool SprintHeld { get; }
+        bool InteractPressed { get; }
+
+        void EnableGameplayInput();
+        void DisableGameplayInput();
+    }
+}
+```
+
+### Правила
+
+1. **Геймплей не знает про `InputSystem`.** Проверяется grep'ом.
+2. **`IInputReader` возвращает семантическое действие, не устройство.**
+   Не `GetAxis("Horizontal")`, а `Move`. Иначе привязка к устройству протекает в геймплей.
+3. **Input actions разделены на геймплейные и UI-действия.**
+   Разные action maps. Геймплейные отключаются, когда открыт UI.
+4. **`Enable`/`Disable` — парные вызовы.** `OnEnable`/`OnDisable` компонента.
+   Иначе утечка подписок и «залипание» ввода.
+5. **`NetworkedInputReader` для remote-игроков** — возвращает нули, а не ошибку.
+   Тот же `PlayerController` работает без специальных веток.
+6. **Никаких строковых имён экшенов** в геймплее. Только сгенерированный C# класс
+   из `InputSystem_Actions.inputactions`.
+
+## Consequences
+
+### Positive
+
+- Один `PlayerController` работает и для local, и для remote игрока
+- Логика движения тестируется в EditMode с заглушкой `IInputReader`
+- Смена раскладки/устройства не трогает геймплей
+- Grep-проверка «в геймплее нет `InputSystem`» ловит нарушения автоматически
+
+### Negative
+
+- Лишний слой абстракции на этапе, когда один игрок. Окупается с первым же
+  удалённым игроком в Stage 03.
+- Абстракция упирается в выразительность: если ввод станет сложным (грязевые лучи,
+  комбо), интерфейс разрастётся. Митигация: не заводить методы «на будущее»,
+  добавлять по мере надобности.
+
+## Alternatives considered
+
+### Читать `InputSystem` в `PlayerController`
+
+Отклонено: делает remote-игрока невозможным без отдельного класса → расхождение кода.
+
+### `InputReader` как статический синглтон
+
+Отклонено: скрытая зависимость, не тестируется, нарушает правило композиции.
+
+### Ставить значения ввода в public-поля компонента
+
+Отклонено: те же проблемы, плюс неявная связь.
+
+## Revisit when
+
+- Появится сложный ввод (combo, remap), и интерфейс станет неудобным
+- Появится буфер ввода (input buffer для атак) — вероятно, потребуется расширение
+
+## Links
+
+- `AGENTS.md → Unity-specific rules → Ввод`
+- `docs/specs/coop-networking.md → Модель владения`
+- `docs/adr/0001-layer-and-assembly-architecture.md`

@@ -1,2 +1,38 @@
-# Auto detect text files and perform LF normalization
+# Нормализация переводов строк
+#
+# Unity генерирует ассеты с CRLF. Без этого правила git может смешивать
+# окончания строк, что приводит к «мусорным» diff'ам в .meta и .unity файлах.
+
 * text=auto
+
+# Unity-ассеты и метаданные — всегда CRLF (создаются редактором)
+*.cs        text eol=crlf diff=csharp
+*.asmdef    text eol=crlf
+*.json      text eol=crlf
+*.meta      text eol=crlf
+*.unity     text eol=crlf diff=unity
+*.prefab    text eol=crlf
+*.asset     text eol=crlf
+*.mat       text eol=crlf
+
+# Проектная документация — LF (кросс-платформенная)
+*.md        text eol=lf
+.gitignore  text eol=lf
+.gitattributes text eol=lf
+
+# Бинарные — не трогать
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.tga       binary
+*.psd       binary
+*.blend     binary
+*.fbx       binary
+*.wav       binary
+*.mp3       binary
+*.ogg       binary
+*.unitypackage binary
+*.dll       binary
+*.pdb       binary
+*.exe       binary

@@ -73,3 +73,33 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# ============================================
+# OpenCode
+# ============================================
+# Служебное состояние goal-плагина — не часть проекта.
+# Проектный слой (.opencode/agents, skills, patterns, templates, command) — КОМИТИТСЯ.
+/.opencode/goals/
+
+# Прочие локальные артефакты OpenCode
+/.opencode/cache/
+/.opencode/log/
+*.opencode.log
+
+# ============================================
+# Прочее
+# ============================================
+# Сборки
+/Builds/
+/Build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Редакторы
+*.swp
+*.swo
+*~
+.idea/
+
