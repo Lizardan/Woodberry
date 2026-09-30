@@ -1,24 +1,24 @@
-# Runbook — Adding Content
+# Runbook вЂ” Adding Content
 
 ## Purpose
 
-Добавлять ассеты, скрипты, префабы и сцены по правилам проекта, не ломая структуру.
+Р”РѕР±Р°РІР»СЏС‚СЊ Р°СЃСЃРµС‚С‹, СЃРєСЂРёРїС‚С‹, РїСЂРµС„Р°Р±С‹ Рё СЃС†РµРЅС‹ РїРѕ РїСЂР°РІРёР»Р°Рј РїСЂРѕРµРєС‚Р°, РЅРµ Р»РѕРјР°СЏ СЃС‚СЂСѓРєС‚СѓСЂСѓ.
 
-## Новый скрипт
+## РќРѕРІС‹Р№ СЃРєСЂРёРїС‚
 
-### 1. Выбрать слой
+### 1. Р’С‹Р±СЂР°С‚СЊ СЃР»РѕР№
 
-| Что делает | Слой | Папка |
+| Р§С‚Рѕ РґРµР»Р°РµС‚ | РЎР»РѕР№ | РџР°РїРєР° |
 |---|---|---|
-| Композиция, сервисы, абстракции | `Core` | `Assets/Scripts/Core/` |
-| Игровые правила | `Gameplay` | `Assets/Scripts/Gameplay/<Domain>/` |
-| Поведение, навигация | `AI` | `Assets/Scripts/AI/` |
-| Сетевой код | `Net` | `Assets/Scripts/Net/` |
-| Презентация | `UI` | `Assets/Scripts/UI/` |
-| Камера | `CameraRig` | `Assets/Scripts/CameraRig/` |
-| Звук | `Audio` | `Assets/Scripts/Audio/` |
-| Сохранение | `Save` | `Assets/Scripts/Save/` |
-| Только редактор | `Editor` | `Assets/Scripts/Editor/` |
+| РљРѕРјРїРѕР·РёС†РёСЏ, СЃРµСЂРІРёСЃС‹, Р°Р±СЃС‚СЂР°РєС†РёРё | `Core` | `Assets/Scripts/Core/` |
+| РРіСЂРѕРІС‹Рµ РїСЂР°РІРёР»Р° | `Gameplay` | `Assets/Scripts/Gameplay/<Domain>/` |
+| РџРѕРІРµРґРµРЅРёРµ, РЅР°РІРёРіР°С†РёСЏ | `AI` | `Assets/Scripts/AI/` |
+| РЎРµС‚РµРІРѕР№ РєРѕРґ | `Net` | `Assets/Scripts/Net/` |
+| РџСЂРµР·РµРЅС‚Р°С†РёСЏ | `UI` | `Assets/Scripts/UI/` |
+| РљР°РјРµСЂР° | `CameraRig` | `Assets/Scripts/CameraRig/` |
+| Р—РІСѓРє | `Audio` | `Assets/Scripts/Audio/` |
+| РЎРѕС…СЂР°РЅРµРЅРёРµ | `Save` | `Assets/Scripts/Save/` |
+| РўРѕР»СЊРєРѕ СЂРµРґР°РєС‚РѕСЂ | `Editor` | `Assets/Scripts/Editor/` |
 
 ### 2. Namespace
 
@@ -26,80 +26,80 @@
 namespace Woodberry.Gameplay.Player
 ```
 
-Формат: `Woodberry.<Слой>[.<Домен>]`.
+Р¤РѕСЂРјР°С‚: `Woodberry.<РЎР»РѕР№>[.<Р”РѕРјРµРЅ>]`.
 
-### 3. Имя файла = имя типа
+### 3. РРјСЏ С„Р°Р№Р»Р° = РёРјСЏ С‚РёРїР°
 
-Один основной тип на файл. `PlayerController.cs` содержит `PlayerController`.
+РћРґРёРЅ РѕСЃРЅРѕРІРЅРѕР№ С‚РёРї РЅР° С„Р°Р№Р». `PlayerController.cs` СЃРѕРґРµСЂР¶РёС‚ `PlayerController`.
 
-### 4. Правила полей
+### 4. РџСЂР°РІРёР»Р° РїРѕР»РµР№
 
 ```csharp
-[SerializeField] private float _moveSpeed = 3f;   // ✅ инспектор
-public float MoveSpeed => _moveSpeed;             // ✅ доступ
-public float MoveSpeed { get; set; }              // ✅
+[SerializeField] private float _moveSpeed = 3f;   // вњ… РёРЅСЃРїРµРєС‚РѕСЂ
+public float MoveSpeed => _moveSpeed;             // вњ… РґРѕСЃС‚СѓРї
+public float MoveSpeed { get; set; }              // вњ…
 
-public float moveSpeed;                           // ❌ public поле в рантайме
-public float MoveSpeed;                           // ❌ public поле в рантайме
+public float moveSpeed;                           // вќЊ public РїРѕР»Рµ РІ СЂР°РЅС‚Р°Р№РјРµ
+public float MoveSpeed;                           // вќЊ public РїРѕР»Рµ РІ СЂР°РЅС‚Р°Р№РјРµ
 ```
 
-**Все поля, видимые дизайнеру, — `[SerializeField] private` + property.**
+**Р’СЃРµ РїРѕР»СЏ, РІРёРґРёРјС‹Рµ РґРёР·Р°Р№РЅРµСЂСѓ, вЂ” `[SerializeField] private` + property.**
 
-### 5. Проверить
+### 5. РџСЂРѕРІРµСЂРёС‚СЊ
 
 ```
-mcp__unityMCP__refresh_unity(compile="request", wait_for_ready=true)
-mcp__unityMCP__read_console(action="get", types=["error"])
+mcp__unityMCP__recompile(focus=false)
+mcp__unityMCP__console(level="error", tail=50)
 ```
 
-## Новый ассет
+## РќРѕРІС‹Р№ Р°СЃСЃРµС‚
 
-### Куда
+### РљСѓРґР°
 
 `Assets/Woodberry/<Category>/[<Subcategory>/]`
 
-| Тип | Куда |
+| РўРёРї | РљСѓРґР° |
 |---|---|
-| Спрайт, текстура 2D | `Woodberry/Art/` |
-| Звук | `Woodberry/Audio/{Music,SFX,Ambience,UI}/` |
-| Материал | `Woodberry/Materials/` |
-| Модель | `Woodberry/Models/` |
-| Префаб | `Woodberry/Prefabs/` |
-| Сцена | `Woodberry/Scenes/` |
-| SO-конфиг | `Woodberry/Settings/` |
-| UI-элемент | `Woodberry/UI/` |
+| РЎРїСЂР°Р№С‚, С‚РµРєСЃС‚СѓСЂР° 2D | `Woodberry/Art/` |
+| Р—РІСѓРє | `Woodberry/Audio/{Music,SFX,Ambience,UI}/` |
+| РњР°С‚РµСЂРёР°Р» | `Woodberry/Materials/` |
+| РњРѕРґРµР»СЊ | `Woodberry/Models/` |
+| РџСЂРµС„Р°Р± | `Woodberry/Prefabs/` |
+| РЎС†РµРЅР° | `Woodberry/Scenes/` |
+| SO-РєРѕРЅС„РёРі | `Woodberry/Settings/` |
+| UI-СЌР»РµРјРµРЅС‚ | `Woodberry/UI/` |
 | VFX | `Woodberry/VFX/` |
 
-### Имя
+### РРјСЏ
 
-`PascalCase`, без пробелов, без кириллицы.
+`PascalCase`, Р±РµР· РїСЂРѕР±РµР»РѕРІ, Р±РµР· РєРёСЂРёР»Р»РёС†С‹.
 `PlayerController.prefab`, `Enemy_Zombie.asset`, `ItemDefinition_Flare.asset`.
 
-Переименуй сразу то, что Unity назвал сам: `New GameObject` → `Player`,
-`Cube` → `Crate_Wooden`.
+РџРµСЂРµРёРјРµРЅСѓР№ СЃСЂР°Р·Сѓ С‚Рѕ, С‡С‚Рѕ Unity РЅР°Р·РІР°Р» СЃР°Рј: `New GameObject` в†’ `Player`,
+`Cube` в†’ `Crate_Wooden`.
 
-### Проверить `.meta`
+### РџСЂРѕРІРµСЂРёС‚СЊ `.meta`
 
-После создания ассета рядом лежит `.meta`. Он **обязан** попасть в коммит
-вместе с ассетом.
+РџРѕСЃР»Рµ СЃРѕР·РґР°РЅРёСЏ Р°СЃСЃРµС‚Р° СЂСЏРґРѕРј Р»РµР¶РёС‚ `.meta`. РћРЅ **РѕР±СЏР·Р°РЅ** РїРѕРїР°СЃС‚СЊ РІ РєРѕРјРјРёС‚
+РІРјРµСЃС‚Рµ СЃ Р°СЃСЃРµС‚РѕРј.
 
-## Новый префаб
+## РќРѕРІС‹Р№ РїСЂРµС„Р°Р±
 
-1. Создать объект(ы) в сцене, настроить.
-2. Выделить корневой объект.
-3. **Ctrl+D / GameObject → Prefab** → перетащить в `Assets/Woodberry/Prefabs/`.
-4. **Применить** в инспекторе префаба (Overrides → Apply All).
-5. Удалить экземпляр из сцены, если он был временным.
+1. РЎРѕР·РґР°С‚СЊ РѕР±СЉРµРєС‚(С‹) РІ СЃС†РµРЅРµ, РЅР°СЃС‚СЂРѕРёС‚СЊ.
+2. Р’С‹РґРµР»РёС‚СЊ РєРѕСЂРЅРµРІРѕР№ РѕР±СЉРµРєС‚.
+3. **Ctrl+D / GameObject в†’ Prefab** в†’ РїРµСЂРµС‚Р°С‰РёС‚СЊ РІ `Assets/Woodberry/Prefabs/`.
+4. **РџСЂРёРјРµРЅРёС‚СЊ** РІ РёРЅСЃРїРµРєС‚РѕСЂРµ РїСЂРµС„Р°Р±Р° (Overrides в†’ Apply All).
+5. РЈРґР°Р»РёС‚СЊ СЌРєР·РµРјРїР»СЏСЂ РёР· СЃС†РµРЅС‹, РµСЃР»Рё РѕРЅ Р±С‹Р» РІСЂРµРјРµРЅРЅС‹Рј.
 
-### Правила
+### РџСЂР°РІРёР»Р°
 
-- Префаб — **единственный источник правды** для повторяющихся объектов.
-  Настройка дубликата в сцене вместо префаба — антипаттерн.
-- Изменения в префабе — через `Apply`. Ручное редактирование инстанса ломает связь.
-- Префаб не содержит логики, зависящей от единственного экземпляра.
-- **Никогда не редактировать `.prefab` как текст** (YAML). Только редактор или MCP.
+- РџСЂРµС„Р°Р± вЂ” **РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ РёСЃС‚РѕС‡РЅРёРє РїСЂР°РІРґС‹** РґР»СЏ РїРѕРІС‚РѕСЂСЏСЋС‰РёС…СЃСЏ РѕР±СЉРµРєС‚РѕРІ.
+  РќР°СЃС‚СЂРѕР№РєР° РґСѓР±Р»РёРєР°С‚Р° РІ СЃС†РµРЅРµ РІРјРµСЃС‚Рѕ РїСЂРµС„Р°Р±Р° вЂ” Р°РЅС‚РёРїР°С‚С‚РµСЂРЅ.
+- РР·РјРµРЅРµРЅРёСЏ РІ РїСЂРµС„Р°Р±Рµ вЂ” С‡РµСЂРµР· `Apply`. Р СѓС‡РЅРѕРµ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РёРЅСЃС‚Р°РЅСЃР° Р»РѕРјР°РµС‚ СЃРІСЏР·СЊ.
+- РџСЂРµС„Р°Р± РЅРµ СЃРѕРґРµСЂР¶РёС‚ Р»РѕРіРёРєРё, Р·Р°РІРёСЃСЏС‰РµР№ РѕС‚ РµРґРёРЅСЃС‚РІРµРЅРЅРѕРіРѕ СЌРєР·РµРјРїР»СЏСЂР°.
+- **РќРёРєРѕРіРґР° РЅРµ СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ `.prefab` РєР°Рє С‚РµРєСЃС‚** (YAML). РўРѕР»СЊРєРѕ СЂРµРґР°РєС‚РѕСЂ РёР»Рё MCP.
 
-## Новый SO-конфиг
+## РќРѕРІС‹Р№ SO-РєРѕРЅС„РёРі
 
 ```csharp
 [CreateAssetMenu(fileName = "Enemy_Definition", menuName = "Woodberry/Enemy Definition")]
@@ -115,60 +115,60 @@ public sealed class EnemyDefinition : ScriptableObject
     {
         if (_maxHealth <= 0f)
         {
-            Debug.LogError($"[{nameof(EnemyDefinition)}] MaxHealth должен быть > 0", this);
+            Debug.LogError($"[{nameof(EnemyDefinition)}] MaxHealth РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ > 0", this);
         }
     }
 }
 ```
 
-Правила — см. ADR 0004. Главное:
-- SO = **дизайн-данные**, не runtime-состояние
-- `OnValidate` ловит невалидные данные в редакторе
-- В рантайме SO **неизменяем**
+РџСЂР°РІРёР»Р° вЂ” СЃРј. ADR 0004. Р“Р»Р°РІРЅРѕРµ:
+- SO = **РґРёР·Р°Р№РЅ-РґР°РЅРЅС‹Рµ**, РЅРµ runtime-СЃРѕСЃС‚РѕСЏРЅРёРµ
+- `OnValidate` Р»РѕРІРёС‚ РЅРµРІР°Р»РёРґРЅС‹Рµ РґР°РЅРЅС‹Рµ РІ СЂРµРґР°РєС‚РѕСЂРµ
+- Р’ СЂР°РЅС‚Р°Р№РјРµ SO **РЅРµРёР·РјРµРЅСЏРµРј**
 
-Создать: **Assets → Create → Woodberry → …**
+РЎРѕР·РґР°С‚СЊ: **Assets в†’ Create в†’ Woodberry в†’ вЂ¦**
 
-## Новая сцена
+## РќРѕРІР°СЏ СЃС†РµРЅР°
 
-1. **File → New Scene** (или **Scene → New Scene**)
-2. Настроить: камера, свет, настройки окружения
-3. **File → Save As** → `Assets/Woodberry/Scenes/Woodberry_<Name>.unity`
+1. **File в†’ New Scene** (РёР»Рё **Scene в†’ New Scene**)
+2. РќР°СЃС‚СЂРѕРёС‚СЊ: РєР°РјРµСЂР°, СЃРІРµС‚, РЅР°СЃС‚СЂРѕР№РєРё РѕРєСЂСѓР¶РµРЅРёСЏ
+3. **File в†’ Save As** в†’ `Assets/Woodberry/Scenes/Woodberry_<Name>.unity`
 
-Обязательно в сцене:
-- ✅ Камера (или ссылка на `CameraRig`)
-- ✅ Свет (хотя бы минимальный, чтобы сцена не была полностью чёрной до настройки)
-- ✅ Если сцена — уровень игры: NavMesh (через `NavMeshSurface`)
+РћР±СЏР·Р°С‚РµР»СЊРЅРѕ РІ СЃС†РµРЅРµ:
+- вњ… РљР°РјРµСЂР° (РёР»Рё СЃСЃС‹Р»РєР° РЅР° `CameraRig`)
+- вњ… РЎРІРµС‚ (С…РѕС‚СЏ Р±С‹ РјРёРЅРёРјР°Р»СЊРЅС‹Р№, С‡С‚РѕР±С‹ СЃС†РµРЅР° РЅРµ Р±С‹Р»Р° РїРѕР»РЅРѕСЃС‚СЊСЋ С‡С‘СЂРЅРѕР№ РґРѕ РЅР°СЃС‚СЂРѕР№РєРё)
+- вњ… Р•СЃР»Рё СЃС†РµРЅР° вЂ” СѓСЂРѕРІРµРЅСЊ РёРіСЂС‹: NavMesh (С‡РµСЂРµР· `NavMeshSurface`)
 
-### Правила
+### РџСЂР°РІРёР»Р°
 
-- **Никогда не редактировать `.unity` как текст** (YAML). Только редактор или MCP.
-- Добавлять сцену в Build Settings: **File → Build Settings → Add Open Scenes**.
-- Имя: `Woodberry_<Name>`, `PascalCase`.
+- **РќРёРєРѕРіРґР° РЅРµ СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ `.unity` РєР°Рє С‚РµРєСЃС‚** (YAML). РўРѕР»СЊРєРѕ СЂРµРґР°РєС‚РѕСЂ РёР»Рё MCP.
+- Р”РѕР±Р°РІР»СЏС‚СЊ СЃС†РµРЅСѓ РІ Build Settings: **File в†’ Build Settings в†’ Add Open Scenes**.
+- РРјСЏ: `Woodberry_<Name>`, `PascalCase`.
 
-## Порядок изменений (чтобы ничего не сломать)
+## РџРѕСЂСЏРґРѕРє РёР·РјРµРЅРµРЅРёР№ (С‡С‚РѕР±С‹ РЅРёС‡РµРіРѕ РЅРµ СЃР»РѕРјР°С‚СЊ)
 
-Если меняешь что-то, что используется в сцене или префабе:
+Р•СЃР»Рё РјРµРЅСЏРµС€СЊ С‡С‚Рѕ-С‚Рѕ, С‡С‚Рѕ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РІ СЃС†РµРЅРµ РёР»Рё РїСЂРµС„Р°Р±Рµ:
 
-1. Изменить скрипт
-2. `refresh_unity` + `read_console` — убедиться в компиляции
-3. Открыть затронутые сцены и префабы
-4. Проверить, что ссылки не стали `Missing`
-5. `File → Save`
+1. РР·РјРµРЅРёС‚СЊ СЃРєСЂРёРїС‚
+2. `recompile` + `console(level="error")` вЂ” СѓР±РµРґРёС‚СЊСЃСЏ РІ РєРѕРјРїРёР»СЏС†РёРё
+3. РћС‚РєСЂС‹С‚СЊ Р·Р°С‚СЂРѕРЅСѓС‚С‹Рµ СЃС†РµРЅС‹ Рё РїСЂРµС„Р°Р±С‹
+4. РџСЂРѕРІРµСЂРёС‚СЊ, С‡С‚Рѕ СЃСЃС‹Р»РєРё РЅРµ СЃС‚Р°Р»Рё `Missing`
+5. `File в†’ Save`
 
-## Проверка после любых изменений
+## РџСЂРѕРІРµСЂРєР° РїРѕСЃР»Рµ Р»СЋР±С‹С… РёР·РјРµРЅРµРЅРёР№
 
 ```
-mcp__unityMCP__refresh_unity(compile="request", wait_for_ready=true)
-mcp__unityMCP__read_console(action="get", types=["error","warning"], count="50")
+mcp__unityMCP__recompile(focus=false)
+mcp__unityMCP__console(level="error", tail=50)
 mcp__unityMCP__run_tests(mode="EditMode", include_failed_tests=true)
 ```
 
-## Чего делать нельзя
+## Р§РµРіРѕ РґРµР»Р°С‚СЊ РЅРµР»СЊР·СЏ
 
-- ❌ Ручной YAML-редакт `.unity` / `.prefab` / `.asset`
-- ❌ Удаление `.meta` вручную
-- ❌ `public` поля в рантайме
-- ❌ `Resources.Load` для геймплейных данных
-- ❌ Логика в UI-контроллере
-- ❌ Сетевые API вне `Assets/Scripts/Net/`
-- ❌ `FindObjectOfType` в геймплейном коде
+- вќЊ Р СѓС‡РЅРѕР№ YAML-СЂРµРґР°РєС‚ `.unity` / `.prefab` / `.asset`
+- вќЊ РЈРґР°Р»РµРЅРёРµ `.meta` РІСЂСѓС‡РЅСѓСЋ
+- вќЊ `public` РїРѕР»СЏ РІ СЂР°РЅС‚Р°Р№РјРµ
+- вќЊ `Resources.Load` РґР»СЏ РіРµР№РјРїР»РµР№РЅС‹С… РґР°РЅРЅС‹С…
+- вќЊ Р›РѕРіРёРєР° РІ UI-РєРѕРЅС‚СЂРѕР»Р»РµСЂРµ
+- вќЊ РЎРµС‚РµРІС‹Рµ API РІРЅРµ `Assets/Scripts/Net/`
+- вќЊ `FindObjectOfType` РІ РіРµР№РјРїР»РµР№РЅРѕРј РєРѕРґРµ

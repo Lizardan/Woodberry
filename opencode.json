@@ -45,12 +45,10 @@
     "unityMCP": {
       "type": "local",
       "command": [
-        "C:\\Users\\Lizardan\\.local\\bin\\uvx.exe",
-        "--from",
-        "mcpforunityserver==10.1.2",
-        "mcp-for-unity",
-        "--transport",
-        "stdio"
+        "F:\\Unity\\Unity Hub\\resources\\unity.exe",
+        "mcp",
+        "--project-path",
+        "F:\\Unity Projects\\Woodberry"
       ],
       "enabled": true
     }

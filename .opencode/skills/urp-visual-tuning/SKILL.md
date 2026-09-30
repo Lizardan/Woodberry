@@ -1,6 +1,6 @@
 ---
 name: urp-visual-tuning
-description: Настройка визуала в URP-проекте Woodberry — свет, Volume, материалы, шейдеры, draw calls. Использовать при визуальных проблемах и оптимизации рендера.
+description: РќР°СЃС‚СЂРѕР№РєР° РІРёР·СѓР°Р»Р° РІ URP-РїСЂРѕРµРєС‚Рµ Woodberry вЂ” СЃРІРµС‚, Volume, РјР°С‚РµСЂРёР°Р»С‹, С€РµР№РґРµСЂС‹, draw calls. РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РїСЂРё РІРёР·СѓР°Р»СЊРЅС‹С… РїСЂРѕР±Р»РµРјР°С… Рё РѕРїС‚РёРјРёР·Р°С†РёРё СЂРµРЅРґРµСЂР°.
 compatibility: opencode
 metadata:
   audience: technical-artist, scene-level-designer
@@ -9,166 +9,166 @@ metadata:
 
 # URP Visual Tuning
 
-## Триггер
+## РўСЂРёРіРіРµСЂ
 
-Используй, когда:
-- сцена выглядит «плоско» или «неправильно»
-- нужно настроить пост-обработку
-- draw calls или frame time выше бюджета
-- подозреваешь, что шейдер/настройка неверны
+РСЃРїРѕР»СЊР·СѓР№, РєРѕРіРґР°:
+- СЃС†РµРЅР° РІС‹РіР»СЏРґРёС‚ В«РїР»РѕСЃРєРѕВ» РёР»Рё В«РЅРµРїСЂР°РІРёР»СЊРЅРѕВ»
+- РЅСѓР¶РЅРѕ РЅР°СЃС‚СЂРѕРёС‚СЊ РїРѕСЃС‚-РѕР±СЂР°Р±РѕС‚РєСѓ
+- draw calls РёР»Рё frame time РІС‹С€Рµ Р±СЋРґР¶РµС‚Р°
+- РїРѕРґРѕР·СЂРµРІР°РµС€СЊ, С‡С‚Рѕ С€РµР№РґРµСЂ/РЅР°СЃС‚СЂРѕР№РєР° РЅРµРІРµСЂРЅС‹
 
-## Правило 0: проверь API
+## РџСЂР°РІРёР»Рѕ 0: РїСЂРѕРІРµСЂСЊ API
 
-Unity `6000.6.3f1`, URP `17.6.0`. API меняется между версиями.
-**Не полагайся на память.**
+Unity `6000.6.3f1`, URP `17.6.0`. API РјРµРЅСЏРµС‚СЃСЏ РјРµР¶РґСѓ РІРµСЂСЃРёСЏРјРё.
+**РќРµ РїРѕР»Р°РіР°Р№СЃСЏ РЅР° РїР°РјСЏС‚СЊ.**
 
 ```
-mcp__unityMCP__unity_reflect(action="search", query="VolumeManager", scope="packages")
-mcp__unityMCP__unity_reflect(action="get_type", class_name="Volume")
-mcp__unityMCP__unity_docs(action="get_doc", class_name="Volume")
-
-# Поиск шейдеров в проекте — до создания нового
-mcp__unityMCP__manage_asset(action="search", filter_type="Shader", page_size=50)
-mcp__unityMCP__manage_graphics(action="ping")
+mcp__unityMCP__eval(code="return typeof(UnityEngine.Rendering.VolumeManager).FullName;")
+mcp__unityMCP__eval(code="return typeof(UnityEngine.Rendering.Volume).FullName;")
+mcp__unityMCP__eval(code="return string.Join(\"; \", typeof(UnityEngine.Rendering.Volume).GetProperties().Select(p => p.Name).ToArray());")
+& "F:\Unity\Unity Hub\resources\unity.exe" docs Volume --url
+# РџРѕРёСЃРє С€РµР№РґРµСЂРѕРІ РІ РїСЂРѕРµРєС‚Рµ вЂ” РґРѕ СЃРѕР·РґР°РЅРёСЏ РЅРѕРІРѕРіРѕ
+mcp__unityMCP__find_assets(type="Shader", limit=50)
+mcp__unityMCP__get_graphics_settings(action="ping")
 ```
 
-## Правило 1: URP, не Standard
+## РџСЂР°РІРёР»Рѕ 1: URP, РЅРµ Standard
 
-| Вместо | Используй |
+| Р’РјРµСЃС‚Рѕ | РСЃРїРѕР»СЊР·СѓР№ |
 |---|---|
 | `Standard` | `Universal Render Pipeline/Lit` |
 | `Unlit/Texture` | `Universal Render Pipeline/Unlit` |
 | Built-in Post-processing | URP **Volume** |
 
-Шейдер из устаревшего туториала в URP может **отображаться фиолетовым** (not supported)
-или работать неправильно.
+РЁРµР№РґРµСЂ РёР· СѓСЃС‚Р°СЂРµРІС€РµРіРѕ С‚СѓС‚РѕСЂРёР°Р»Р° РІ URP РјРѕР¶РµС‚ **РѕС‚РѕР±СЂР°Р¶Р°С‚СЊСЃСЏ С„РёРѕР»РµС‚РѕРІС‹Рј** (not supported)
+РёР»Рё СЂР°Р±РѕС‚Р°С‚СЊ РЅРµРїСЂР°РІРёР»СЊРЅРѕ.
 
-## Свет: порядок настройки
+## РЎРІРµС‚: РїРѕСЂСЏРґРѕРє РЅР°СЃС‚СЂРѕР№РєРё
 
-1. **Render Settings** — ambient mode, ambient intensity, рендереры
-2. **Освещение** — Directional / Spot / Point
-3. **Тени** — только там, где критично для читаемости
-4. **Reflection** — Reflection Probe, skybox
-5. **Post** — Volume
+1. **Render Settings** вЂ” ambient mode, ambient intensity, СЂРµРЅРґРµСЂРµСЂС‹
+2. **РћСЃРІРµС‰РµРЅРёРµ** вЂ” Directional / Spot / Point
+3. **РўРµРЅРё** вЂ” С‚РѕР»СЊРєРѕ С‚Р°Рј, РіРґРµ РєСЂРёС‚РёС‡РЅРѕ РґР»СЏ С‡РёС‚Р°РµРјРѕСЃС‚Рё
+4. **Reflection** вЂ” Reflection Probe, skybox
+5. **Post** вЂ” Volume
 
-### Проверить текущие настройки
-
-```
-mcp__unityMCP__manage_graphics(action="skybox_get")
-mcp__unityMCP__manage_graphics(action="pipeline_get_info")
-mcp__unityMCP__manage_graphics(action="volume_get_info", target="Global Volume")
-```
-
-### Запекание
+### РџСЂРѕРІРµСЂРёС‚СЊ С‚РµРєСѓС‰РёРµ РЅР°СЃС‚СЂРѕР№РєРё
 
 ```
-mcp__unityMCP__manage_graphics(action="bake_get_settings")
-mcp__unityMCP__manage_graphics(action="bake_start")
-mcp__unityMCP__manage_graphics(action="bake_status")
+mcp__unityMCP__get_graphics_settings(action="skybox_get")
+mcp__unityMCP__get_graphics_settings()
+mcp__unityMCP__get_graphics_settings(, target="Global Volume")
 ```
 
-Запечённый свет **бесплатный**. Не запекай то, что двигается.
-
-## Volume: набор для хоррора
+### Р—Р°РїРµРєР°РЅРёРµ
 
 ```
-mcp__unityMCP__manage_graphics(action="volume_create", name="Woodberry_Horror", is_global=true)
-mcp__unityMCP__manage_graphics(action="volume_add_effect", target="Woodberry_Horror", effect="Vignette")
-mcp__unityMCP__manage_graphics(action="volume_set_effect", target="Woodberry_Horror", effect="Vignette",
+mcp__unityMCP__get_graphics_settings(action="bake_get_settings")
+mcp__unityMCP__bake_lighting(confirm=true)
+mcp__unityMCP__lighting_bake_status()
+```
+
+Р—Р°РїРµС‡С‘РЅРЅС‹Р№ СЃРІРµС‚ **Р±РµСЃРїР»Р°С‚РЅС‹Р№**. РќРµ Р·Р°РїРµРєР°Р№ С‚Рѕ, С‡С‚Рѕ РґРІРёРіР°РµС‚СЃСЏ.
+
+## Volume: РЅР°Р±РѕСЂ РґР»СЏ С…РѕСЂСЂРѕСЂР°
+
+```
+mcp__unityMCP__get_graphics_settings(action="volume_create", name="Woodberry_Horror", is_global=true)
+mcp__unityMCP__get_graphics_settings(action="volume_add_effect", target="Woodberry_Horror", effect="Vignette")
+mcp__unityMCP__get_graphics_settings(action="volume_set_effect", target="Woodberry_Horror", effect="Vignette",
   parameters={...})
 ```
 
-| Эффект | Параметры | Типичная ошибка |
+| Р­С„С„РµРєС‚ | РџР°СЂР°РјРµС‚СЂС‹ | РўРёРїРёС‡РЅР°СЏ РѕС€РёР±РєР° |
 |---|---|---|
-| `Vignette` | Intensity, Smoothness, Color | Слишком сильная → «слепое» поле зрения |
-| `Bloom` | Intensity, Threshold, Scatter | Слишком высокий threshold → только самые яркие засвечены |
-| `ColorAdjustments` | Post Exposure, Contrast, Saturation, Filter | Saturation вниз = «грязь», а не хоррор |
-| `FilmGrain` | Intensity | Слишком сильный → мешает читаемости |
-| `Tonemapping` | Mode | Neutral/ACES — пробовать оба |
+| `Vignette` | Intensity, Smoothness, Color | РЎР»РёС€РєРѕРј СЃРёР»СЊРЅР°СЏ в†’ В«СЃР»РµРїРѕРµВ» РїРѕР»Рµ Р·СЂРµРЅРёСЏ |
+| `Bloom` | Intensity, Threshold, Scatter | РЎР»РёС€РєРѕРј РІС‹СЃРѕРєРёР№ threshold в†’ С‚РѕР»СЊРєРѕ СЃР°РјС‹Рµ СЏСЂРєРёРµ Р·Р°СЃРІРµС‡РµРЅС‹ |
+| `ColorAdjustments` | Post Exposure, Contrast, Saturation, Filter | Saturation РІРЅРёР· = В«РіСЂСЏР·СЊВ», Р° РЅРµ С…РѕСЂСЂРѕСЂ |
+| `FilmGrain` | Intensity | РЎР»РёС€РєРѕРј СЃРёР»СЊРЅС‹Р№ в†’ РјРµС€Р°РµС‚ С‡РёС‚Р°РµРјРѕСЃС‚Рё |
+| `Tonemapping` | Mode | Neutral/ACES вЂ” РїСЂРѕР±РѕРІР°С‚СЊ РѕР±Р° |
 
-## Материалы
+## РњР°С‚РµСЂРёР°Р»С‹
 
-### Правило: один материал — много объектов
+### РџСЂР°РІРёР»Рѕ: РѕРґРёРЅ РјР°С‚РµСЂРёР°Р» вЂ” РјРЅРѕРіРѕ РѕР±СЉРµРєС‚РѕРІ
 
-| Ситуация | Решение |
+| РЎРёС‚СѓР°С†РёСЏ | Р РµС€РµРЅРёРµ |
 |---|---|
-| Разный цвет | `MaterialPropertyBlock` |
-| Разные текстуры | Атлас |
-| Одинаковый материал | Переиспользовать |
+| Р Р°Р·РЅС‹Р№ С†РІРµС‚ | `MaterialPropertyBlock` |
+| Р Р°Р·РЅС‹Рµ С‚РµРєСЃС‚СѓСЂС‹ | РђС‚Р»Р°СЃ |
+| РћРґРёРЅР°РєРѕРІС‹Р№ РјР°С‚РµСЂРёР°Р» | РџРµСЂРµРёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ |
 
 ```
-mcp__unityMCP__manage_material(action="set_renderer_color", target="Obj", color=[1,0,0], mode="property_block")
+mcp__unityMCP__set_material_properties(, target="Obj", color=[1,0,0], mode="property_block")
 ```
 
-Материал на объект = сломанный батчинг + утечка памяти.
+РњР°С‚РµСЂРёР°Р» РЅР° РѕР±СЉРµРєС‚ = СЃР»РѕРјР°РЅРЅС‹Р№ Р±Р°С‚С‡РёРЅРі + СѓС‚РµС‡РєР° РїР°РјСЏС‚Рё.
 
-### Проверка существующего материала
-
-```
-mcp__unityMCP__manage_material(action="get_material_info", material_path="Assets/Woodberry/Materials/X.mat")
-```
-
-## Draw calls: бюджет
-
-Цель: **< 800**, жёсткий предел 1500.
+### РџСЂРѕРІРµСЂРєР° СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ РјР°С‚РµСЂРёР°Р»Р°
 
 ```
-mcp__unityMCP__manage_graphics(action="stats_get")
-mcp__unityMCP__manage_profiler(action="get_frame_timing")
+mcp__unityMCP__get_material_properties(material="Assets/Woodberry/Materials/X.mat")
 ```
 
-### Как снижать
+## Draw calls: Р±СЋРґР¶РµС‚
 
-| Приём | Когда |
+Р¦РµР»СЊ: **< 800**, Р¶С‘СЃС‚РєРёР№ РїСЂРµРґРµР» 1500.
+
+```
+mcp__unityMCP__get_performance_stats()
+mcp__unityMCP__get_performance_stats(action="get_frame_timing")
+```
+
+### РљР°Рє СЃРЅРёР¶Р°С‚СЊ
+
+| РџСЂРёС‘Рј | РљРѕРіРґР° |
 |---|---|
-| GPU Instancing | Повторяющиеся объекты с одним материалом |
-| Static Batching | Статичная геометрия |
-| Объединение мешей | Много мелких объектов в одном |
-| LOD | Крупная геометрия вдали |
-| Occlusion culling | Закрытые уровни |
-| Убрать прозрачность | Blend-сортировка дорогая |
-| Меньше теневых каскадов | Каждый каскад = проход |
-| Один материал вместо N | Батчинг |
+| GPU Instancing | РџРѕРІС‚РѕСЂСЏСЋС‰РёРµСЃСЏ РѕР±СЉРµРєС‚С‹ СЃ РѕРґРЅРёРј РјР°С‚РµСЂРёР°Р»РѕРј |
+| Static Batching | РЎС‚Р°С‚РёС‡РЅР°СЏ РіРµРѕРјРµС‚СЂРёСЏ |
+| РћР±СЉРµРґРёРЅРµРЅРёРµ РјРµС€РµР№ | РњРЅРѕРіРѕ РјРµР»РєРёС… РѕР±СЉРµРєС‚РѕРІ РІ РѕРґРЅРѕРј |
+| LOD | РљСЂСѓРїРЅР°СЏ РіРµРѕРјРµС‚СЂРёСЏ РІРґР°Р»Рё |
+| Occlusion culling | Р—Р°РєСЂС‹С‚С‹Рµ СѓСЂРѕРІРЅРё |
+| РЈР±СЂР°С‚СЊ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ | Blend-СЃРѕСЂС‚РёСЂРѕРІРєР° РґРѕСЂРѕРіР°СЏ |
+| РњРµРЅСЊС€Рµ С‚РµРЅРµРІС‹С… РєР°СЃРєР°РґРѕРІ | РљР°Р¶РґС‹Р№ РєР°СЃРєР°Рґ = РїСЂРѕС…РѕРґ |
+| РћРґРёРЅ РјР°С‚РµСЂРёР°Р» РІРјРµСЃС‚Рѕ N | Р‘Р°С‚С‡РёРЅРі |
 
-## Frame time: бюджет
+## Frame time: Р±СЋРґР¶РµС‚
 
-Цель: **16.6 ms** (60 FPS), жёсткий предел 22 ms.
+Р¦РµР»СЊ: **16.6 ms** (60 FPS), Р¶С‘СЃС‚РєРёР№ РїСЂРµРґРµР» 22 ms.
 
 ```
-mcp__unityMCP__manage_profiler(action="profiler_start")
-mcp__unityMCP__manage_profiler(action="get_counters", category="Render")
-mcp__unityMCP__manage_profiler(action="profiler_stop")
+mcp__unityMCP__get_performance_stats(action="profiler_start")
+mcp__unityMCP__get_performance_stats(action="get_counters", category="Render")
+mcp__unityMCP__get_performance_stats(action="profiler_stop")
 ```
 
-Что смотреть в порядке убывания влияния:
-1. **GPU** — шейдеры, overdraw, разрешение
-2. **Rendering** — draw calls, culling
-3. **Scripts** — аллокации, `Update` стоимость
-4. **Physics** — количество коллайдеров, broadphase
-5. **GC** — аллокации в рантайме
+Р§С‚Рѕ СЃРјРѕС‚СЂРµС‚СЊ РІ РїРѕСЂСЏРґРєРµ СѓР±С‹РІР°РЅРёСЏ РІР»РёСЏРЅРёСЏ:
+1. **GPU** вЂ” С€РµР№РґРµСЂС‹, overdraw, СЂР°Р·СЂРµС€РµРЅРёРµ
+2. **Rendering** вЂ” draw calls, culling
+3. **Scripts** вЂ” Р°Р»Р»РѕРєР°С†РёРё, `Update` СЃС‚РѕРёРјРѕСЃС‚СЊ
+4. **Physics** вЂ” РєРѕР»РёС‡РµСЃС‚РІРѕ РєРѕР»Р»Р°Р№РґРµСЂРѕРІ, broadphase
+5. **GC** вЂ” Р°Р»Р»РѕРєР°С†РёРё РІ СЂР°РЅС‚Р°Р№РјРµ
 
-## Типичные проблемы
+## РўРёРїРёС‡РЅС‹Рµ РїСЂРѕР±Р»РµРјС‹
 
-| Симптом | Причина | Решение |
+| РЎРёРјРїС‚РѕРј | РџСЂРёС‡РёРЅР° | Р РµС€РµРЅРёРµ |
 |---|---|---|
-| Фиолетовый объект | Шейдер не поддерживается URP | Заменить на URP-шейдер |
-| Объекты чёрные в билде | Не запечён свет, стриппинг шейдера | Запечь, проверить шейдер на стриппинг |
-| Сцена «плоская» | Нет запечённого света, слабый ambient | Ambient ↑, directional свет настроить |
-| Всё засвечено | Bloom intensity высокий, threshold низкий | Threshold ↑, intensity ↓ |
-| Мерцание теней | Shadow acne / низкое разрешение теней | Bias ↑, resolution ↓ |
-| FPS ниже бюджета | См. порядок проверки выше | Профилируй, не гадай |
-| Много draw calls | Материал на объект | `MaterialPropertyBlock`, инстансинг |
+| Р¤РёРѕР»РµС‚РѕРІС‹Р№ РѕР±СЉРµРєС‚ | РЁРµР№РґРµСЂ РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ URP | Р—Р°РјРµРЅРёС‚СЊ РЅР° URP-С€РµР№РґРµСЂ |
+| РћР±СЉРµРєС‚С‹ С‡С‘СЂРЅС‹Рµ РІ Р±РёР»РґРµ | РќРµ Р·Р°РїРµС‡С‘РЅ СЃРІРµС‚, СЃС‚СЂРёРїРїРёРЅРі С€РµР№РґРµСЂР° | Р—Р°РїРµС‡СЊ, РїСЂРѕРІРµСЂРёС‚СЊ С€РµР№РґРµСЂ РЅР° СЃС‚СЂРёРїРїРёРЅРі |
+| РЎС†РµРЅР° В«РїР»РѕСЃРєР°СЏВ» | РќРµС‚ Р·Р°РїРµС‡С‘РЅРЅРѕРіРѕ СЃРІРµС‚Р°, СЃР»Р°Р±С‹Р№ ambient | Ambient в†‘, directional СЃРІРµС‚ РЅР°СЃС‚СЂРѕРёС‚СЊ |
+| Р’СЃС‘ Р·Р°СЃРІРµС‡РµРЅРѕ | Bloom intensity РІС‹СЃРѕРєРёР№, threshold РЅРёР·РєРёР№ | Threshold в†‘, intensity в†“ |
+| РњРµСЂС†Р°РЅРёРµ С‚РµРЅРµР№ | Shadow acne / РЅРёР·РєРѕРµ СЂР°Р·СЂРµС€РµРЅРёРµ С‚РµРЅРµР№ | Bias в†‘, resolution в†“ |
+| FPS РЅРёР¶Рµ Р±СЋРґР¶РµС‚Р° | РЎРј. РїРѕСЂСЏРґРѕРє РїСЂРѕРІРµСЂРєРё РІС‹С€Рµ | РџСЂРѕС„РёР»РёСЂСѓР№, РЅРµ РіР°РґР°Р№ |
+| РњРЅРѕРіРѕ draw calls | РњР°С‚РµСЂРёР°Р» РЅР° РѕР±СЉРµРєС‚ | `MaterialPropertyBlock`, РёРЅСЃС‚Р°РЅСЃРёРЅРі |
 
-## Критерии успеха
+## РљСЂРёС‚РµСЂРёРё СѓСЃРїРµС…Р°
 
-- [ ] Шейдеры проверены на существование и URP-совместимость
-- [ ] Свет запечён где возможно
-- [ ] Volume настроен осмысленно, эффекты не перебарщены
-- [ ] Один материал на много объектов
-- [ ] Draw calls в бюджете
-- [ ] Frame time в бюджете
-- [ ] Проверено на реальной сцене в Play Mode
-- [ ] Фактические цифры указаны в отчёте
-- [ ] Указано, что проверено, а что — нет
+- [ ] РЁРµР№РґРµСЂС‹ РїСЂРѕРІРµСЂРµРЅС‹ РЅР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёРµ Рё URP-СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚СЊ
+- [ ] РЎРІРµС‚ Р·Р°РїРµС‡С‘РЅ РіРґРµ РІРѕР·РјРѕР¶РЅРѕ
+- [ ] Volume РЅР°СЃС‚СЂРѕРµРЅ РѕСЃРјС‹СЃР»РµРЅРЅРѕ, СЌС„С„РµРєС‚С‹ РЅРµ РїРµСЂРµР±Р°СЂС‰РµРЅС‹
+- [ ] РћРґРёРЅ РјР°С‚РµСЂРёР°Р» РЅР° РјРЅРѕРіРѕ РѕР±СЉРµРєС‚РѕРІ
+- [ ] Draw calls РІ Р±СЋРґР¶РµС‚Рµ
+- [ ] Frame time РІ Р±СЋРґР¶РµС‚Рµ
+- [ ] РџСЂРѕРІРµСЂРµРЅРѕ РЅР° СЂРµР°Р»СЊРЅРѕР№ СЃС†РµРЅРµ РІ Play Mode
+- [ ] Р¤Р°РєС‚РёС‡РµСЃРєРёРµ С†РёС„СЂС‹ СѓРєР°Р·Р°РЅС‹ РІ РѕС‚С‡С‘С‚Рµ
+- [ ] РЈРєР°Р·Р°РЅРѕ, С‡С‚Рѕ РїСЂРѕРІРµСЂРµРЅРѕ, Р° С‡С‚Рѕ вЂ” РЅРµС‚
 
-Подробнее: `docs/specs/performance-budget.md`, `docs/specs/asset-standards.md`
+РџРѕРґСЂРѕР±РЅРµРµ: `docs/specs/performance-budget.md`, `docs/specs/asset-standards.md`

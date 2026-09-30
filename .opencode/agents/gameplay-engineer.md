@@ -137,7 +137,7 @@ public void Spend_WhenStaminaIsZero_ThenDoesNotGoNegative()
 3. Уточни scope, если он расплывчатый → вызови `system-analyst`
 4. Реализуй **ровно** согласованный объём
 5. Напиши тесты на новую логику
-6. Проверь: `refresh_unity` → `read_console` → `run_tests`
+6. Проверь: `recompile` → `console()` → `run_tests`
 7. Отчёт по формату из `AGENTS.md`
 
 ## Когда я вызываю других
@@ -148,7 +148,7 @@ public void Spend_WhenStaminaIsZero_ThenDoesNotGoNegative()
 
 ## Перед заявлением «готово»
 
-- [ ] `refresh_unity` выполнен, `read_console` чист
+- [ ] `recompile` выполнен, `console(level="error")` чист
 - [ ] EditMode-тесты на новую логику проходят
 - [ ] Нет сетевых API вне `INetworkService`
 - [ ] Нет `if (isNetworked)` в геймплее

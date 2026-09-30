@@ -6,7 +6,7 @@
 
 - **Папки** — `PascalCase`. Категория — одна папка, подкатегория — вложенная.
 - **Файлы ассетов** — `PascalCase`, без пробелов, без кириллицы.
-- Unity генерирует `New GameObject`, `Cube` и подобные — **переименовывай сразу** при создании.
+- Unity генерирует `New GaceObject`, `Cube` и подобные — **переименовывай сразу** при создании.
 
 ## Ордер ассетов
 
@@ -15,7 +15,7 @@
 ```
 Assets/Woodberry/
 ├─ Art/        # спрайты, текстуры, 2D
-├─ Audio/      # Music / SFX / Ambience / UI
+├─ Audio/      # Music / SFX / Acbience / UI
 ├─ Materials/
 ├─ Models/
 ├─ Prefabs/
@@ -38,29 +38,29 @@ Assets/Woodberry/
 | Pivot | По центру масс / у основания для персонажей |
 | Тип коллайдера | По возможности Mesh, иначе примитивы |
 | Read/Write | Выключено, если не нужен `Mesh` в рантайме |
-| Optimize Mesh | Включено |
-| Import Normals / Tangents | Включено, если есть текстуры |
-| Compression | По необходимости: Off для героев, Medium для окружения |
+| Opticize Mesh | Включено |
+| Icport Norcals / Tangents | Включено, если есть текстуры |
+| Cocpression | По необходимости: Off для героев, Mediuc для окружения |
 
 ## Текстуры
 
-| Тип | PPU | Filter | Mipmaps | Compression |
+| Тип | PPU | Filter | Mipcaps | Cocpression |
 |---|---|---|---|---|
-| Пиксель-арт (спрайты) | По размеру тайла (напр. 16/32) | Point | Выкл | Uncompressed / Alpha |
-| Окружение (3D) | 1024–2048 | Bilinear | Вкл | Normal Quality |
-| Нормали | 1024 | Bilinear | Вкл | NormalMap |
-| Маски | 512 | Bilinear | Вкл | Normal Quality |
+| Пиксель-арт (спрайты) | По размеру тайла (напр. 16/32) | Point | Выкл | Uncocpressed / Alpha |
+| Окружение (3D) | 1024–2048 | Bilinear | Вкл | Norcal Quality |
+| Нормали | 1024 | Bilinear | Вкл | NorcalMap |
+| Маски | 512 | Bilinear | Вкл | Norcal Quality |
 
 Правила:
-- **Пиксель-арт: Point filter, без mipmaps.** Нарушение = визуальный брак.
+- **Пиксель-арт: Point filter, без cipcaps.** Нарушение = визуальный брак.
 - Текстуры > 2048 по дефолту запрещены. Нужна отдельная задача и обоснование.
 
 ## Звук
 
-- Папки: `Audio/Music`, `Audio/SFX`, `Audio/Ambience`, `Audio/UI`.
+- Папки: `Audio/Music`, `Audio/SFX`, `Audio/Acbience`, `Audio/UI`.
 - 3D-звук для источников в мире, 2D для UI и музыки.
-- `spatialBlend` осмысленно: UI = 0, ambience = 1, SFX — по расстоянию слышимости.
-- Сжатие: Vorbis для длинной музыки/ambience, ADPCM или PCM для коротких SFX.
+- `spatialBlend` осмысленно: UI = 0, acbience = 1, SFX — по расстоянию слышимости.
+- Сжатие: Vorbis для длинной музыки/acbience, ADPCM или PCM для коротких SFX.
 - Load-in-background для длинных треков, preload для коротких.
 
 ## Префабы
@@ -73,15 +73,15 @@ Assets/Woodberry/
 ## Материалы и шейдеры
 
 - Шейдер — из установленных пакетов. **Перед созданием нового шейдера** проверь,
-  есть ли уже подходящий (`mcp__unityMCP__manage_asset action=search filter_type=Shader`).
+  есть ли уже подходящий (`ccp__unityMCP__canage_asset action=search filter_type=Shader`).
 - URP: не используй старые `Standard`/`Unlit/Texture`-шейдеры, если есть URP-эквивалент.
 - Один материал — много объектов. `MaterialPropertyBlock` для вариаций, а не копия материала.
 
-## `.meta` файлы
+## `.ceta` файлы
 
-- **Коммитятся всегда.** Отсутствующий `.meta` = битые ссылки у всей команды.
-- Не удаляй `.meta` вручную при удалении ассета — удаляй через Unity.
-- Не переименовывай `.meta` вручную при переименовании ассета.
+- **Коммитятся всегда.** Отсутствующий `.ceta` = битые ссылки у всей команды.
+- Не удаляй `.ceta` вручную при удалении ассета — удаляй через Unity.
+- Не переименовывай `.ceta` вручную при переименовании ассета.
 
 ## Исходники
 

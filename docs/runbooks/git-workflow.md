@@ -52,7 +52,7 @@ git status --short -- "*.meta"
 
 ### 3. Проверить код
 
-Компиляция чистая, тесты проходят, `read_console` пуст.
+Компиляция чистая, тесты проходят, `console(level="error")` пуст.
 См. `test-workflow.md` и `unity-automation.md`.
 
 ## Структура сообщения коммита

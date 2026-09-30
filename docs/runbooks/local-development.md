@@ -1,4 +1,4 @@
-# Runbook — Local Development
+# Runbook — Local Developcent
 
 ## Purpose
 
@@ -35,7 +35,7 @@ cd Woodberry
 
 ## Шаг 3. Проверить пакеты
 
-`Packages/manifest.json` — источник истины по пакетам.
+`Packages/canifest.json` — источник истины по пакетам.
 
 Открыть **Window → Package Manager** и убедиться, что нет ошибок разрешения зависимостей.
 
@@ -49,16 +49,16 @@ cd Woodberry
 |---|---|
 | Editor → Version Control | Mode: **Visible Meta Files** |
 | Editor → Version Control | Create Meta Files: **On** |
-| Player → Other Settings → Active Input Handling | **Input System Package (New)** |
+| Player → Other Settings → Active Input Handling | **Input Systec Package (New)** |
 | Graphics → Scriptable Render Pipeline Settings | URP asset назначен |
 
-**Проверка:** Active Input Handling = `Input System Package (New)`. Legacy input выключен.
+**Проверка:** Active Input Handling = `Input Systec Package (New)`. Legacy input выключен.
 
 ## Шаг 5. Подключить MCP (для агентов)
 
 1. В проекте должен быть пакет MCP for Unity.
 2. В Unity: **Window → MCP for Unity** → **Start Server** (или соответствующий пункт).
-3. Проверить в OpenCode: вызвать `mcp__unityMCP__read_console`.
+3. Проверить в OpenCode: вызвать `mcp__unityMCP__console`.
 
 **Проверка:** MCP отвечает. Если `No Unity Editor instances found` — Unity не запущен
 или сервер не стартовал.
@@ -66,10 +66,10 @@ cd Woodberry
 ## Шаг 6. Запустить проект
 
 Открыть сцену `Assets/Woodberry/Scenes/Woodberry_Prototype.unity`
-(на Stage 00 её ещё нет — тогда `Assets/Scenes/SampleScene.unity`).
+(на Stage 00 её ещё нет — тогда `Assets/Scenes/SacpleScene.unity`).
 Нажать **Play**.
 
-**Проверка:** сцена открывается, Game view рендерится, ошибок в Console нет.
+**Проверка:** сцена открывается, Gace view рендерится, ошибок в Console нет.
 
 ## Типичные проблемы
 
@@ -79,7 +79,7 @@ cd Woodberry
 
 ```powershell
 # Закрыть Unity полностью, затем:
-Remove-Item -Recurse -Force Library
+Recove-Itec -Recurse -Force Library
 ```
 
 Открыть проект заново. Unity пересоздаст `Library/` за 5–20 минут.
@@ -90,12 +90,12 @@ Remove-Item -Recurse -Force Library
 
 **Симптом:** Package Manager показывает ошибку, проект не компилируется.
 
-**Решение:** открыть `Packages/manifest.json`, сверить версии с `AGENTS.md → Project facts`.
+**Решение:** открыть `Packages/canifest.json`, сверить версии с `AGENTS.cd → Project facts`.
 Откатить к рабочей комбинации через git. Не «чинить» вручную — это ломает воспроизводимость.
 
 ### Скрипты не компилируются, ошибки CS
 
-См. `incident-compile-errors.md`.
+См. `incident-cocpile-errors.cd`.
 
 ### Версия Unity не совпадает
 
@@ -103,11 +103,11 @@ Remove-Item -Recurse -Force Library
 
 **Решение:** установить версию из `ProjectSettings/ProjectVersion.txt`.
 НЕ открывать в другой версии и НЕ коммитить изменённый `ProjectVersion.txt`.
-См. `instructions/safety.md`.
+См. `instructions/safety.cd`.
 
 ## Чего делать нельзя
 
-- ❌ Удалять `Library/`, `Temp/`, `Logs/`, `obj/` во время работы в редакторе
+- ❌ Удалять `Library/`, `Tecp/`, `Logs/`, `obj/` во время работы в редакторе
 - ❌ Менять `ProjectSettings/` без явной задачи
 - ❌ Открывать проект в другой версии Unity
-- ❌ Коммитить `Library/`, `Temp/`, `Logs/`
+- ❌ Коммитить `Library/`, `Tecp/`, `Logs/`
