@@ -63,9 +63,20 @@ Plan → Spec (если меняется контракт) → Build → Verify 
 | Интерфейс, HUD, меню | `ui-engineer` |
 | Визуал, материалы, шейдеры, VFX | `technical-artist` |
 | Сборка, CI, пакеты, Editor-утилиты | `unity-tools-engineer` |
-| Тесты, ревью, регрессии | `qa-analyst` |
+| Написать тесты, регрессионный прогон, баг-репорт | `qa-analyst` |
+| **Ревью изменений, архитектурный аудит, contract drift** | **`code-reviewer`** (read-only) |
 
 Маршрутизация уже настроена в `opencode.json → agent.build.permission.task`.
+
+**Разделение build и review:** агент, который только что написал код, плохо его
+проверяет. Поэтому `code-reviewer` — отдельная **read-only** роль (`edit: deny`,
+только git-команды на чтение), которая запускается *после* build-агента, а не вместо него.
+Найденную проблему правит соответствующий builder-агент — отдельным вызовом.
+
+```powershell
+@code-reviewer сделай review текущих изменений
+@code-reviewer проверь изменения в Assets/Scripts/Gameplay/Player/
+```
 
 **5. Skills** — подгружай по задаче, не заранее:
 
@@ -73,13 +84,19 @@ Plan → Spec (если меняется контракт) → Build → Verify 
 |---|---|
 | `stage-planning` | Начало нетривиальной задачи |
 | `unity-test-strategy` | Новая логика, падающие тесты |
-| `unity-architecture-review` | Перед завершением этапа со слоями |
+| `code-review-checklist` | Чеклисты по слоям для `code-reviewer` |
+| `git-diff-analysis` | Анализ диффа и группировка по слоям |
+| `unity-architecture-review` | Быстрые grep-проверки архитектуры |
 | `unity-prefab-safety` | Префабы, сцены, `.meta` |
 | `coop-networking-model` | Перед Stage 03 или сетевым кодом |
 | `horror-level-design` | Сцены, свет, «слишком темно» |
 | `urp-visual-tuning` | Визуал, draw calls, frame time |
 | `stage-report` | Завершение этапа |
 | `debug-unity-console` | Ошибки компиляции, падающие тесты |
+
+`code-review-checklist` и `git-diff-analysis` доступны **только** `code-reviewer` —
+у него в скиллах `*: deny`, кроме этих двух. Это гарантирует, что read-only роль
+не подгружат лишнего контекста.
 
 **6. Готовые промпты** (вызываются как `/plan-stage`, `/review` и т.д.):
 

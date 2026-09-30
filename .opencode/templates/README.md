@@ -35,27 +35,34 @@ Stage 02 — ...
 
 ## Формат review
 
-Из `AGENTS.md → Review expectations`.
+Источник истины — `docs/specs/code-review-flow.md`. Формат зафиксирован, чтобы
+вывод одинаково читался человеком и агентом. Пустые секции остаются в выводе:
+так читается разница между «проверил и не нашёл» и «не проверял».
 
 ```
-## Critical issues
-- <файл:строка> — <что не так> — <почему критично>
+## Code Review: <scope>
 
-## Important follow-ups
-- ...
+### Summary
+<один абзац: что изменилось, какие слои затронуты, сигнал качества>
 
-## Nice-to-have improvements
-- ...
+### Findings
+#### 🔴 Critical      — обязательно исправить до merge
+#### 🟠 Major         — желательно исправить до merge
+#### 🟡 Minor         — исправить или зафиксировать как компромисс
+#### 💡 Suggestions   — опционально
 
-## Testing gaps
-- <что не покрыто>
+Каждая находка: - [ ] **`<file>`:**`<line>`** — <проблема и влияние>
 
-## Architecture concerns
-- <нарушение границ>
+### What looks good
+- <что сделано правильно>
 
-## Overall assessment
-[Ready / Ready with follow-ups / Not ready]
+### Next steps
+1. <первым идёт пункт высшей severity>
 ```
+
+Severity-уровни и перечень Critical для Woodberry — в
+`docs/specs/code-review-flow.md`. Чеклисты по слоям — в
+`.opencode/skills/code-review-checklist/SKILL.md`.
 
 ## Формат bug-репорта
 

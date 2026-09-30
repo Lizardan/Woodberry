@@ -430,7 +430,7 @@ Plan → Spec (если меняется контракт) → Build → Verify 
 2. **Уточнение.** Уменьшай scope: «какой минимальный инкремент закрывает главный риск и даёт демонстрируемый результат?»
 3. **Build.** Ровно согласованный scope. Без «улучшений», не включённых в план.
 4. **Verify.** Реально запустить команды и честно сообщить статус.
-5. **Review.** Отдельный проход: correctness, edge cases, architecture drift, test gaps, contract drift.
+5. **Review.** Отдельный read-only проход через `code-reviewer`: correctness, edge cases, architecture drift, test gaps, contract drift. Процесс — `docs/specs/code-review-flow.md`.
 6. **Report.** Заполнить `docs/reports/<дата>-<stage>-report.md` по шаблону.
 
 ### Когда оставаться в `plan`
@@ -467,9 +467,44 @@ Plan → Spec (если меняется контракт) → Build → Verify 
 | Визуал, материалы, шейдеры, VFX, импорт ассетов | `technical-artist` |
 | Сеть, репликация, authority, лаг, хостинг | `gameplay-engineer` → `docs/adr/0003-networking-stack.md` |
 | Сборка, билд, CI, релиз, платформы | `unity-tools-engineer` |
-| Тесты, ревью, баг-репорт, регрессии | `qa-analyst` |
+| Тесты, баг-репорт, регрессии | `qa-analyst` |
+| **Ревью изменений, архитектурный аудит, contract drift** | **`code-reviewer`** (read-only) |
 
 Маршрутизация через `opencode.json` → `agent.build.permission.task` уже настроена. Не обходи её.
+
+### Разделение ролей: build и review
+
+**Агент, который только что написал код, плохо его проверяет.**
+Разделяй роли во времени, а не одновременно:
+
+```
+build-агент реализует → Stage Report → code-reviewer делает независимый review
+```
+
+`code-reviewer` — **роль чтения и анализа**, а не расширение builder-агента:
+
+| Свойство | Значение |
+|---|---|
+| Права | `edit: deny` — не может изменить файл, даже случайно |
+| Bash | только read-only git: `diff`, `log`, `show`, `status`, `blame`, `ls-files` |
+| Навыки | `code-review-checklist`, `git-diff-analysis` |
+| Режим | `mode: all` — можно вызвать напрямую через `@code-reviewer` |
+| Спецификация процесса | `docs/specs/code-review-flow.md` |
+
+Если `code-reviewer` нашёл проблему — исправляет её соответствующий builder-агент,
+**отдельным вызовом, с отдельной ответственностью**. Никогда сам.
+
+Вызывай `code-reviewer`:
+- после любого нетривиального этапа
+- перед merge
+- когда сомневаешься, что изменение вписывается в архитектуру
+
+Вызывай `qa-analyst`:
+- когда нужно **написать** тесты
+- когда нужен регрессионный прогон
+- когда нужен баг-репорт
+
+Это разные роли. `qa-analyst` пишет тесты, `code-reviewer` только читает.
 
 ---
 
@@ -541,17 +576,24 @@ Review-проход ищет:
 - утечки (неотписанные подписки, `static event`)
 - избыточная сложность и мёртвый код
 
-Формат вывода ревью:
+Severity-уровни и формат вывода заданы в `docs/specs/code-review-flow.md` —
+это источник истины. Кратко:
 
-```
-## Critical issues
-## Important follow-ups
-## Nice-to-have improvements
-## Testing gaps
-## Architecture concerns
-## Overall assessment
-[Ready / Ready with follow-ups / Not ready]
-```
+| Уровень | Значение | Действие |
+|---|---|---|
+| 🔴 Critical | Нарушение обязательной архитектурной границы, потеря данных, раскрытый секрет, поломка ассетов у команды | Обязательно исправить до merge |
+| 🟠 Major | Нарушение правил проекта, contract drift, test gap, риск в hot path | Желательно исправить до merge |
+| 🟡 Minor | Naming, комментарии, небольшие пробелы | Исправить или зафиксировать как компромисс |
+| 💡 Suggestion | Рефакторинг, улучшение, идея на будущее | Опционально |
+
+Что считается **Critical** в этом проекте — перечислено явно в
+`docs/specs/code-review-flow.md`. Коротко: сетевой API вне `Net/`,
+`if (isNetworked)` в геймплее, `Gameplay` → `UI`, `Core` → `Gameplay`,
+runtime-код с `UnityEditor`, ручной YAML-редакт Unity-ассетов,
+ассет без `.meta`, дубль контроллера игрока, секрет в коде.
+
+Ревью выполняет **отдельный read-only агент `code-reviewer`**, а не тот же агент,
+что писал код. Процесс — в `docs/specs/code-review-flow.md`.
 
 ---
 

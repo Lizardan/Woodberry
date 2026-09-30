@@ -1,59 +1,27 @@
 ---
-description: Строгий review изменений — correctness, edge cases, drift, test gaps
-agent: build
-subtask: true
+description: Строгий read-only review изменений — correctness, edge cases, architecture drift, contract drift
+agent: code-reviewer
+subtask: false
 ---
 
-Сделай строгий review текущих изменений как senior engineer.
+@code-reviewer сделай code review.
 
-Задача: $ARGUMENTS
+Scope: $ARGUMENTS
 
-Сначала посмотри фактический diff:
-```
-git status --short
-git diff --stat
-```
+Если scope не задан — review текущих незакоммиченных изменений против `HEAD`
+(и staged, если есть).
 
-Фокус:
-- **Correctness** — делает ли логика то, что заявлено
-- **Edge cases** — пустые данные, `null`, ноль, отрицательные значения, гонки, отсутствие ресурсов
-- **Architecture drift** — смешение слоёв
-- **Test gaps** — логика без тестов, happy path без негативных
-- **Contract drift** — spec разошёлся с кодом
-- **Performance** — аллокации и `GetComponent` в `Update`/`FixedUpdate`/`LateUpdate`
-- **Сетевые проблемы** — доверие клиенту, рассинхрон
-- **Утечки** — неотписанные подписки, `static event`
-- **Избыточная сложность** и мёртвый код
+Следуй процессу из `docs/specs/code-review-flow.md`:
 
-Проверь grep'ами (см. skill `unity-architecture-review`):
-- Сетевые API вне `Assets/Scripts/Net/`
-- `if (isNetworked)` / `IsServer` в геймплее
-- `UnityEngine.InputSystem` вне `Core`
-- `FindObjectOfType` в геймплее
-- `Resources.Load` для геймплейных данных
-- Runtime-код ссылается на `UnityEditor`
-- `public`-поля в рантайме
+1. **Context** — прочитай `AGENTS.md` и релевантные спеки из `docs/specs/`
+   **до** чтения диффа
+2. **Inspect** — примени скилл `git-diff-analysis`
+3. **Read** — прочитай изменённые файлы и их соседей, а также `.asmdef`
+   затронутой сборки
+4. **Checklists** — примени `code-review-checklist` для каждого затронутого слоя
+5. **Cross-cutting** — секреты, выравнивание документации, честность верификации
+6. **Report** — recommendation plan по формату из спеки
 
-Формат вывода:
-
-```
-## Critical issues
-- <файл:строка> — <что не так> — <почему критично>
-
-## Important follow-ups
-- ...
-
-## Nice-to-have improvements
-- ...
-
-## Testing gaps
-- <что не покрыто тестами>
-
-## Architecture concerns
-- <нарушение границ>
-
-## Overall assessment
-[Ready / Ready with follow-ups / Not ready]
-```
-
-Не правь код. Только отчёт.
+Не изменяй файлы. Только отчёт.
+Формат: Summary → 🔴 Critical → 🟠 Major → 🟡 Minor → 💡 Suggestions →
+What looks good → Next steps.

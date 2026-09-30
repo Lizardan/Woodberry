@@ -86,6 +86,12 @@ crashlytics-build.properties
 /.opencode/log/
 *.opencode.log
 
+# Бинарь MCP for Unity, установленный скриптом в корень проекта
+/UnityMcpBridge/
+/MCPForUnity/
+mcp-for-unity*.exe
+mcp-for-unity*.dll
+
 # ============================================
 # Прочее
 # ============================================

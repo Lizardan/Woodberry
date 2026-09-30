@@ -24,6 +24,7 @@
 | `game-vision.md` | Что такое Woodberry, для кого, ядро петли геймплея и атмосферы |
 | `core-gameplay.md` | Базовые игровые правила: движение, взаимодействие, ресурсы |
 | `coop-networking.md` | Authority-модель, что реплицируется, тики, спавн, join/leave |
+| `code-review-flow.md` | Процесс code review, severity-уровни, формат вывода |
 | `save-system.md` | Что сохраняется, формат, версионирование, миграции |
 | `performance-budget.md` | Целевые FPS, память, draw calls, размер билда |
 | `asset-standards.md` | Имена, пайплайн импорта, масштабы, оси, pivot |
