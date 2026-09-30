@@ -46,8 +46,8 @@ permission:
 
 ```
 1. РР·РјРµРЅРёС‚СЊ С„Р°Р№Р»С‹
-2. mcp__unityMCP__recompile(focus=false)
-3. mcp__unityMCP__console(level="error", tail=50)
+2. mcp__coplay__check_compile_errors()
+3. mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
 4. РџСЂРѕРґРѕР»Р¶Р°С‚СЊ С‚РѕР»СЊРєРѕ РµСЃР»Рё РѕС€РёР±РѕРє РЅРµС‚
 ```
 
@@ -57,11 +57,11 @@ permission:
 ## Р—РѕР»РѕС‚РѕР№ С†РёРєР» РїСЂРѕРІРµСЂРєРё РїРµСЂРµРґ В«РіРѕС‚РѕРІРѕВ»
 
 ```
-mcp__unityMCP__clear_console()
-mcp__unityMCP__recompile(focus=false)
-mcp__unityMCP__console(level="error", tail=50)
-mcp__unityMCP__run_tests(mode="EditMode", include_failed_tests=true)
-mcp__unityMCP__run_tests(mode="PlayMode", include_failed_tests=true, init_timeout=120000)
+(вручную: Edit → Clear)()
+mcp__coplay__check_compile_errors()
+mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
+Test Runner → EditMode → Run All (вручную)
+Test Runner → PlayMode → Run All (вручную)
 ```
 
 `clear` **РґРѕ** РїСЂРѕРІРµСЂРєРё вЂ” РёРЅР°С‡Рµ СЃС‚Р°СЂС‹Рµ РѕС€РёР±РєРё РІС‹РіР»СЏРґСЏС‚ РєР°Рє РЅРѕРІС‹Рµ.
@@ -92,7 +92,7 @@ Runtime-СЃР±РѕСЂРєР° **РЅРµ РґРѕР»Р¶РЅР°** СЃРѕ�
 
 ```powershell
 # РџСЂРѕРІРµСЂРёС‚СЊ РїРµСЂРµРґ СѓСЃС‚Р°РЅРѕРІРєРѕР№
-mcp__unityMCP__package_list()
+mcp__coplay__list_packages()
 ```
 
 РЈСЃС‚Р°РЅРѕРІРєР°/СѓРґР°Р»РµРЅРёРµ РїР°РєРµС‚Р° РјРµРЅСЏРµС‚ `Packages/manifest.json` Рё С‚СЂРёРіРіРµСЂРёС‚
@@ -103,15 +103,15 @@ mcp__unityMCP__package_list()
 
 | Р—Р°РґР°С‡Р° | РРЅСЃС‚СЂСѓРјРµРЅС‚ |
 |---|---|
-| РљРѕРјРїРёР»СЏС†РёСЏ | `mcp__unityMCP__recompile(focus=false)` |
-| РћС€РёР±РєРё | `mcp__unityMCP__console(level="error", tail=100)action="get", types=["error","warning"])` |
-| РўРµСЃС‚С‹ | `mcp__unityMCP__run_tests(mode="EditMode"/"PlayMode")` |
-| РЎРѕСЃС‚РѕСЏРЅРёРµ СЂРµРґР°РєС‚РѕСЂР° | `mcp__unityMCP__editor_status()` |
-| РЎР±РѕСЂРєР° | `mcp__unityMCP__build(/"status"/"settings")` |
-| РџР°РєРµС‚С‹ | `mcp__unityMCP__package_add(action="list_packages"/"get_package_info")` |
-| РџРѕРёСЃРє Р°СЃСЃРµС‚РѕРІ | `mcp__unityMCP__find_assets(, ...)` |
-| РџСЂРѕС„Р°Р№Р»РµСЂ | `mcp__unityMCP__get_performance_stats(action="get_frame_timing"/"get_counters")` |
-| РњРµРЅСЋ СЂРµРґР°РєС‚РѕСЂР° | `mcp__unityMCP__menu(menu_path=...)` |
+| РљРѕРјРїРёР»СЏС†РёСЏ | `mcp__coplay__check_compile_errors()` |
+| РћС€РёР±РєРё | `mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)action="get", types=["error","warning"])` |
+| РўРµСЃС‚С‹ | `Test Runner → Run All (вручную)` |
+| РЎРѕСЃС‚РѕСЏРЅРёРµ СЂРµРґР°РєС‚РѕСЂР° | `mcp__coplay__get_unity_editor_state()()` |
+| РЎР±РѕСЂРєР° | `(вручную: File → Build Settings → Build)` |
+| РџР°РєРµС‚С‹ | `mcp__coplay__install_unity_package(identifier="...")` |
+| РџРѕРёСЃРє Р°СЃСЃРµС‚РѕРІ | `mcp__coplay__search_files(query="...")  # или Window → Project` |
+| РџСЂРѕС„Р°Р№Р»РµСЂ | `mcp__coplay__get_worst_cpu_frames() / get_worst_gc_frames()` |
+| РњРµРЅСЋ СЂРµРґР°РєС‚РѕСЂР° | `(вручную: меню Unity)` |
 
 ### РџСЂР°РІРёР»Р° РїР°РіРёРЅР°С†РёРё
 

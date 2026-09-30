@@ -58,8 +58,8 @@ NN <РќР°Р·РІР°РЅРёРµ>, СЃСЃС‹Р»РєР° РЅР° `docs/
 
 ## Verification performed
 ### Automated checks run
-- `mcp__unityMCP__console(level="error", tail=100)types=["error"])` вЂ” 0 РѕС€РёР±РѕРє
-- `mcp__unityMCP__run_tests(mode="EditMode")` вЂ” 12/12 passed
+- `mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)types=["error"])` вЂ” 0 РѕС€РёР±РѕРє
+- `Test Runner → EditMode → Run All` вЂ” 12/12 passed
 - `<РєРѕРјР°РЅРґР°>` вЂ” `<С„Р°РєС‚РёС‡РµСЃРєРёР№ СЂРµР·СѓР»СЊС‚Р°С‚>`
 
 ### Manual checks performed
@@ -145,7 +145,7 @@ NN <РќР°Р·РІР°РЅРёРµ>, СЃСЃС‹Р»РєР° РЅР° `docs/
 git status --short -- "*.meta"
 
 # РЎРєСЂРёРЅС€РѕС‚ РґР»СЏ РѕС‚С‡С‘С‚Р°
-mcp__unityMCP__capture_game_view(, include_image=true, max_resolution=800)
+mcp__coplay__capture_scene_object(name="Main Camera")
 ```
 
 вљ пёЏ РЎРєСЂРёРЅС€РѕС‚ СЃ СѓРєР°Р·Р°РЅРёРµРј РєР°РјРµСЂС‹ **РЅРµ РІРєР»СЋС‡Р°РµС‚** `Screen Space - Overlay` UI.

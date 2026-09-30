@@ -57,8 +57,8 @@
 ## РЁР°Рі 6. РџСЂРѕРІРµСЂРёС‚СЊ С‡РµСЂРµР· MCP
 
 ```
-mcp__unityMCP__build(, target="windows64", output_path="Builds/Windows/Woodberry.exe")
-mcp__unityMCP__build_status()
+(вручную: File → Build Settings → Build)
+(вручную: окно Build)
 ```
 
 ## РЁР°Рі 7. Smoke-РїСЂРѕРІРµСЂРєР° СЃР±РѕСЂРєРё
@@ -85,7 +85,7 @@ mcp__unityMCP__build_status()
 РЅРµРїСЂР°РІРёР»СЊРЅРѕ. РџСЂРѕРІРµСЂРєР°:
 
 ```
-mcp__unityMCP__build_status()
+(вручную: окно Build)
 ```
 
 Р СѓР±РµРґРёС‚СЊСЃСЏ, С‡С‚Рѕ `Woodberry.Editor.asmdef` РїРѕРјРµС‡РµРЅ РєР°Рє **Editor** РїР»Р°С‚С„РѕСЂРјС‹

@@ -15,7 +15,7 @@ Unity-РёРЅСЃС‚СЂСѓРјРµРЅС‚Р° РІРµСЂРЅС‘С‚ 
 ## РЁР°Рі 1. РџРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє РѕС€РёР±РѕРє
 
 ```
-mcp__unityMCP__console(level="error", tail=50, count="100")
+mcp__coplay__get_unity_logs(show_errors=true, limit=100)
 ```
 
 РР»Рё РІ СЂРµРґР°РєС‚РѕСЂРµ: **Window в†’ General в†’ Console**, С„РёР»СЊС‚СЂ **Errors**.
@@ -29,7 +29,7 @@ mcp__unityMCP__console(level="error", tail=50, count="100")
 | РќРµС‚ РґРѕСЃС‚СѓРїР° | `'X' is inaccessible due to its protection level` | РџСЂРѕРІРµСЂРёС‚СЊ `internal`/`private`, assembly reference |
 | РќРµС‚ СЃСЃС‹Р»РєРё РЅР° СЃР±РѕСЂРєСѓ | РѕС€РёР±РєР° РїСЂРѕ assembly reference | РџСЂРѕРІРµСЂРёС‚СЊ `.asmdef` в†’ `references` |
 | РљРѕРЅС„Р»РёРєС‚ С‚РёРїРѕРІ | `The type 'X' exists in both 'A' Рё 'B'` | Р”СѓР±Р»РёРєР°С‚ РѕРїСЂРµРґРµР»РµРЅРёСЏ РёР»Рё РєРѕРЅС„Р»РёРєС‚ РїР°РєРµС‚РѕРІ |
-| API РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ | `'X' does not contain a definition for 'Y'` | **РџСЂРѕРІРµСЂРёС‚СЊ С‡РµСЂРµР· `mcp__unityMCP__eval`** вЂ” РІРµСЂРѕСЏС‚РЅРѕ, СѓСЃС‚Р°СЂРµРІС€Р°СЏ РїР°РјСЏС‚СЊ РѕР± API |
+| API РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ | `'X' does not contain a definition for 'Y'` | **РџСЂРѕРІРµСЂРёС‚СЊ С‡РµСЂРµР· `mcp__coplay__execute_script`** вЂ” РІРµСЂРѕСЏС‚РЅРѕ, СѓСЃС‚Р°СЂРµРІС€Р°СЏ РїР°РјСЏС‚СЊ РѕР± API |
 | Missing РІ СЃС†РµРЅРµ/РїСЂРµС„Р°Р±Рµ | `The referenced script on this Behaviour is missing` | РЎРј. РЅРёР¶Рµ |
 
 ## РЁР°Рі 3. Р§Р°СЃС‚С‹Рµ РїСЂРёС‡РёРЅС‹ РІ СЌС‚РѕРј РїСЂРѕРµРєС‚Рµ
@@ -89,10 +89,10 @@ mcp__unityMCP__console(level="error", tail=50, count="100")
 ```
 ```
 # Живая рефлексия: проверяем, что тип и член реально существуют
-mcp__unityMCP__eval(code="var m = typeof(<Namespace>.<ClassName>).GetProperty(\"MemberName\"); return m == null ? \"NULL - такого API нет\" : m.PropertyType.Name + \" canWrite=\" + m.CanWrite;")
+mcp__coplay__execute_script(filePath="<временный .cs>")  # code="var m = typeof(<Namespace>.<ClassName>).GetProperty(\"MemberName\"); return m == null ? \"NULL - такого API нет\" : m.PropertyType.Name + \" canWrite=\" + m.CanWrite;")
 
 # Поиск типа по имени среди всех загруженных сборок
-mcp__unityMCP__eval(code="return string.Join(\"; \", System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => { try { return a.GetTypes(); } catch { return new Type[0]; } }).Where(x => x.Name == \"TypeName\").Select(x => x.FullName).ToArray());")
+mcp__coplay__execute_script(filePath="<временный .cs>")  # code="return string.Join(\"; \", System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => { try { return a.GetTypes(); } catch { return new Type[0]; } }).Where(x => x.Name == \"TypeName\").Select(x => x.FullName).ToArray());")
 
 # Ссылка на документацию под версию проекта
 & "F:\Unity\Unity Hub\resources\unity.exe" docs <ClassName> --url
@@ -105,9 +105,9 @@ mcp__unityMCP__eval(code="return string.Join(\"; \", System.AppDomain.CurrentDom
 ## РЁР°Рі 5. РџСЂРѕРІРµСЂРёС‚СЊ СЂРµР·СѓР»СЊС‚Р°С‚ РїРѕС‡РёРЅРєРё
 
 ```
-mcp__unityMCP__clear_console()
-mcp__unityMCP__recompile(focus=false)
-mcp__unityMCP__console(level="error", tail=50)
+(вручную: Edit → Clear)()
+mcp__coplay__check_compile_errors()
+mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
 ```
 
 РџРѕРІС‚РѕСЂСЏС‚СЊ, РїРѕРєР° `errors` РЅРµ СЃС‚Р°РЅРµС‚ РїСѓСЃС‚С‹Рј. РРјРµРЅРЅРѕ РїРѕСЌС‚РѕРјСѓ `clear` РёРґС‘С‚ **РґРѕ** РїСЂРѕРІРµСЂРєРё вЂ”
@@ -118,8 +118,8 @@ mcp__unityMCP__console(level="error", tail=50)
 РљРѕРјРїРёР»СЏС†РёСЏ С‡РёСЃС‚Р°СЏ в‰  С‚РµСЃС‚С‹ РїСЂРѕС…РѕРґСЏС‚.
 
 ```
-mcp__unityMCP__run_tests(mode="EditMode", include_failed_tests=true)
-mcp__unityMCP__run_tests(mode="PlayMode", include_failed_tests=true, init_timeout=120000)
+Test Runner → EditMode → Run All (вручную)
+Test Runner → PlayMode → Run All (вручную)
 ```
 
 ## Р§РµРіРѕ РґРµР»Р°С‚СЊ РЅРµР»СЊР·СЏ
@@ -128,6 +128,6 @@ mcp__unityMCP__run_tests(mode="PlayMode", include_failed_tests=true, init_timeou
 - вќЊ РљРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ РєРѕРґ, С‡С‚РѕР±С‹ В«Р·Р°РєРѕРјРїРёР»РёСЂРѕРІР°Р»РѕСЃСЊВ», Р±РµР· РїРѕРЅРёРјР°РЅРёСЏ РїСЂРёС‡РёРЅС‹
 - вќЊ РЈРґР°Р»СЏС‚СЊ `.meta` РґР»СЏ РїРѕС‡РёРЅРєРё Missing
 - вќЊ РџСЂР°РІРёС‚СЊ YAML `.unity`/`.prefab` РґР»СЏ РїРѕС‡РёРЅРєРё Missing
-- вќЊ Р”РѕРІРµСЂСЏС‚СЊ РїР°РјСЏС‚Рё РѕР± Unity API вЂ” РїСЂРѕРІРµСЂСЏР№ С‡РµСЂРµР· `mcp__unityMCP__eval`
-- ❌ Доверять памяти об Unity API — проверяй через `mcp__unityMCP__eval`
+- вќЊ Р”РѕРІРµСЂСЏС‚СЊ РїР°РјСЏС‚Рё РѕР± Unity API вЂ” РїСЂРѕРІРµСЂСЏР№ С‡РµСЂРµР· `mcp__coplay__execute_script`
+- ❌ Доверять памяти об Unity API — проверяй через `mcp__coplay__execute_script`
 - вќЊ Р—Р°СЏРІР»СЏС‚СЊ В«РіРѕС‚РѕРІРѕВ» СЃ РѕС€РёР±РєР°РјРё РІ Console

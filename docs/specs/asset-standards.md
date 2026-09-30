@@ -73,7 +73,7 @@ Assets/Woodberry/
 ## Материалы и шейдеры
 
 - Шейдер — из установленных пакетов. **Перед созданием нового шейдера** проверь,
-  есть ли уже подходящий (`ccp__unityMCP__canage_asset action=search filter_type=Shader`).
+  есть ли уже подходящий (`mcp__coplay__search_all_packages() и поиск шейдера в Project`).
 - URP: не используй старые `Standard`/`Unlit/Texture`-шейдеры, если есть URP-эквивалент.
 - Один материал — много объектов. `MaterialPropertyBlock` для вариаций, а не копия материала.
 

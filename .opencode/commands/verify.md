@@ -11,13 +11,13 @@ Scope: $ARGUMENTS
 Р’С‹РїРѕР»РЅРё СЃС‚СЂРѕРіРѕ РїРѕ РїРѕСЂСЏРґРєСѓ:
 
 ```
-1. mcp__unityMCP__clear_console()
-2. mcp__unityMCP__recompile(focus=false)
-3. mcp__unityMCP__console(level="error", tail=50)
-4. mcp__unityMCP__run_tests(mode="EditMode", include_failed_tests=true)
-5. mcp__unityMCP__test_status()
-6. mcp__unityMCP__run_tests(mode="PlayMode", include_failed_tests=true, init_timeout=120000)
-7. mcp__unityMCP__test_status()
+1. (вручную: Edit → Clear)()
+2. mcp__coplay__check_compile_errors()
+3. mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
+4. Test Runner → EditMode → Run All (вручную)
+5. mcp__coplay__get_unity_logs(search_term="TESTS_DONE")
+6. Test Runner → PlayMode → Run All (вручную)
+7. mcp__coplay__get_unity_logs(search_term="TESTS_DONE")
 ```
 
 `clear` РёРґС‘С‚ **РґРѕ** РїСЂРѕРІРµСЂРєРё вЂ” РёРЅР°С‡Рµ СЃС‚Р°СЂС‹Рµ РѕС€РёР±РєРё РІС‹РіР»СЏРґСЏС‚ РєР°Рє РЅРѕРІС‹Рµ.

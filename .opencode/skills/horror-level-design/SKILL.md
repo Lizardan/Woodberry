@@ -146,7 +146,7 @@ transform.position = Vector3.Lerp(a, b, k);
 ## РЎРєСЂРёРЅС€РѕС‚С‹
 
 ```
-mcp__unityMCP__capture_game_view(, include_image=true, max_resolution=800)
+mcp__coplay__capture_scene_object(name="Main Camera")
 ```
 
 вљ пёЏ `Screen Space - Overlay` UI **РЅРµ РїРѕРїР°РґР°РµС‚** РІ СЃРєСЂРёРЅС€РѕС‚ РїСЂРё СѓРєР°Р·Р°РЅРёРё РєР°РјРµСЂС‹.

@@ -372,34 +372,47 @@ Awake в†’ OnEnable в†’ Start в†’ FixedUpdate/Update в†’ Late
 # File в†’ Build Settings в†’ Build And Run
 ```
 
-**Агентский способ** (предпочтительный). Мост — нативный MCP-сервер Unity CLI,
-он работает автоматически, пока Editor открыт:
+**Агентский способ** (предпочтительный). Мост — MCP-сервер **Coplay**,
+он работает, пока открыт Unity и Coplay авторизован в редакторе:
 
 ```
-mcp__unityMCP__clear_console()
-mcp__unityMCP__recompile(focus=false)
-mcp__unityMCP__recompile_status()
-mcp__unityMCP__console(level="error", tail=100)
-mcp__unityMCP__run_tests(mode="EditMode", timeout=120)
-mcp__unityMCP__test_status()
-mcp__unityMCP__run_tests(mode="PlayMode", timeout=180)
-mcp__unityMCP__test_status()
+mcp__coplay__check_compile_errors()
+mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
 ```
 
 Проверить, что мост жив:
 
-```powershell
-& "F:\Unity\Unity Hub\resources\unity.exe" status --json
+```
+mcp__coplay__get_unity_editor_state()
 ```
 
-Ожидается `state: "ready"` и порт `7801`. Полный справочник из 160 команд —
-`docs/runbooks/unity-automation.md`. Не выдумывай команды и параметры:
-актуальный список — `unity command --json`.
+Если не отвечает — логи сервера:
+```powershell
+Get-Content "C:\Users\Lizardan\AppData\Local\Coplay\Logs\coplay_mcp_*.log" -Tail 40
+```
+
+Полный справочник из 96 инструментов — `docs/runbooks/unity-automation.md`.
+Не выдумывай инструменты: сверяйся с этим файлом.
+
+### Чего Coplay не умеет
+
+Это ограничения инструмента, а не правила проекта. Планируй с учётом:
+
+| Задача | Как делать |
+|---|---|
+| Запуск тестов | **вручную** через Test Runner, затем `get_unity_logs(search_term="TESTS_DONE")` |
+| Сборка player | вручную: File → Build Settings |
+| Очистка консоли | вручную: Edit → Clear |
+| Рефлексия Unity API | через `execute_script` с временным .cs — см. runbook |
+| Запекание света / NavMesh | вручную через окна Unity |
+
+**Следствие:** этап нельзя объявить «готово», пока тесты фактически
+не прогнаны. Coplay их не запускает — это делает человек.
 
 **Правила:**
-- После любого изменения скриптов — `recompile`, затем `console()`. Не продолжай работу при ошибках компиляции.
-- `clear_console` **до** проверки, иначе старые ошибки выглядят как новые.
-- Перед тем как заявить «готово», запусти релевантные тесты и приведи **фактический** результат.
+- После любого изменения скриптов — `check_compile_errors()`. Не продолжай работу при ошибках компиляции.
+- Очистки консоли через MCP нет — вместо неё используй `get_unity_logs(search_term=...)` для точечной выборки.
+- Перед тем как заявить «готово», прогони релевантные тесты и приведи **фактический** результат.
 - Если Unity Editor не запущен — честно скажи это в отчёте как «Not verified».
 
 ---
@@ -626,7 +639,7 @@ runtime-РєРѕРґ СЃ `UnityEditor`, СЂСѓС‡РЅРѕР№ YAML-СЂР�
 
 ## References
 
-- Основы Unity: `mcp__unityMCP__eval` (живая рефлексия по API Editor'а) и CLI `unity docs` (документация под версию проекта). **Не полагайся на память о Unity API** — версии меняются, и устаревшие API — частая причина ошибок компиляции. Всегда проверяй через `mcp__unityMCP__eval` и `unity docs`.
+- Основы Unity: `mcp__coplay__execute_script(filePath="<временный .cs>")` — единственный способ живой рефлексии по API Editor'а. Рецепт пробника — `docs/runbooks/unity-automation.md`. **Не полагайся на память о Unity API** — версии меняются, и устаревшие API — частая причина ошибок компиляции. Всегда проверяй через `execute_script` перед использованием незнакомого API.
 - РЁР°Р±Р»РѕРЅС‹ OpenCode: https://opencode.ai/docs/ru/
 - РЎРїРµС†РёС„РёРєР°С†РёРё: `docs/specs/`
 - Р РµС€РµРЅРёСЏ: `docs/adr/`

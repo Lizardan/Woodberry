@@ -32,7 +32,7 @@
 - Unity Editor должен быть запущен и подключён к MCP bridge, иначе верификация невозможна.
   Если он не запущен — явно пиши `Not verified: Unity Editor не запущен`, не выдумывай результат.
 - После изменения скриптов всегда: `recompile(focus=false)`, затем `console(level="error", tail=50)`.
-- Не полагайся на память об Unity API. Проверяй через `mcp__unityMCP__eval` и `unity docs`.
+- Не полагайся на память об Unity API. Проверяй через `mcp__coplay__execute_script` (рецепт — `docs/runbooks/unity-automation.md`).
 - Никогда не редактируй `.unity` и `.prefab` как текст.
 
 ## Git

@@ -42,14 +42,17 @@
   },
 
   "mcp": {
-    "unityMCP": {
+    "coplay": {
       "type": "local",
       "command": [
-        "F:\\Unity\\Unity Hub\\resources\\unity.exe",
-        "mcp",
-        "--project-path",
-        "F:\\Unity Projects\\Woodberry"
+        "C:\\Users\\Lizardan\\.local\\bin\\uvx.exe",
+        "--python",
+        ">=3.11",
+        "coplay-mcp-server@latest"
       ],
+      "environment": {
+        "MCP_TOOL_TIMEOUT": "720000"
+      },
       "enabled": true
     }
   },

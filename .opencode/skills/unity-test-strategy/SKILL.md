@@ -163,13 +163,13 @@ Assert.That(controller.CurrentSpeed, Is.EqualTo(0f));
 ## РЁР°Рі 6. Р—Р°РїСѓСЃРє
 
 ```
-mcp__unityMCP__clear_console()
-mcp__unityMCP__recompile(focus=false)
-mcp__unityMCP__console(level="error", tail=50, count="50")
-mcp__unityMCP__run_tests(mode="EditMode", include_failed_tests=true)
-mcp__unityMCP__test_status()
-mcp__unityMCP__run_tests(mode="PlayMode", include_failed_tests=true, init_timeout=120000)
-mcp__unityMCP__test_status()
+(вручную: Edit → Clear)()
+mcp__coplay__check_compile_errors()
+mcp__coplay__get_unity_logs(show_errors=true, limit=50)
+Test Runner → EditMode → Run All (вручную)
+mcp__coplay__get_unity_logs(search_term="TESTS_DONE")
+Test Runner → PlayMode → Run All (вручную)
+mcp__coplay__get_unity_logs(search_term="TESTS_DONE")
 ```
 
 ## Р Р°Р·Р±РѕСЂ РїСЂРѕР±Р»РµРј

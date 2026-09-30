@@ -23,13 +23,13 @@ Unity `6000.6.3f1`, URP `17.6.0`. API РјРµРЅСЏРµС‚СЃСЏ РјРµ
 **РќРµ РїРѕР»Р°РіР°Р№СЃСЏ РЅР° РїР°РјСЏС‚СЊ.**
 
 ```
-mcp__unityMCP__eval(code="return typeof(UnityEngine.Rendering.VolumeManager).FullName;")
-mcp__unityMCP__eval(code="return typeof(UnityEngine.Rendering.Volume).FullName;")
-mcp__unityMCP__eval(code="return string.Join(\"; \", typeof(UnityEngine.Rendering.Volume).GetProperties().Select(p => p.Name).ToArray());")
+mcp__coplay__execute_script(filePath="<временный .cs>")  # return typeof(UnityEngine.Rendering.VolumeManager).FullName;
+mcp__coplay__execute_script(filePath="<временный .cs>")  # return typeof(UnityEngine.Rendering.Volume).FullName;
+mcp__coplay__execute_script(filePath="<временный .cs>")  # code="return string.Join(\"; \", typeof(UnityEngine.Rendering.Volume).GetProperties().Select(p => p.Name).ToArray());")
 & "F:\Unity\Unity Hub\resources\unity.exe" docs Volume --url
 # РџРѕРёСЃРє С€РµР№РґРµСЂРѕРІ РІ РїСЂРѕРµРєС‚Рµ вЂ” РґРѕ СЃРѕР·РґР°РЅРёСЏ РЅРѕРІРѕРіРѕ
-mcp__unityMCP__find_assets(type="Shader", limit=50)
-mcp__unityMCP__get_graphics_settings(action="ping")
+mcp__coplay__search_all_packages()  # шейдеры: поиск в проекте
+mcp__coplay__get_unity_editor_state()
 ```
 
 ## РџСЂР°РІРёР»Рѕ 1: URP, РЅРµ Standard
@@ -54,17 +54,17 @@ mcp__unityMCP__get_graphics_settings(action="ping")
 ### РџСЂРѕРІРµСЂРёС‚СЊ С‚РµРєСѓС‰РёРµ РЅР°СЃС‚СЂРѕР№РєРё
 
 ```
-mcp__unityMCP__get_graphics_settings(action="skybox_get")
-mcp__unityMCP__get_graphics_settings()
-mcp__unityMCP__get_graphics_settings(, target="Global Volume")
+(вручную: Window → Rendering → Lighting)
+mcp__coplay__get_game_object_info(name="Global Volume")  # или вручную
+mcp__coplay__get_game_object_info(name="Global Volume")
 ```
 
 ### Р—Р°РїРµРєР°РЅРёРµ
 
 ```
-mcp__unityMCP__get_graphics_settings(action="bake_get_settings")
-mcp__unityMCP__bake_lighting(confirm=true)
-mcp__unityMCP__lighting_bake_status()
+(вручную: Window → AI → Navigation)
+(вручную: Window → Rendering → Lighting → Generate Lighting)
+(вручную: окно Lighting)
 ```
 
 Р—Р°РїРµС‡С‘РЅРЅС‹Р№ СЃРІРµС‚ **Р±РµСЃРїР»Р°С‚РЅС‹Р№**. РќРµ Р·Р°РїРµРєР°Р№ С‚Рѕ, С‡С‚Рѕ РґРІРёРіР°РµС‚СЃСЏ.
@@ -72,9 +72,9 @@ mcp__unityMCP__lighting_bake_status()
 ## Volume: РЅР°Р±РѕСЂ РґР»СЏ С…РѕСЂСЂРѕСЂР°
 
 ```
-mcp__unityMCP__get_graphics_settings(action="volume_create", name="Woodberry_Horror", is_global=true)
-mcp__unityMCP__get_graphics_settings(action="volume_add_effect", target="Woodberry_Horror", effect="Vignette")
-mcp__unityMCP__get_graphics_settings(action="volume_set_effect", target="Woodberry_Horror", effect="Vignette",
+(вручную: Create → Volume Profile)
+(вручную: Volume Profile → Add Override)
+(вручную: Volume Profile → Vignette → параметры)
   parameters={...})
 ```
 
@@ -97,7 +97,7 @@ mcp__unityMCP__get_graphics_settings(action="volume_set_effect", target="Woodber
 | РћРґРёРЅР°РєРѕРІС‹Р№ РјР°С‚РµСЂРёР°Р» | РџРµСЂРµРёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ |
 
 ```
-mcp__unityMCP__set_material_properties(, target="Obj", color=[1,0,0], mode="property_block")
+mcp__coplay__set_property(name="Obj", properties={...})
 ```
 
 РњР°С‚РµСЂРёР°Р» РЅР° РѕР±СЉРµРєС‚ = СЃР»РѕРјР°РЅРЅС‹Р№ Р±Р°С‚С‡РёРЅРі + СѓС‚РµС‡РєР° РїР°РјСЏС‚Рё.
@@ -105,7 +105,7 @@ mcp__unityMCP__set_material_properties(, target="Obj", color=[1,0,0], mode="prop
 ### РџСЂРѕРІРµСЂРєР° СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ РјР°С‚РµСЂРёР°Р»Р°
 
 ```
-mcp__unityMCP__get_material_properties(material="Assets/Woodberry/Materials/X.mat")
+(вручную: инспектор материала Assets/Woodberry/Materials/X.mat)
 ```
 
 ## Draw calls: Р±СЋРґР¶РµС‚
@@ -113,8 +113,8 @@ mcp__unityMCP__get_material_properties(material="Assets/Woodberry/Materials/X.ma
 Р¦РµР»СЊ: **< 800**, Р¶С‘СЃС‚РєРёР№ РїСЂРµРґРµР» 1500.
 
 ```
-mcp__unityMCP__get_performance_stats()
-mcp__unityMCP__get_performance_stats(action="get_frame_timing")
+mcp__coplay__get_worst_cpu_frames() / mcp__coplay__get_worst_gc_frames()
+mcp__coplay__get_worst_cpu_frames()
 ```
 
 ### РљР°Рє СЃРЅРёР¶Р°С‚СЊ
@@ -135,9 +135,9 @@ mcp__unityMCP__get_performance_stats(action="get_frame_timing")
 Р¦РµР»СЊ: **16.6 ms** (60 FPS), Р¶С‘СЃС‚РєРёР№ РїСЂРµРґРµР» 22 ms.
 
 ```
-mcp__unityMCP__get_performance_stats(action="profiler_start")
-mcp__unityMCP__get_performance_stats(action="get_counters", category="Render")
-mcp__unityMCP__get_performance_stats(action="profiler_stop")
+mcp__coplay__get_worst_cpu_frames()
+mcp__coplay__get_worst_gc_frames()
+mcp__coplay__get_worst_gc_frames()
 ```
 
 Р§С‚Рѕ СЃРјРѕС‚СЂРµС‚СЊ РІ РїРѕСЂСЏРґРєРµ СѓР±С‹РІР°РЅРёСЏ РІР»РёСЏРЅРёСЏ:

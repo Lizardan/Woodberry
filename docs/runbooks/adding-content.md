@@ -48,8 +48,8 @@ public float MoveSpeed;                           // вќЊ public РїРѕР»�
 ### 5. РџСЂРѕРІРµСЂРёС‚СЊ
 
 ```
-mcp__unityMCP__recompile(focus=false)
-mcp__unityMCP__console(level="error", tail=50)
+mcp__coplay__check_compile_errors()
+mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
 ```
 
 ## РќРѕРІС‹Р№ Р°СЃСЃРµС‚
@@ -158,9 +158,9 @@ public sealed class EnemyDefinition : ScriptableObject
 ## РџСЂРѕРІРµСЂРєР° РїРѕСЃР»Рµ Р»СЋР±С‹С… РёР·РјРµРЅРµРЅРёР№
 
 ```
-mcp__unityMCP__recompile(focus=false)
-mcp__unityMCP__console(level="error", tail=50)
-mcp__unityMCP__run_tests(mode="EditMode", include_failed_tests=true)
+mcp__coplay__check_compile_errors()
+mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
+Test Runner → EditMode → Run All (вручную)
 ```
 
 ## Р§РµРіРѕ РґРµР»Р°С‚СЊ РЅРµР»СЊР·СЏ

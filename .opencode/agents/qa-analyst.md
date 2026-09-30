@@ -50,13 +50,13 @@ contract drift Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РёР·
 ## Р—РѕР»РѕС‚РѕР№ С†РёРєР» РїСЂРѕРіРѕРЅР°
 
 ```
-mcp__unityMCP__clear_console()
-mcp__unityMCP__recompile(focus=false)
-mcp__unityMCP__console(level="error", tail=50)
-mcp__unityMCP__run_tests(mode="EditMode", include_failed_tests=true)
-mcp__unityMCP__test_status()
-mcp__unityMCP__run_tests(mode="PlayMode", include_failed_tests=true, init_timeout=120000)
-mcp__unityMCP__test_status()
+(вручную: Edit → Clear)()
+mcp__coplay__check_compile_errors()
+mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
+Test Runner → EditMode → Run All (вручную)
+mcp__coplay__get_unity_logs(search_term="TESTS_DONE")
+Test Runner → PlayMode → Run All (вручную)
+mcp__coplay__get_unity_logs(search_term="TESTS_DONE")
 ```
 
 `clear` **РґРѕ** РїСЂРѕРІРµСЂРєРё вЂ” РёРЅР°С‡Рµ СЃС‚Р°СЂС‹Рµ РѕС€РёР±РєРё РІС‹РіР»СЏРґСЏС‚ РєР°Рє РЅРѕРІС‹Рµ.

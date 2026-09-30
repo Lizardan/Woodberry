@@ -86,25 +86,49 @@ namespace Woodberry.Tests.EditMode
 
 **Run All** РЅР° РєР°Р¶РґРѕР№ РІРєР»Р°РґРєРµ.
 
-## Р—Р°РїСѓСЃРє С‡РµСЂРµР· MCP
+## Запуск через MCP — ограничение Coplay
+
+**Coplay не умеет запускать тесты.** Инструмента `run_tests` в нём нет.
+Это осознанное ограничение, а не баг конфигурации. Поэтому прогон тестов —
+**ручная операция**, и её результат вносится в stage report честно.
 
 ```
-mcp__unityMCP__run_tests(mode="EditMode", include_failed_tests=true)
-mcp__unityMCP__test_status()
+# EditMode
+1. Test → Test Runner → EditMode → Run All
+2. mcp__coplay__get_unity_logs(show_errors=true, search_term="test")
 
-mcp__unityMCP__run_tests(mode="PlayMode", include_failed_tests=true, init_timeout=120000)
-mcp__unityMCP__test_status()
+# PlayMode
+3. Test → Test Runner → PlayMode → Run All
+4. mcp__coplay__get_unity_logs(show_errors=true, search_term="test")
 ```
 
-PlayMode РїРµСЂРІС‹Р№ Р·Р°РїСѓСЃРє РґРѕР»РіРёР№ РёР·-Р·Р° РїРµСЂРµР·Р°РіСЂСѓР·РєРё РґРѕРјРµРЅР°. Р­С‚Рѕ РЅРѕСЂРјР°Р»СЊРЅРѕ, РЅРµ РїР°РЅРёРєСѓР№
-Рё РЅРµ РїРµСЂРµР·Р°РїСѓСЃРєР°Р№.
+**Полуавтоматический вариант для EditMode** — через `execute_script` с
+`TestRunnerApi`. Рецепт — в `unity-automation.md → Запуск тестов: обходной путь`.
+PlayMode так не запустить: он перезапускает домен и обрывает вызов.
 
-Р¤РёР»СЊС‚СЂР°С†РёСЏ РїРѕ РіСЂСѓРїРїРµ:
+## Фильтрация
+
+Через UI — фильтры в панели Test Runner:
+- Debug / EditMode / PlayMode, поиск по имени теста
+- Дерево по сборкам и по namespace
+
+Через `run_tests` при его наличии в будущей версии Coplay:
 ```
-mcp__unityMCP__run_tests(mode="EditMode", assembly_names=["Woodberry.Tests.EditMode"])
-mcp__unityMCP__run_tests(mode="EditMode", test_names=["Woodberry.Tests.EditMode.PlayerStaminaTests"])
+mode="EditMode", filter="Woodberry.Tests.EditMode.PlayerStaminaTests"
 ```
 
+## Честность отчёта
+
+Раз Coplay не запускает тесты автоматически, **заявление «тесты прошли»
+должно сопровождаться указанием, как именно они были прогнаны**:
+
+| Как прогнано | Как записать в отчёте |
+|---|---|
+| Вручную через Test Runner | `EditMode: 12/12 passed (ручной прогон)` |
+| Через `execute_script` | `EditMode: 12/12 passed (execute_script + TestRunnerApi)` |
+| Не прогнано | `Not verified: тесты не запускались` |
+
+Формулировка «тесты, вероятно, проходят» — не верификация.
 ## РџСЂРёРѕСЂРёС‚РµС‚ С‚РµСЃС‚РѕРІ
 
 Р•СЃР»Рё РЅРµ С…РІР°С‚Р°РµС‚ РІСЂРµРјРµРЅРё, С‚РµСЃС‚РёСЂСѓР№ РІ СЌС‚РѕРј РїРѕСЂСЏРґРєРµ:

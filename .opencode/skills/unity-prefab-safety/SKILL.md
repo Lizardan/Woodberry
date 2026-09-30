@@ -108,9 +108,9 @@ Unity РѕР±РЅРѕРІРёС‚ `.meta` Рё РІСЃРµ СЃСЃС‹Р»�
 ### РџСЂР°РІРёР»СЊРЅС‹Р№ РїСѓС‚СЊ
 
 ```
-mcp__unityMCP__open_scene(path="Assets/Woodberry/Scenes/Woodberry_X.unity")
-mcp__unityMCP__get_scene_hierarchy()
-mcp__unityMCP__save_scene()
+mcp__coplay__open_scene(path="Assets/Woodberry/Scenes/Woodberry_X.unity")
+mcp__coplay__list_game_objects_in_hierarchy()
+mcp__coplay__save_scene()
 ```
 
 ### РћР±СЏР·Р°С‚РµР»СЊРЅРѕРµ СЃРѕРґРµСЂР¶РёРјРѕРµ
@@ -139,7 +139,7 @@ mcp__unityMCP__save_scene()
 **РЎРЅР°С‡Р°Р»Р°** РїСЂРѕРІРµСЂРёС‚СЊ РєРѕРјРїРёР»СЏС†РёСЋ вЂ” СЌС‚Рѕ С‡Р°С‰Рµ РІСЃРµРіРѕ РїСЂРёС‡РёРЅР°:
 
 ```
-mcp__unityMCP__console(level="error", tail=50, count="50")
+mcp__coplay__get_unity_logs(show_errors=true, limit=50)
 ```
 
 Р•СЃР»Рё РєРѕРјРїРёР»СЏС†РёСЏ С‡РёСЃС‚Р°СЏ:

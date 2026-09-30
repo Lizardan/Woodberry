@@ -15,8 +15,8 @@
 - docs/specs/core-gameplay.md
 
 ## Verification performed
-- mcp__unityMCP__console(level="error", tail=100)types=["error"]) вЂ” 0 РѕС€РёР±РѕРє
-- mcp__unityMCP__run_tests(mode="EditMode") вЂ” 12/12 passed
+- mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)types=["error"]) вЂ” 0 РѕС€РёР±РѕРє
+- Test Runner → EditMode → Run All вЂ” 12/12 passed
 
 ## Not verified
 - РџСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚СЊ РЅР° 4 РёРіСЂРѕРєР°С… вЂ” Unity Editor РЅРµ Р±С‹Р» Р·Р°РїСѓС‰РµРЅ

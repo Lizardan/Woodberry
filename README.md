@@ -223,12 +223,12 @@ Woodberry/
 
 ```powershell
 # РљРѕРјРїРёР»СЏС†РёСЏ
-mcp__unityMCP__recompile(focus=false)
-mcp__unityMCP__console(level="error", tail=50)
+mcp__coplay__check_compile_errors()
+mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
 
 # РўРµСЃС‚С‹
-mcp__unityMCP__run_tests(mode="EditMode", include_failed_tests=true)
-mcp__unityMCP__run_tests(mode="PlayMode", include_failed_tests=true, init_timeout=120000)
+Test Runner → EditMode → Run All (вручную)
+Test Runner → PlayMode → Run All (вручную)
 ```
 
 **РџСЂР°РІРёР»Рѕ:** В«РџСЂРµРґРїРѕР»РѕР¶РёС‚РµР»СЊРЅРѕ СЂР°Р±РѕС‚Р°РµС‚В» вЂ” РЅРµ РІРµСЂРёС„РёРєР°С†РёСЏ.

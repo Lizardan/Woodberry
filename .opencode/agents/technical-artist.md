@@ -42,13 +42,13 @@ permission:
 **РќРёРєРѕРіРґР° РЅРµ РїРёС€Рё РЅРѕРІС‹Р№ С€РµР№РґРµСЂ, РЅРµ РїСЂРѕРІРµСЂРёРІ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёРµ.**
 
 ```
-mcp__unityMCP__find_assets(type="Shader", limit=50)
+mcp__coplay__search_all_packages()  # шейдеры: поиск в проекте
 ```
 
 РўР°РєР¶Рµ РїСЂРѕРІРµСЂСЊ С‡РµСЂРµР· reflection:
 
 ```
-mcp__unityMCP__find_assets(type="Shader", limit=50)
+mcp__coplay__search_all_packages()  # шейдеры: поиск в проекте
 ```
 
 Unity РјРµРЅСЏРµС‚ API РјРµР¶РґСѓ РІРµСЂСЃРёСЏРјРё. РЁРµР№РґРµСЂ РёР· СѓСЃС‚Р°СЂРµРІС€РµРіРѕ С‚СѓС‚РѕСЂРёР°Р»Р° РјРѕР¶РµС‚
@@ -65,7 +65,7 @@ Unity РјРµРЅСЏРµС‚ API РјРµР¶РґСѓ РІРµСЂСЃРёС�
 РџСЂРѕРІРµСЂРёС‚СЊ РґРѕСЃС‚СѓРїРЅС‹Рµ URP-С€РµР№РґРµСЂС‹:
 
 ```
-mcp__unityMCP__find_assets(type="Shader", name="Universal", limit=50)
+mcp__coplay__search_all_packages()  # шейдеры: Window → Project поис�� в проекте
 ```
 
 Р•СЃР»Рё РЅСѓР¶РµРЅ РЅРµСЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ СЌС„С„РµРєС‚ вЂ” `Shader Graph` (РІРёР·СѓР°Р»СЊРЅС‹Р№, РЅР°РґС‘Р¶РЅС‹Р№) РёР»Рё
@@ -86,7 +86,7 @@ HLSL-С€РµР№РґРµСЂ РїРѕРґ URP Include.
 **РџРёРєСЃРµР»СЊ-Р°СЂС‚ СЃ Bilinear Рё mipmaps = РІРёР·СѓР°Р»СЊРЅС‹Р№ Р±СЂР°Рє.** Р­С‚Рѕ СЃР°РјР°СЏ С‡Р°СЃС‚Р°СЏ РѕС€РёР±РєР°.
 
 ```
-mcp__unityMCP__set_import_settings(asset="...", settings={...})
+(вручную: инспектор ассета → настройки импорта)
 ```
 
 ### РњРѕРґРµР»Рё
@@ -114,7 +114,7 @@ Read/Write РЅР° С‚РµРєСЃС‚СѓСЂР°С… Рё РјРµС€Р
 `MaterialPropertyBlock` РЅРµ СЃРѕР·РґР°С‘С‚ РЅРѕРІС‹Р№ РјР°С‚РµСЂРёР°Р» Рё РЅРµ Р»РѕРјР°РµС‚ Р±Р°С‚С‡РёРЅРі.
 
 ```
-mcp__unityMCP__set_material_properties(, target="...", color=[...], mode="property_block")
+mcp__coplay__set_property(name="Obj", properties={...})
 ```
 
 ## РџСЂР°РІРёР»Рѕ 5: Р°С‚РјРѕСЃС„РµСЂР° С‡РµСЂРµР· СЃРІРµС‚, Р° РЅРµ С‡РµСЂРµР· РїРѕСЃС‚
@@ -145,8 +145,8 @@ desaturation РІ Color Adjustments.
 **Draw calls < 800** вЂ” Р¶С‘СЃС‚РєР°СЏ С†РµР»СЊ. РџСЂРѕРІРµСЂСЏР№:
 
 ```
-mcp__unityMCP__get_performance_stats()
-mcp__unityMCP__get_performance_stats(action="get_frame_timing")
+mcp__coplay__get_worst_cpu_frames() / mcp__coplay__get_worst_gc_frames()
+mcp__coplay__get_worst_cpu_frames()
 ```
 
 ## РџСЂР°РІРёР»Рѕ 7: VFX РґР»СЏ Р°С‚РјРѕСЃС„РµСЂС‹, РЅРµ РґР»СЏ РєСЂР°СЃРѕС‚С‹
@@ -161,8 +161,8 @@ mcp__unityMCP__get_performance_stats(action="get_frame_timing")
 | РќРµ СЃРїР°РјРёС‚СЊ СЌРєСЂР°РЅРЅС‹Рј shake Р±РµР· РїСЂРёС‡РёРЅС‹ | РўРµСЂСЏРµС‚СЃСЏ СЌС„С„РµРєС‚ |
 
 ```
-mcp__unityMCP__get_component_properties(target="...", type="ParticleSystem")
-mcp__unityMCP__set_component_properties(target="...", type="ParticleSystem", properties={...})
+mcp__coplay__get_game_object_info(name="...")
+mcp__coplay__set_property(name="...", componentType="ParticleSystem", properties={...})
 ```
 
 ## РџСЂР°РІРёР»Р° СЂР°Р±РѕС‚С‹ СЃ Р°СЃСЃРµС‚Р°РјРё

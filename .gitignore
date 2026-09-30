@@ -78,7 +78,7 @@ crashlytics-build.properties
 # OpenCode
 # ============================================
 # Служебное состояние goal-плагина — не часть проекта.
-# Проектный слой (.opencode/agents, skills, patterns, templates, command) — КОМИТИТСЯ.
+# Проектный слой (.opencode/agents, skills, patterns, templates, commands) — КОМИТИТСЯ.
 /.opencode/goals/
 
 # Прочие локальные артефакты OpenCode
@@ -86,11 +86,12 @@ crashlytics-build.properties
 /.opencode/log/
 *.opencode.log
 
-# Бинарь MCP for Unity, установленный скриптом в корень проекта
-/UnityMcpBridge/
-/MCPForUnity/
-mcp-for-unity*.exe
-mcp-for-unity*.dll
+# Coplay: локальные данные плагина (логи, чаты, настройки, кэш).
+# Плагин сам игнорирует только Packages/Coplay/Editor/, остальное — на нас.
+# ВАЖНО: Packages/manifest.json и packages-lock.json коммитятся — без них
+# проект не восстановится у всей команды.
+Packages/Coplay/*
+!Packages/Coplay/.gitignore
 
 # ============================================
 # Прочее

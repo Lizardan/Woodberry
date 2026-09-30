@@ -26,8 +26,8 @@ metadata:
 ## РЁР°Рі 1. РџРѕР»СѓС‡РёС‚СЊ РѕС€РёР±РєРё
 
 ```
-mcp__unityMCP__console(level="error", tail=50, count="100")
-mcp__unityMCP__console(level="error", tail=100)action="get", types=["error","warning"], count="100", include_stacktrace=true)
+mcp__coplay__get_unity_logs(show_errors=true, limit=100)
+mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)action="get", types=["error","warning"], count="100", include_stacktrace=true)
 ```
 
 РР»Рё РІ СЂРµРґР°РєС‚РѕСЂРµ: **Window в†’ General в†’ Console**, С„РёР»СЊС‚СЂ Errors.
@@ -72,15 +72,15 @@ namespace Gameplay.Player             // вќЊ РЅРµС‚ РїСЂРµС„�
 Р•СЃР»Рё С‚РёРї РІ РґСЂСѓРіРѕР№ СЃР±РѕСЂРєРµ, Р° СЃСЃС‹Р»РєР° РЅРµ РѕР±СЉСЏРІР»РµРЅР° РІ `.asmdef` в†’ `references`.
 
 ```
-mcp__unityMCP__find_assets(action="get_info", path="Assets/Scripts/Core/Woodberry.Runtime.asmdef")
+mcp__coplay__search_files(query="...")  # или Window → Project
 ```
 
 ### РџСЂРѕРІРµСЂСЊ, С‡С‚Рѕ С‚РёРї РІРѕРѕР±С‰Рµ РµСЃС‚СЊ
 
 ```
-mcp__unityMCP__eval(code="return string.Join(\"; \", System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => { try { return a.GetTypes(); } catch { return new Type[0]; } }).Where(x => x.Name == \"TypeName\").Select(x => x.FullName).ToArray());")
+mcp__coplay__execute_script(filePath="<временный .cs>")  # code="return string.Join(\"; \", System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => { try { return a.GetTypes(); } catch { return new Type[0]; } }).Where(x => x.Name == \"TypeName\").Select(x => x.FullName).ToArray());")
 ```
-mcp__unityMCP__eval(code="return string.Join(\"; \", System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => { try { return a.GetTypes(); } catch { return new Type[0]; } }).Where(x => x.Name == \"TypeName\").Select(x => x.FullName).ToArray());")
+mcp__coplay__execute_script(filePath="<временный .cs>")  # code="return string.Join(\"; \", System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => { try { return a.GetTypes(); } catch { return new Type[0]; } }).Where(x => x.Name == \"TypeName\").Select(x => x.FullName).ToArray());")
 ```
 
 ## РЁР°Рі 5. РљРѕРЅС„Р»РёРєС‚ СЃР±РѕСЂРѕРє
@@ -101,9 +101,9 @@ The type 'X' exists in both 'Assembly-A' and 'Assembly-B'
 РїР°РјСЏС‚СЊ Рѕ Unity API С‡Р°СЃС‚Рѕ СѓСЃС‚Р°СЂРµРІС€Р°СЏ.
 
 ```
-mcp__unityMCP__eval(code="return typeof(<Ns>.<ClassName>).GetMember(\"MemberName\").Length;")
-mcp__unityMCP__eval(code="return typeof(<Namespace>.<ClassName>).GetMember(\"MemberName\").Length;")
-mcp__unityMCP__eval(code="var m = typeof(<Namespace>.<ClassName>).GetProperty(\"MemberName\"); return m == null ? \"NULL - не существует\" : m.PropertyType.Name + \" canWrite=\" + m.CanWrite;")
+mcp__coplay__execute_script(filePath="<временный .cs>")  # code="return typeof(<Ns>.<ClassName>).GetMember(\"MemberName\").Length;")
+mcp__coplay__execute_script(filePath="<временный .cs>")  # code="return typeof(<Namespace>.<ClassName>).GetMember(\"MemberName\").Length;")
+mcp__coplay__execute_script(filePath="<временный .cs>")  # code="var m = typeof(<Namespace>.<ClassName>).GetProperty(\"MemberName\"); return m == null ? \"NULL - не существует\" : m.PropertyType.Name + \" canWrite=\" + m.CanWrite;")
 
 # Ссылка на документацию под версию проекта:
 & "F:\Unity\Unity Hub\resources\unity.exe" docs <ClassName> --url
@@ -115,7 +115,7 @@ mcp__unityMCP__eval(code="var m = typeof(<Namespace>.<ClassName>).GetProperty(\"
 Р­С‚Рѕ **СЃР°РјР°СЏ С‡Р°СЃС‚Р°СЏ** РїСЂРёС‡РёРЅР°: С‚РёРї РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ в†’ РєРѕРјРїРѕРЅРµРЅС‚ РїРѕРєР°Р·С‹РІР°РµС‚ Missing.
 
 ```
-mcp__unityMCP__console(level="error", tail=50, count="50")
+mcp__coplay__get_unity_logs(show_errors=true, limit=50)
 ```
 
 ### Р•СЃР»Рё РєРѕРјРїРёР»СЏС†РёСЏ С‡РёСЃС‚Р°СЏ
@@ -175,9 +175,9 @@ Not verified: Unity Editor РЅРµ Р·Р°РїСѓС‰РµРЅ, РєРѕРј�
 ## Р—РѕР»РѕС‚РѕР№ С†РёРєР» РїСЂРѕРІРµСЂРєРё
 
 ```
-mcp__unityMCP__clear_console()
-mcp__unityMCP__recompile(focus=false)
-mcp__unityMCP__console(level="error", tail=50)
+(вручную: Edit → Clear)()
+mcp__coplay__check_compile_errors()
+mcp__coplay__get_unity_logs(show_errors=true, show_warnings=true, limit=50)
 ```
 
 `clear` **РґРѕ** РїСЂРѕРІРµСЂРєРё вЂ” РёРЅР°С‡Рµ СЃС‚Р°СЂС‹Рµ РѕС€РёР±РєРё РІС‹РіР»СЏРґСЏС‚ РєР°Рє РЅРѕРІС‹Рµ.
