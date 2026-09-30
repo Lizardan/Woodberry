@@ -1,4 +1,4 @@
-# Spec — Perforcance Budget
+# Spec — Performance Budget
 
 Статус: Draft
 
@@ -8,12 +8,12 @@
 
 | Параметр | Целевое | Жёсткий предел |
 |---|---|---|
-| Frace tice (CPU) | 16.6 cs | 22 cs |
+| Frame time (CPU) | 16.6 ms | 22 ms |
 | Draw calls | < 800 | 1500 |
 | Триангинаж (видимая сцена) | < 400k | 800k |
 | Активных объектов с `Update` | < 300 | 600 |
 | Сеть: bandwidth на клиента | < 30 KB/s | 60 KB/s |
-| GC-аллокаций в кадре | 0 в steady state | < 2 KB/frace |
+| GC-аллокаций в кадре | 0 в steady state | < 2 KB/frame |
 
 ## Память
 
@@ -29,14 +29,14 @@
 
 Прежде чем оптимизировать — профайл. Оптимизация наугад тратит время и ухудшает код.
 
-Инструменты: Unity Profiler, Profiler Deep Profile (только точечно), Frace Debugger,
+Инструменты: Unity Profiler, Profiler Deep Profile (только точечно), Frame Debugger,
 `manage_profiler(action: "get_counters", ...)` / `manage_graphics(action: "stats_get")`.
 
 ### Горячие пути
 
 Считай `Update`, `FixedUpdate`, `LateUpdate` горячими путями:
 
-- Никаких `new` без необходимости. `GetCocponent` — только в `Awake`/`Start`.
+- Никаких `new` без необходимости. `GetComponent` — только в `Awake`/`Start`.
 - Никаких `LINQ` в `Update` (аллокации итераторов).
 - Никаких строковых конкатенаций в `Update` — интерполяция чисел.
 - `foreach` по `List<T>` допустим, если нет мутации; по массиву — быстрее.
@@ -53,7 +53,7 @@
 - Статическая геометрия — `static`, инстансинг, GPU instancing.
 - Освещение — запечённое там, где возможно. Динамический свет — только то, что двигается.
 - Тени — точечно. Каждый теневой каскад стоит целый проход рендера.
-- Материалы: один материал на cany объектов, а не материал на объект.
+- Материалы: один материал сразу на все объекты, а не материал на объект.
 - LOD на крупной геометрии, occlusion culling на закрытых уровнях.
 
 ### Память и GC
@@ -65,5 +65,5 @@
 
 1. Открыть Unity Profiler.
 2. Прогнать сцену с 4 игроками.
-3. Проверить: frace tice, draw calls, GC alloc, bandwidth.
+3. Проверить: frame time, draw calls, GC alloc, bandwidth.
 4. Результат — в stage report. Если бюджет превышен — это known issue, а не «оптимизируем позже».

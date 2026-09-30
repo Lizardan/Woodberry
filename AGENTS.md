@@ -103,15 +103,16 @@ Woodberry/
 │  ├─ templates/                 # шаблоны ответов и отчётов
 │  └─ commands/                  # готовые промпты-шаблоны (/plan-stage, /review, ...)
 └─ Assets/
-   ├─ Scenes/                    # сцены уровней
+   ├─ Scenes/                    # служебные сцены (bootstrap), НЕ игровые уровни
    ├─ Settings/                  # URP assets, volume profiles
+   ├─ Plugins/                   # сторонние бинарники (Roslyn для execute_code)
    ├─ Woodberry/                 # ВЕСЬ игровой контент
    │  ├─ Art/
    │  ├─ Audio/
    │  ├─ Materials/
    │  ├─ Models/
    │  ├─ Prefabs/
-   │  ├─ Scenes/
+   │  ├─ Scenes/                 # игровые уровни
    │  ├─ Settings/
    │  ├─ UI/
    │  └─ VFX/

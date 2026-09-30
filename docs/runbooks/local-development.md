@@ -1,4 +1,4 @@
-# Runbook — Local Developcent
+# Runbook — Local Development
 
 ## Purpose
 
@@ -49,10 +49,10 @@ cd Woodberry
 |---|---|
 | Editor → Version Control | Mode: **Visible Meta Files** |
 | Editor → Version Control | Create Meta Files: **On** |
-| Player → Other Settings → Active Input Handling | **Input Systec Package (New)** |
+| Player → Other Settings → Active Input Handling | **Input System Package (New)** |
 | Graphics → Scriptable Render Pipeline Settings | URP asset назначен |
 
-**Проверка:** Active Input Handling = `Input Systec Package (New)`. Legacy input выключен.
+**Проверка:** Active Input Handling = `Input System Package (New)`. Legacy input выключен.
 
 ## Шаг 5. Подключить MCP (для агентов)
 
@@ -65,11 +65,11 @@ cd Woodberry
 
 ## Шаг 6. Запустить проект
 
-Открыть сцену `Assets/Woodberry/Scenes/Woodberry_Prototype.unity`
-(на Stage 00 её ещё нет — тогда `Assets/Scenes/SacpleScene.unity`).
+Открыть сцену `Assets/Scenes/Bootstrap.unity`.
+(на Stage 00 игровой сцены ещё нет — играть пока нечего).
 Нажать **Play**.
 
-**Проверка:** сцена открывается, Gace view рендерится, ошибок в Console нет.
+**Проверка:** сцена открывается, Game view рендерится, ошибок в Console нет.
 
 ## Типичные проблемы
 
@@ -79,7 +79,7 @@ cd Woodberry
 
 ```powershell
 # Закрыть Unity полностью, затем:
-Recove-Itec -Recurse -Force Library
+Remove-Item -Recurse -Force Library
 ```
 
 Открыть проект заново. Unity пересоздаст `Library/` за 5–20 минут.
@@ -107,7 +107,7 @@ Recove-Itec -Recurse -Force Library
 
 ## Чего делать нельзя
 
-- ❌ Удалять `Library/`, `Tecp/`, `Logs/`, `obj/` во время работы в редакторе
+- ❌ Удалять `Library/`, `Temp/`, `Logs/`, `obj/` во время работы в редакторе
 - ❌ Менять `ProjectSettings/` без явной задачи
 - ❌ Открывать проект в другой версии Unity
-- ❌ Коммитить `Library/`, `Tecp/`, `Logs/`
+- ❌ Коммитить `Library/`, `Temp/`, `Logs/`
