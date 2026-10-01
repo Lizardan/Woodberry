@@ -189,7 +189,7 @@ namespace Woodberry.Tests.PlayMode
             }
         }
 
-        /// <summary>
+/// <summary>
         /// Ждёт заданное число физических тиков. Движение живёт в FixedUpdate,
         /// поэтому ждать по кадрам бессмысленно: на быстром железе успеет
         /// пройти больше тиков, чем на медленном, и тест станет плавающим.
@@ -200,6 +200,55 @@ namespace Woodberry.Tests.PlayMode
             {
                 yield return new WaitForFixedUpdate();
             }
+        }
+
+        /// <summary>
+        /// Поворот спрайта по направлению движения: без него персонаж всегда
+        /// смотрит в одну сторону и шагает боком.
+        ///
+        /// Берёт префаб, а не пустой объект: поворот живёт на узле
+        /// <c>Visual</c> внутри рига, и на голом <c>GameObject</c> его нет.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator Facing_ChangesDirection_AcrossAllFourFacings()
+        {
+            var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Woodberry/Prefabs/Player.prefab");
+            Assert.That(prefab, Is.Not.Null, "Player.prefab не найден");
+
+            GameObject go = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(prefab);
+            _spawned.Add(go);
+
+            PlayerController controller = go.GetComponent<PlayerController>();
+            var input = new FakeInputReader();
+            controller.Initialize(input);
+
+            var visual = controller.transform.Find("Visual");
+            Assert.That(visual, Is.Not.Null, "узел Visual обязателен: он разворачивает спрайт");
+
+            var seen = new System.Collections.Generic.List<float>();
+            foreach (Vector2 direction in new[]
+                     {
+                         new Vector2(0f, -1f),   // вниз
+                         new Vector2(1f, 0f),    // вправо
+                         new Vector2(0f, 1f),    // вверх
+                         new Vector2(-1f, 0f)    // влево
+                     })
+            {
+                input.Move = direction;
+                yield return WaitForPhysicsSteps(3);
+                seen.Add(visual.localEulerAngles.z);
+            }
+
+            Assert.That(seen[0], Is.EqualTo(0f).Within(1f), "вниз — без поворота");
+            Assert.That(seen[2], Is.EqualTo(180f).Within(1f), "вверх — разворот на 180");
+
+            // Лево и право должны различаться: одинаковый угол означал бы либо
+            // зеркальную ошибку, либо что поворот не применяется вовсе.
+            Assert.That(
+                Mathf.Abs(Mathf.DeltaAngle(seen[1], seen[3])),
+                Is.GreaterThan(1f),
+                "влево и вправо должны давать разный поворот");
         }
     }
 }

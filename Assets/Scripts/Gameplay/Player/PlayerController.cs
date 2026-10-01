@@ -27,6 +27,9 @@ namespace Woodberry.Gameplay.Player
         /// <summary>Имя параметра аниматора: идёт ли шаг.</summary>
         private const string IsMovingParameter = "IsMoving";
 
+        /// <summary>Узел, который разворачивается по направлению движения.</summary>
+        private const string VisualNodeName = "Visual";
+
         private static readonly int IsMovingHash = Animator.StringToHash(IsMovingParameter);
 
         [SerializeField]
@@ -41,6 +44,7 @@ namespace Woodberry.Gameplay.Player
 
         private Rigidbody2D _body;
         private IInputReader _input;
+        private Transform _visual;
         private Vector2 _facing = Vector2.down;
         private bool _bodyMissing;
 
@@ -71,6 +75,7 @@ namespace Woodberry.Gameplay.Player
         private void Awake()
         {
             _body = GetComponent<Rigidbody2D>();
+            _visual = transform.Find(VisualNodeName);
 
             // RequireComponent срабатывает только когда компонент ДОБАВЛЯЮТ.
             // Если скрипт изменился у объекта, который уже лежит в сцене,
@@ -135,6 +140,7 @@ namespace Woodberry.Gameplay.Player
             {
                 _facing = displacement.normalized;
                 CurrentSpeed = speed;
+                ApplyFacing();
             }
             else
             {
@@ -142,6 +148,44 @@ namespace Woodberry.Gameplay.Player
             }
 
             SetMoving(CurrentSpeed > 0f);
+        }
+
+        /// <summary>
+        /// Разворачивает спрайт по направлению движения.
+        ///
+        /// Четыре направления: набор из восьми потребовал бы вдвое больше
+        /// графики, а четыре — минимум, при котором персонаж читается.
+        /// Влево и вправо — зеркальные, поэтому ассетов всего четыре.
+        ///
+        /// Поворот идёт на узле <c>Visual</c>, а не на корне: корень двигает
+        /// физическое тело, и его поворот утащил бы за собой кинематику.
+        /// </summary>
+        private void ApplyFacing()
+        {
+            if (_visual == null)
+            {
+                return;
+            }
+
+            // Спрайт нарисован лицом вниз (-Y), поэтому «вперёд» = -Y.
+            float degrees = Mathf.Atan2(_facing.x, -_facing.y) * Mathf.Rad2Deg;
+
+            if (degrees > 45f && degrees <= 135f)
+            {
+                _visual.localRotation = Quaternion.Euler(0f, 0f, -90f);
+            }
+            else if (degrees < -45f && degrees >= -135f)
+            {
+                _visual.localRotation = Quaternion.Euler(0f, 0f, 90f);
+            }
+            else if (degrees > 135f || degrees < -135f)
+            {
+                _visual.localRotation = Quaternion.Euler(0f, 0f, 180f);
+            }
+            else
+            {
+                _visual.localRotation = Quaternion.identity;
+            }
         }
 
         private void StopWalking()

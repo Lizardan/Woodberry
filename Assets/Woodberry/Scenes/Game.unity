@@ -182,7 +182,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 3.2
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -207,7 +207,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 0.3, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -269,13 +269,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00bb628f28d5b984bbef98ac9f4f2f10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Woodberry.CameraRig::Woodberry.CameraRig.TopDownCameraRig
-  _target: {fileID: 1793688102}
-  _orthographicSize: 5
-  _lookOffset: {x: 0, y: 0.5}
+  _target: {fileID: 716907686}
+  _orthographicSize: 3.2
+  _lookOffset: {x: 0, y: 0.4}
   _followSharpness: 6
   _maxFollowSpeed: 40
   _positionDeadZone: 0.01
---- !u!1001 &1793688101
+--- !u!1001 &716907685
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -332,10 +332,10 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e96f5b1486987a14fa7e1900df0f0015, type: 3}
---- !u!4 &1793688102 stripped
+--- !u!4 &716907686 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 529157665459072129, guid: e96f5b1486987a14fa7e1900df0f0015, type: 3}
-  m_PrefabInstance: {fileID: 1793688101}
+  m_PrefabInstance: {fileID: 716907685}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1986713327
 GameObject:
@@ -434,5 +434,5 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 330585546}
-  - {fileID: 1793688101}
   - {fileID: 1986713329}
+  - {fileID: 716907685}
