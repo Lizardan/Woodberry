@@ -93,7 +93,7 @@ feat(gameplay): добавить выносливость с бегом и во�
 Чистая логика в PlayerStamina, EditMode-тесты на кривую.
 Интеграция в PlayerController через IInputReader.
 
-Refs: docs/stages/stage-01-movement-and-camera.md
+Refs: docs/stages/stage-03-movement-and-camera.md
 ```
 
 ```

@@ -44,20 +44,32 @@ namespace Woodberry.Tests.PlayMode
         {
             CreateRig(out Camera camera, out TopDownCameraRig rig);
 
-            _target.transform.position = new Vector3(10f, 0f, 4f);
+            _target.transform.position = new Vector3(10f, 4f, 0f);
             rig.SetTarget(_target.transform);
 
             yield return null;
 
             Assert.That(
                 rig.transform.position,
-                Is.EqualTo(new Vector3(10f, 12f, 6f)).Using(Vector3ComparerWithEqualsOperator.Instance),
+                Is.EqualTo(new Vector3(10f, 5f, 0f)).Using(Vector3ComparerWithEqualsOperator.Instance),
                 "после SetTarget камера должна встать над целью, а не остаться в нуле");
 
             Assert.That(
-                camera.transform.eulerAngles.x,
-                Is.EqualTo(90f).Within(0.01f),
-                "камера должна смотреть строго сверху вниз");
+                rig.transform.eulerAngles,
+                Is.EqualTo(Vector3.zero),
+                "камера обязана смотреть строго вниз: в 2D это нулевой наклон");
+        }
+
+        [UnityTest]
+        public IEnumerator Awake_CameraIsOrthographic_LookingStraightDown()
+        {
+            CreateRig(out Camera camera, out _);
+            yield return null;
+
+            // Перспектива сверху разъезжается к краям и ломает ровную сетку,
+            // по которой игроки кооперативно ориентируются.
+            Assert.That(camera.orthographic, Is.True, "камера обязана быть ортографической");
+            Assert.That(camera.orthographicSize, Is.GreaterThan(0f));
         }
 
         [UnityTest]
@@ -69,10 +81,10 @@ namespace Woodberry.Tests.PlayMode
 
             Vector3 before = rig.transform.position;
 
-            _target.transform.position = new Vector3(3f, 0f, 3f);
+            _target.transform.position = new Vector3(3f, 3f, 0f);
             yield return null;
 
-            Vector3 desired = new Vector3(3f, 12f, 5f);
+            Vector3 desired = new Vector3(3f, 4f, 0f);
             float distanceBefore = Vector3.Distance(before, desired);
             float distanceAfter = Vector3.Distance(rig.transform.position, desired);
 

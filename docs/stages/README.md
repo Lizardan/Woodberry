@@ -48,10 +48,12 @@ Stage — это единица поставки, а не единица код�
 
 | Файл | Stage | Статус |
 |---|---|---|
-| `stage-00-foundation.md` | Foundation: asmdef, папки, слои, сборка | Готов к работе |
-| `stage-01-movement-and-camera.md` | Игрок ходит, камера следует сверху | Не начат |
-| `stage-02-light-and-visibility.md` | Источник света и ограниченная видимость | Не начат |
-| `stage-03-coop-baseline.md` | Два игрока видят друг друга, сетевой seam введён | Не начат |
+| `stage-00-foundation.md` | Foundation: asmdef, папки, слои, сборка | **Завершён** |
+| `stage-01-scene-architecture.md` | Три сцены, реестр сервисов, экран загрузки | **Завершён** |
+| `stage-02-2d-player-and-animation.md` | 2D-персонаж, походка, игрок и камера в 2D | **Завершён** |
+| `stage-03-movement-and-camera.md` | Выносливость, доработанная камера | Не начат |
+| `stage-04-light-and-visibility.md` | Источник света и ограниченная видимость | Не начат |
+| `stage-05-coop-baseline.md` | Два игрока видят друг друга, сетевой seam введён | Не начат |
 
 ## Правило одного stage
 

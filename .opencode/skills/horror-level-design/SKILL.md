@@ -164,4 +164,4 @@ manage_editor(action: "stop")
 - [ ] Скриншот приложен к отчёту
 - [ ] Указано, что проверено, а что — нет
 
-Подробнее: `docs/specs/game-vision.md`, `docs/stages/stage-02-light-and-visibility.md`
+Подробнее: `docs/specs/game-vision.md`, `docs/stages/stage-04-light-and-visibility.md`

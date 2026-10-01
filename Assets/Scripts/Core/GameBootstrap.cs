@@ -1,5 +1,8 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Woodberry.Core.Bootstrap;
 using Woodberry.Core.Input;
 using Woodberry.Core.Scenes;
 
@@ -14,8 +17,10 @@ namespace Woodberry.Core
     /// Объекты других сцен получают сервисы из <see cref="ServiceRegistry"/>:
     /// сериализованная ссылка на объект другой сцены Unity не сохраняет.
     ///
-    /// Здесь же будет жить всё, что грузится на старте: сессия, сейв,
-    /// загрузчики уровней. Пока их нет — реестр содержит только ввод и загрузчик сцен.
+    /// Последовательность: собирает сервисы шагами стартовой инициализации,
+    /// показывает прогресс, и только когда всё готово — уходит в меню.
+    /// Переход раньше готовности означал бы запуск игры на недособранных
+    /// зависимостях, и отказ был бы отложенным и невнятным.
     /// </summary>
     [DefaultExecutionOrder(-1000)]
     [DisallowMultipleComponent]
@@ -30,13 +35,27 @@ namespace Woodberry.Core
         /// </summary>
         private static bool s_isPrimary;
 
-        private ISceneLoader _sceneLoader;
-        private InputSystemReader _reader;
+        /// <summary>
+        /// Сбрасывает статик перед стартом подсистем.
+        ///
+        /// В проекте отключён и domain reload, и scene reload
+        /// (`m_EnterPlayModeOptionsEnabled: 1`, `m_EnterPlayModeOptions: 3`), то
+        /// есть между запусками Play Mode статические поля живут. Без этого
+        /// сброса второй запуск увидел бы <c>s_isPrimary == true</c>, убил бы
+        /// единственный composition root, и приложение стартовало бы без
+        /// сервисов и без перехода в меню. Отказ выглядел бы как «ничего не
+        /// работает», и найти его было бы трудно.
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics()
+        {
+            s_isPrimary = false;
+        }
+
+        private StartupProgress _progress;
+        private IInputReader _reader;
         private bool _inputEnabled;
         private bool _isPrimaryInstance;
-
-        /// <summary>Загрузчик сцен. Зарегистрирован для меню и геймплея.</summary>
-        public ISceneLoader SceneLoader => _sceneLoader;
 
         /// <summary>Сервис ввода, готовый к выдаче геймплею.</summary>
         public IInputReader Input => _reader;
@@ -68,32 +87,19 @@ namespace Woodberry.Core
 
             DontDestroyOnLoad(gameObject);
 
-            // Сгенерированная обёртка самодостаточна: в неё встроен JSON карт,
-            // поэтому ассет в сцене назначать не нужно.
-            _reader = new InputSystemReader(new InputSystem_Actions());
-            _sceneLoader = new UnitySceneLoader(this);
-
-            ServiceRegistry.Register<IInputReader>(_reader);
-            ServiceRegistry.Register<ISceneLoader>(_sceneLoader);
+            // Регистрируем до шагов: экран загрузки читает прогресс в своём Start,
+            // а порядок Start между объектами сцены не гарантирован.
+            _progress = new StartupProgress();
+            ServiceRegistry.Register<IStartupProgress>(_progress);
 
             SceneManager.sceneLoaded += OnSceneLoaded;
-        }
-
-        private void OnEnable()
-        {
-            if (_isPrimaryInstance)
-            {
-                EnableInput();
-            }
         }
 
         private void Start()
         {
             if (_isPrimaryInstance)
             {
-                // Уходим из Bootstrap-сцены сразу: она нужна только чтобы собрать
-                // сервисы, а её объекты уже переехали в DontDestroyOnLoad.
-                _sceneLoader.Load(_startScene);
+                StartCoroutine(RunStartup());
             }
         }
 
@@ -119,9 +125,40 @@ namespace Woodberry.Core
             // гарантирован защитой от второго экземпляра в Awake.
             ServiceRegistry.Unregister<IInputReader>();
             ServiceRegistry.Unregister<ISceneLoader>();
+            ServiceRegistry.Unregister<IStartupProgress>();
 
             _isPrimaryInstance = false;
             s_isPrimary = false;
+        }
+
+        private IEnumerator RunStartup()
+        {
+            var runner = new StartupRunner(BuildSteps());
+            yield return runner.Run(_progress);
+
+            if (!ServiceRegistry.TryGet<ISceneLoader>(out ISceneLoader loader))
+            {
+                Debug.LogError(
+                    $"{nameof(GameBootstrap)}: загрузчик сцен не зарегистрирован после " +
+                    "инициализации. Приложение не может продолжить.", this);
+                yield break;
+            }
+
+            loader.Load(_startScene);
+        }
+
+        /// <summary>
+        /// Шаги стартовой инициализации. Пока реальная работа только одна —
+        /// это честно: придумывать искусственные задержки ради красивой полосы
+        /// нельзя, иначе она будет врать игроку. По мере появления загрузки
+        /// ассетов, сессии и сейва шаги добавляются здесь.
+        /// </summary>
+        private IReadOnlyList<IStartupStep> BuildSteps()
+        {
+            return new IStartupStep[]
+            {
+                new RegisterServicesStep(this)
+            };
         }
 
         /// <summary>
@@ -137,14 +174,25 @@ namespace Woodberry.Core
                 return;
             }
 
-            if (id == SceneId.Game)
-            {
-                EnableInput();
-            }
-            else
+            if (id != SceneId.Game)
             {
                 DisableInput();
+                return;
             }
+
+            // Тип указывается явно намеренно: вывод T из поля `_reader` дал бы
+            // InputSystemReader вместо IInputReader, и поиск шёл бы по ключу
+            // реализации, которого в реестре нет. Сервисы регистрируются
+            // по интерфейсу — значит и ищутся по интерфейсу.
+            if (!ServiceRegistry.TryGet<IInputReader>(out _reader))
+            {
+                Debug.LogError(
+                    $"{nameof(GameBootstrap)}: IInputReader не зарегистрирован, " +
+                    "в игровой сцене игрок останется без ввода.", this);
+                return;
+            }
+
+            EnableInput();
         }
 
         private void EnableInput()
@@ -154,7 +202,7 @@ namespace Woodberry.Core
                 return;
             }
 
-            _reader.Enable();
+            _reader.EnableGameplayInput();
             _inputEnabled = true;
         }
 
@@ -165,7 +213,7 @@ namespace Woodberry.Core
                 return;
             }
 
-            _reader.Disable();
+            _reader.DisableGameplayInput();
             _inputEnabled = false;
         }
     }

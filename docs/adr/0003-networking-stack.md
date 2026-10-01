@@ -136,7 +136,7 @@ ECS здесь не нужен, а сложность NetCode for Entities не 
 ## Links
 
 - `docs/specs/coop-networking.md`
-- `docs/stages/stage-03-coop-baseline.md`
+- `docs/stages/stage-05-coop-baseline.md`
 - `docs/adr/0001-layer-and-assembly-architecture.md`
 - Пакеты: `Packages/manifest.json` (сетевой пакет **не установлен**)
 

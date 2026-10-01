@@ -1,4 +1,4 @@
-# Stage 03 — Coop Baseline
+# Stage 04 — Coop Baseline
 
 Статус: **Не начат**
 Зависит от: Stage 02, ADR 0003 (сетевой стек)

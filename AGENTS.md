@@ -29,15 +29,24 @@
 | Параметр | Значение |
 |---|---|
 | Unity | `6000.6.3f1` |
-| Render pipeline | URP `17.6.0` |
+| Render pipeline | URP `17.6.0` (3D-рендерер, спрайты работают) |
 | Редактор | `ProjectSettings/ProjectVersion.txt` |
+| Игра | **2D-спрайты**, вид сверху — см. `docs/adr/0007-2d-sprite-game.md` |
 | Input | `com.unity.inputsystem` `1.20.0` (legacy input выключен) |
 | UI | `com.unity.ugui` `2.6.0` + UI Toolkit (встроен) |
+| 2D | `com.unity.feature.2d` `2.0.2` (включая `2d.tilemap.extras` с Rule Tiles) |
 | Тесты | `com.unity.test-framework` `1.8.0` |
 | Ассеты | `com.unity.ai.navigation` `2.0.15` (Unity AI Navigation) |
 | Таймлайн | `com.unity.timeline` `6.6.0` |
 | Visual Scripting | `com.unity.visualscripting` `1.9.12` |
 | Сетевой пакет | **не установлен** — см. `docs/adr/0003-networking-stack.md` |
+
+**Важно про Play Mode:** в проекте отключены и domain reload, и scene reload
+(`m_EnterPlayModeOptionsEnabled: 1`, `m_EnterPlayModeOptions: 3`). Статические
+поля живут между запусками. Любое мутабельное статическое состояние обязано
+сбрасываться через
+`[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]`,
+иначе второй запуск Play Mode упадёт, а первый будет выглядеть исправным.
 | Git | репозиторий инициализирован, `.gitignore` из Unity-шаблона |
 
 Актуальный список пакетов всегда смотри в `Packages/manifest.json`. Это источник истины, а не эта таблица.

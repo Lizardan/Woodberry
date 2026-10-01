@@ -197,4 +197,4 @@ Get-ChildItem -Recurse Assets/Scripts -Filter "Network*Player*.cs"
 - [ ] Производительность на 4 игроках в бюджете
 - [ ] Указано, что проверено, а что — нет
 
-Подробнее: `docs/specs/coop-networking.md`, `docs/stages/stage-03-coop-baseline.md`
+Подробнее: `docs/specs/coop-networking.md`, `docs/stages/stage-05-coop-baseline.md`

@@ -25,7 +25,7 @@ namespace Woodberry.Core.Input
         public bool InteractPressed => _player.Interact.WasPressedThisFrame();
 
         /// <summary>Включает карту Player. Парные вызовы обязательны.</summary>
-        public void Enable()
+        public void EnableGameplayInput()
         {
             if (_enabled)
             {
@@ -36,7 +36,7 @@ namespace Woodberry.Core.Input
             _enabled = true;
         }
 
-        public void Disable()
+        public void DisableGameplayInput()
         {
             if (!_enabled)
             {

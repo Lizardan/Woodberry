@@ -3,9 +3,13 @@ using UnityEngine;
 namespace Woodberry.Gameplay.Player
 {
     /// <summary>
-    /// Чистое правило движения: ввод (XZ) + скорость -> смещение за кадр.
+    /// Чистое правило движения: ввод + скорость -> смещение за кадр.
     /// Вынесено отдельно от <see cref="PlayerController"/>, чтобы правило
     /// проверялось EditMode-тестом без сцены, MonoBehaviour и таймера.
+    ///
+    /// Игра двухмерная: движение в плоскости XY, поэтому и возвращается Vector2.
+    /// При переходе на вид сверху в 3D оси были бы XZ — это единственное отличие
+    /// от прежней версии, и оно намеренно держится в одной строке.
     /// </summary>
     public static class PlayerMovement
     {
@@ -13,29 +17,27 @@ namespace Woodberry.Gameplay.Player
         public const float DeadZone = 0.1f;
 
         /// <summary>
-        /// Смещение за кадр в плоскости XZ.
+        /// Смещение за кадр в плоскости XY.
         /// Ввод обрезается по мёртвой зоне, затем нормализуется, поэтому диагональ
-        /// не даёт диагональной скорости. Y всегда 0 — вид сверху.
+        /// не даёт диагональной скорости.
         /// </summary>
-        public static Vector3 ComputeDisplacement(Vector2 input, float speed, float deltaTime)
+        public static Vector2 ComputeDisplacement(Vector2 input, float speed, float deltaTime)
         {
             if (speed <= 0f || deltaTime <= 0f)
             {
-                return Vector3.zero;
+                return Vector2.zero;
             }
 
             Vector2 direction = ClampDeadZone(input);
 
             if (direction.sqrMagnitude <= 0f)
             {
-                return Vector3.zero;
+                return Vector2.zero;
             }
 
             // Нормализация ограничивает длину сверху единицей, поэтому
             // диагональ (1,1) движется с той же скоростью, что и (1,0).
-            Vector3 offset = Vector3.ClampMagnitude(direction, 1f);
-
-            return new Vector3(offset.x, 0f, offset.y) * (speed * deltaTime);
+            return Vector2.ClampMagnitude(direction, 1f) * (speed * deltaTime);
         }
 
         /// <summary>Убирает мёртвую зону, не меняя направление.</summary>

@@ -18,6 +18,14 @@ namespace Woodberry.Tests.PlayMode
         public Vector2 Move { get; set; }
         public bool SprintHeld { get; set; }
         public bool InteractPressed { get; set; }
+
+        public void EnableGameplayInput()
+        {
+        }
+
+        public void DisableGameplayInput()
+        {
+        }
     }
 
     /// <summary>
@@ -31,7 +39,9 @@ namespace Woodberry.Tests.PlayMode
         private PlayerController CreatePlayer(string name)
         {
             var go = new GameObject(name);
-            go.AddComponent<CharacterController>();
+
+            // PlayerController требует Rigidbody2D и CircleCollider2D сам.
+            // Явный AddComponent здесь не нужен и был бы дублем RequireComponent.
             PlayerController controller = go.AddComponent<PlayerController>();
             _spawned.Add(go);
             return controller;
@@ -66,17 +76,21 @@ namespace Woodberry.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator PlayerController_WithInput_MovesAlongXZ()
+        public IEnumerator PlayerController_WithInput_MovesAlongXY()
         {
             PlayerController controller = CreatePlayer("MovingPlayer");
             controller.Initialize(new FakeInputReader { Move = Vector2.up });
 
             Vector3 start = controller.transform.position;
-            yield return new WaitForSeconds(0.5f);
+
+            // Движение теперь в FixedUpdate, поэтому ждём физический тик,
+            // а не условные полсекунды кадрового времени.
+            yield return WaitForPhysicsSteps(20);
+
             Vector3 delta = controller.transform.position - start;
 
-            Assert.That(delta.y, Is.EqualTo(0f).Within(1e-3f), "движение строго в XZ");
-            Assert.That(delta.z, Is.GreaterThan(0.01f), "игрок должен двигаться вперёд");
+            Assert.That(delta.x, Is.EqualTo(0f).Within(1e-3f), "движение строго в плоскости XY");
+            Assert.That(delta.y, Is.GreaterThan(0.01f), "игрок должен двигаться вверх по экрану");
         }
 
         [UnityTest]
@@ -86,10 +100,24 @@ namespace Woodberry.Tests.PlayMode
             controller.Initialize(new FakeInputReader());
 
             Vector3 start = controller.transform.position;
-            yield return new WaitForSeconds(0.3f);
+            yield return WaitForPhysicsSteps(10);
 
             Assert.That(controller.transform.position.x, Is.EqualTo(start.x).Within(1e-3f));
-            Assert.That(controller.transform.position.z, Is.EqualTo(start.z).Within(1e-3f));
+            Assert.That(controller.transform.position.y, Is.EqualTo(start.y).Within(1e-3f));
+        }
+
+        [UnityTest]
+        public IEnumerator PlayerController_RigidBody_IsKinematicWithNoGravity()
+        {
+            PlayerController controller = CreatePlayer("BodyConfigPlayer");
+            yield return null;
+
+            Rigidbody2D body = controller.GetComponent<Rigidbody2D>();
+
+            Assert.That(body, Is.Not.Null, "контроллер требует Rigidbody2D");
+            Assert.That(body.bodyType, Is.EqualTo(RigidbodyType2D.Kinematic),
+                "динамическое тело даёт дребезг и рассинхрон в кооперативе");
+            Assert.That(body.gravityScale, Is.Zero, "иначе игрок провалится вниз");
         }
 
         [UnityTest]
@@ -98,11 +126,11 @@ namespace Woodberry.Tests.PlayMode
             PlayerController controller = CreatePlayer("DisabledPlayer");
             controller.Initialize(new FakeInputReader { Move = Vector2.right });
 
-            yield return new WaitForSeconds(0.2f);
+            yield return WaitForPhysicsSteps(5);
             controller.gameObject.SetActive(false);
 
             Vector3 parked = controller.transform.position;
-            yield return new WaitForSeconds(0.3f);
+            yield return WaitForPhysicsSteps(10);
 
             Assert.That(
                 controller.transform.position.x,
@@ -119,7 +147,7 @@ namespace Woodberry.Tests.PlayMode
             LogAssert.ignoreFailingMessages = false;
 
             PlayerController controller = CreatePlayer("NoInputPlayer");
-            yield return new WaitForSeconds(0.2f);
+            yield return WaitForPhysicsSteps(5);
 
             Assert.That(
                 controller.transform.position,
@@ -158,6 +186,19 @@ namespace Woodberry.Tests.PlayMode
             finally
             {
                 Woodberry.Core.ServiceRegistry.Unregister<Woodberry.Core.Input.IInputReader>();
+            }
+        }
+
+        /// <summary>
+        /// Ждёт заданное число физических тиков. Движение живёт в FixedUpdate,
+        /// поэтому ждать по кадрам бессмысленно: на быстром железе успеет
+        /// пройти больше тиков, чем на медленном, и тест станет плавающим.
+        /// </summary>
+        private static IEnumerator WaitForPhysicsSteps(int steps)
+        {
+            for (int i = 0; i < steps; i++)
+            {
+                yield return new WaitForFixedUpdate();
             }
         }
     }

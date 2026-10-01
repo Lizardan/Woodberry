@@ -108,12 +108,16 @@ namespace Woodberry.Tests.PlayMode
             Assert.That(player, Is.Not.Null, "в игровой сцене должен быть игрок");
 
             // Поведенческая проверка: без ручной связки в инспекторе игрок
-            // обязан поехать на ввод, взятый из реестра.
+            // обязан поехать на ввод, взятый из реестра. Движение в FixedUpdate,
+            // поэтому ждём физические тики, а не кадры.
             Vector3 start = player.transform.position;
-            yield return new WaitForSeconds(0.3f);
+            for (int i = 0; i < 20; i++)
+            {
+                yield return new WaitForFixedUpdate();
+            }
 
             Assert.That(
-                player.transform.position.z - start.z,
+                player.transform.position.y - start.y,
                 Is.GreaterThan(0.01f),
                 "игрок обязан двигаться на ввод из реестра");
         }

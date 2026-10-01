@@ -1,7 +1,7 @@
-# Stage 01 — Movement and Camera
+# Stage 02 — Movement and Camera
 
 Статус: **Не начат**
-Зависит от: Stage 00
+Зависит от: Stage 00, Stage 01
 
 ## Goal
 

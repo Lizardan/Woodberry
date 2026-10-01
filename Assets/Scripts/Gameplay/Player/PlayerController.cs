@@ -5,15 +5,29 @@ using Woodberry.Core.Input;
 namespace Woodberry.Gameplay.Player
 {
     /// <summary>
-    /// Кинематическое движение игрока в плоскости XZ.
-    /// Физика твёрдых тел не используется намеренно: в top-down кооперативе она
-    /// даёт дребезг и рассинхрон. Коллизии решает <see cref="CharacterController"/>.
+    /// Движение игрока в плоскости XY через кинематический <see cref="Rigidbody2D"/>.
+    ///
+    /// Почему кинематический, а не динамический: spec запрещает динамическое
+    /// тело для игрока — в top-down кооперативе оно даёт дребезг и рассинхрон
+    /// между клиентами. Кинематическое тело — точная аналогия трёхмерного
+    /// <c>CharacterController</c> в 2D: двигаем сами, но учитываем коллизии.
+    ///
+    /// Движение считается в <c>FixedUpdate</c>, то есть с фиксированным тиком.
+    /// Это совпадает с требованием сетевого тика 20–30 Гц из
+    /// <c>coop-networking.md</c>, поэтому перенос на сеть не потребует
+    /// переписывания цикла движения.
     /// </summary>
-    [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(CircleCollider2D))]
     public sealed class PlayerController : MonoBehaviour
     {
         private const float DefaultMoveSpeed = 3.5f;
         private const float DefaultSprintMultiplier = 1.8f;
+
+        /// <summary>Имя параметра аниматора: идёт ли шаг.</summary>
+        private const string IsMovingParameter = "IsMoving";
+
+        private static readonly int IsMovingHash = Animator.StringToHash(IsMovingParameter);
 
         [SerializeField]
         private float _moveSpeed = DefaultMoveSpeed;
@@ -21,9 +35,14 @@ namespace Woodberry.Gameplay.Player
         [SerializeField]
         private float _sprintMultiplier = DefaultSprintMultiplier;
 
-        private CharacterController _controller;
+        [Tooltip("Аниматор персонажа. Необязателен: без него движение работает, анимация нет.")]
+        [SerializeField]
+        private Animator _animator;
+
+        private Rigidbody2D _body;
         private IInputReader _input;
-        private Vector3 _facing = Vector3.forward;
+        private Vector2 _facing = Vector2.down;
+        private bool _bodyMissing;
 
 #if UNITY_EDITOR
         private bool _warnedAboutMissingInput;
@@ -35,8 +54,8 @@ namespace Woodberry.Gameplay.Player
         /// </summary>
         public float CurrentSpeed { get; private set; }
 
-        /// <summary>Направление взгляда на плоскости XZ. Не зависит от камеры.</summary>
-        public Vector3 Facing => _facing;
+        /// <summary>Направление взгляда в плоскости XY. Не зависит от камеры.</summary>
+        public Vector2 Facing => _facing;
 
         /// <summary>
         /// Единственная точка внедрения зависимости. Тесты вызывают её напрямую.
@@ -51,7 +70,28 @@ namespace Woodberry.Gameplay.Player
 
         private void Awake()
         {
-            _controller = GetComponent<CharacterController>();
+            _body = GetComponent<Rigidbody2D>();
+
+            // RequireComponent срабатывает только когда компонент ДОБАВЛЯЮТ.
+            // Если скрипт изменился у объекта, который уже лежит в сцене,
+            // Unity не доливает требуемые компоненты повторно — объект
+            // остаётся без тела, и обращение к нему падает. Поэтому проверяем
+            // явно и говорим, что делать, вместо MissingComponentException.
+            if (_body == null)
+            {
+                _bodyMissing = true;
+                Debug.LogError(
+                    $"{nameof(PlayerController)}: на объекте нет {nameof(Rigidbody2D)}. " +
+                    $"Добавь {nameof(Rigidbody2D)} и {nameof(CircleCollider2D)} " +
+                    "(RequireComponent не помогает для объектов, уже сохранённых в сцене). " +
+                    "Игрок не будет двигаться.", this);
+                return;
+            }
+
+            // Кинематическое тело: позицией управляем мы, а не симуляция.
+            // Без этого Unity будет стремить тело вниз и игрок провалится.
+            _body.bodyType = RigidbodyType2D.Kinematic;
+            _body.gravityScale = 0f;
         }
 
         private void Start()
@@ -62,49 +102,81 @@ namespace Woodberry.Gameplay.Player
             }
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
-            if (_input == null)
+            if (_bodyMissing)
             {
-                CurrentSpeed = 0f;
-
-#if UNITY_EDITOR
-                if (!_warnedAboutMissingInput)
-                {
-                    _warnedAboutMissingInput = true;
-                    Debug.LogWarning(
-                        $"{nameof(PlayerController)}: IInputReader недоступен. " +
-                        "Вызови Initialize или запусти сцену через Bootstrap. " +
-                        "Игрок не будет двигаться.",
-                        this);
-                }
-#endif
+                // Ошибка уже сказана в Awake. Повторять её каждый физический тик
+                // значит засорять консоль и замедлять отладку.
                 return;
             }
 
-            if (_controller == null)
+            if (_input == null)
+            {
+                StopWalking();
+                ReportMissingInput();
+                return;
+            }
+
+            if (_body == null)
             {
                 CurrentSpeed = 0f;
+                SetMoving(false);
                 return;
             }
 
             float speed = _input.SprintHeld ? _moveSpeed * _sprintMultiplier : _moveSpeed;
-            Vector3 displacement =
-                PlayerMovement.ComputeDisplacement(_input.Move, speed, Time.deltaTime);
+            Vector2 displacement =
+                PlayerMovement.ComputeDisplacement(_input.Move, speed, Time.fixedDeltaTime);
 
-            _controller.Move(displacement);
+            _body.MovePosition(_body.position + displacement);
 
-            Vector2 planar = new Vector2(displacement.x, displacement.z);
-
-            if (planar.sqrMagnitude > 0f)
+            if (displacement.sqrMagnitude > 0f)
             {
-                _facing = new Vector3(planar.x, 0f, planar.y).normalized;
+                _facing = displacement.normalized;
                 CurrentSpeed = speed;
             }
             else
             {
                 CurrentSpeed = 0f;
             }
+
+            SetMoving(CurrentSpeed > 0f);
+        }
+
+        private void StopWalking()
+        {
+            CurrentSpeed = 0f;
+            SetMoving(false);
+        }
+
+        private void SetMoving(bool isMoving)
+        {
+            if (_animator != null)
+            {
+                _animator.SetBool(IsMovingHash, isMoving);
+            }
+        }
+
+        /// <summary>
+        /// Пишет предупреждение один раз за сессию. В рантайме не логируется
+        /// ничего: промах с инъекцией — это ошибка сцены, а не игрока.
+        /// </summary>
+        private void ReportMissingInput()
+        {
+#if UNITY_EDITOR
+            if (_warnedAboutMissingInput)
+            {
+                return;
+            }
+
+            _warnedAboutMissingInput = true;
+            Debug.LogWarning(
+                $"{nameof(PlayerController)}: IInputReader недоступен. " +
+                "Вызови Initialize или запусти сцену через Bootstrap. " +
+                "Игрок не будет двигаться.",
+                this);
+#endif
         }
     }
 }

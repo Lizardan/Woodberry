@@ -1,4 +1,4 @@
-# Stage 02 — Light and Visibility
+# Stage 03 — Light and Visibility
 
 Статус: **Не начат**
 Зависит от: Stage 01
