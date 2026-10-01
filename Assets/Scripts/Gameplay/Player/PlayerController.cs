@@ -167,25 +167,11 @@ namespace Woodberry.Gameplay.Player
                 return;
             }
 
-            // Спрайт нарисован лицом вниз (-Y), поэтому «вперёд» = -Y.
-            float degrees = Mathf.Atan2(_facing.x, -_facing.y) * Mathf.Rad2Deg;
-
-            if (degrees > 45f && degrees <= 135f)
-            {
-                _visual.localRotation = Quaternion.Euler(0f, 0f, -90f);
-            }
-            else if (degrees < -45f && degrees >= -135f)
-            {
-                _visual.localRotation = Quaternion.Euler(0f, 0f, 90f);
-            }
-            else if (degrees > 135f || degrees < -135f)
-            {
-                _visual.localRotation = Quaternion.Euler(0f, 0f, 180f);
-            }
-            else
-            {
-                _visual.localRotation = Quaternion.identity;
-            }
+            // Сам угол считает чистая функция: её можно проверить тестом,
+            // а каскад условий здесь — нельзя, и именно в нём лево с правом
+            // однажды поменялись местами.
+            float degrees = PlayerFacing.ComputeZRotation(_facing);
+            _visual.localRotation = Quaternion.Euler(0f, 0f, degrees);
         }
 
         private void StopWalking()

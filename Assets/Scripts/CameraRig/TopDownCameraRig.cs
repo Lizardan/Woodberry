@@ -41,7 +41,6 @@ namespace Woodberry.CameraRig
         private float _positionDeadZone = 0.01f;
 
         private Vector2 _followVelocity;
-        private Vector2 _lastTargetPosition;
         private float _depth;
 
         /// <summary>Цель следования. null — камера стоит на месте.</summary>
@@ -59,16 +58,27 @@ namespace Woodberry.CameraRig
                 return;
             }
 
-            Vector2 target = CurrentTargetPosition();
+            // Мёртвая зона считается по ОСТАТКУ ПУТИ КАМЕРЫ, а не по смещению
+            // цели за кадр.
+            //
+            // Здесь был дефект: зона сравнивалась с дельтой цели, и после
+            // первого же шага «цель не двигалась» становилось истиной —
+            // камера замирала, не догнав цель, и оставалась позади навсегда.
+            // На глаз это выглядит как «камера отстала», а не как отказ,
+            // поэтому дефект и прожил до первой сцены с телепортом.
+            //
+            // Сравнение с остатком решает обе задачи сразу: пока камера не
+            // доехала — она едет, а когда доехала — микродребезг цели её
+            // больше не трогает.
+            Vector2 desiredPosition = CurrentTargetPosition() + _lookOffset;
+            Vector2 currentPosition = CurrentCameraPosition();
 
-            // Мёртвая зона: пока цель почти не двигается, камера стоит.
-            // Иначе стоящий игрок уводит камеру микродребезгом каждый кадр.
-            if ((target - _lastTargetPosition).sqrMagnitude <= _positionDeadZone * _positionDeadZone)
+            if ((desiredPosition - currentPosition).sqrMagnitude
+                <= _positionDeadZone * _positionDeadZone)
             {
+                _followVelocity = Vector2.zero;
                 return;
             }
-
-            _lastTargetPosition = target;
 
             // Z камеры задаёт удаление от плоскости спрайтов и не должен
             // вычисляться следованием. Неявное присваивание Vector2 в
@@ -76,8 +86,8 @@ namespace Woodberry.CameraRig
             // спрайтов — ровно тогда, когда игрок начинает двигаться, то есть
             // в самый неожиданный момент.
             Vector3 desired = Vector2.SmoothDamp(
-                CurrentCameraPosition(),
-                target + _lookOffset,
+                currentPosition,
+                desiredPosition,
                 ref _followVelocity,
                 1f / Mathf.Max(_followSharpness, 0.01f),
                 _maxFollowSpeed);
@@ -135,8 +145,7 @@ namespace Woodberry.CameraRig
 
         private void SnapToTarget()
         {
-            _lastTargetPosition = CurrentTargetPosition();
-            Vector2 desired = _lastTargetPosition + _lookOffset;
+            Vector2 desired = CurrentTargetPosition() + _lookOffset;
             transform.position = new Vector3(desired.x, desired.y, _depth);
         }
     }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -5,20 +6,22 @@ using UnityEngine.TestTools;
 namespace Woodberry.Tests.EditMode
 {
     /// <summary>
-    /// Анимация персонажа: связка «движение → состояние аниматора».
+    /// Анимация персонажа: связка «движение → состояние аниматора → кадр спрайта».
     ///
     /// Отдельный класс, а не тест в PlayerControllerTests, потому что отказ
-    /// здесь невидим глазом и не ломает движение: персонаж едет, а ноги
-    /// подрагивают на месте. Ловится только проверкой самого аниматора.
+    /// здесь невидим глазом и не ломает движение: персонаж едет, а картинка
+    /// стоит. Ловится только проверкой самого аниматора и подмены спрайта.
     ///
     /// Живёт в EditMode, а не в PlayMode, по двум причинам. Первая: тесты
     /// инспектируют ассеты и крутят <c>Animator.Update</c> вручную — кадры
     /// игры им не нужны. Вторая: проверка ассетов требует <c>UnityEditor</c>,
     /// а PlayMode-сборка обязана компилироваться и под player, где его нет.
     ///
-    /// Тесты помечены <c>[Test]</c>, а не <c>[UnityTest]</c>: ни один из них
-    /// не ждёт кадров. Корутина потребовала бы пустого <c>yield</c> ради
-    /// соответствия атрибуту.
+    /// Раньше здесь проверялся модульный риг (голова/торс/руки/ноги отдельными
+    /// спрайтами) и кривые на узлах <c>Visual/Body/LegBackLeft</c>. Фигура
+    /// переведена на покадровые спрайты, узлов конечностей больше нет, поэтому
+    /// проверки переписаны на подмену спрайта — но проверяют они ровно те же
+    /// отказы: пустой клип, отсутствие зацикливания и перезапуск перехода.
     /// </summary>
     public sealed class PlayerAnimationTests
     {
@@ -28,7 +31,10 @@ namespace Woodberry.Tests.EditMode
         private static readonly int IdleStateHash = Animator.StringToHash("Idle");
 
         private const string PrefabPath = "Assets/Woodberry/Prefabs/Player.prefab";
-        private const string WalkClipPath = "Assets/Woodberry/Art/Characters/Animations/Walk.anim";
+        private const string WalkClipPath =
+            "Assets/Woodberry/Art/Characters/Animations/Player_TopDown_Walk.anim";
+        private const string IdleClipPath =
+            "Assets/Woodberry/Art/Characters/Animations/Player_TopDown_Idle.anim";
 
         private GameObject _player;
 
@@ -51,37 +57,52 @@ namespace Woodberry.Tests.EditMode
             Assert.That(animator.runtimeAnimatorController, Is.Not.Null,
                 "префаб игрока без контроллера анимации: персонаж не шагает");
 
-            var names = new System.Collections.Generic.List<string>();
+            var names = new List<string>();
             foreach (var clip in animator.runtimeAnimatorController.animationClips)
             {
                 names.Add(clip.name);
             }
 
-            Assert.That(names, Does.Contain("Walk"), "нет клипа ходьбы");
-            Assert.That(names, Does.Contain("Idle"), "нет клипа покоя");
+            Assert.That(names, Has.Some.Contains("Walk"), "нет клипа ходьбы");
+            Assert.That(names, Has.Some.Contains("Idle"), "нет клипа покоя");
         }
 
         [Test]
-        public void WalkClip_HasCurvesOnLegsArmsAndBody()
+        public void WalkClip_SwapsSpriteFramesOnVisualNode()
         {
             // Пустой клип ходьбы выглядит как статичная картинка и никак не
             // проявляется в тестах на движение.
             var clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AnimationClip>(WalkClipPath);
 
-            Assert.That(clip, Is.Not.Null, "Walk.anim не найден");
-            Assert.That(clip.legacy, Is.False, "legacy-клит не воспроизводится");
-            Assert.That(clip.length, Is.GreaterThan(0.1f), "длительность цикла ходьбы подозрительно мала");
+            Assert.That(clip, Is.Not.Null, "клип ходьбы не найден");
+            Assert.That(clip.legacy, Is.False, "legacy-клип не воспроизводится");
+            Assert.That(clip.length, Is.GreaterThan(0.1f),
+                "длительность цикла ходьбы подозрительно мала");
 
-            var paths = new System.Collections.Generic.List<string>();
-            foreach (var binding in UnityEditor.AnimationUtility.GetCurveBindings(clip))
-            {
-                paths.Add(binding.path);
-            }
+            var bindings = UnityEditor.AnimationUtility.GetObjectReferenceCurveBindings(clip);
+            Assert.That(bindings.Length, Is.EqualTo(1), "ожидается одна дорожка подмены спрайта");
 
-            Assert.That(paths, Does.Contain("Visual/Body/LegBackLeft"), "нет кривой для левой ноги");
-            Assert.That(paths, Does.Contain("Visual/Body/LegBackRight"), "нет кривой для правой ноги");
-            Assert.That(paths, Does.Contain("Visual/Body/ArmLeft"), "нет кривой для левой руки");
-            Assert.That(paths, Does.Contain("Visual/Body"), "нет покачивания корпуса");
+            Assert.That(bindings[0].path, Is.EqualTo("Visual"),
+                "кадры обязаны подменяться на узле Visual: там живёт SpriteRenderer");
+            Assert.That(bindings[0].propertyName, Is.EqualTo("m_Sprite"));
+
+            var keys = UnityEditor.AnimationUtility.GetObjectReferenceCurve(clip, bindings[0]);
+            Assert.That(keys.Length, Is.GreaterThanOrEqualTo(6),
+                "в цикле шага мало кадров: шаг будет читаться как дёрганье картинки");
+        }
+
+        [Test]
+        public void IdleClip_IsLoopingAndHasFrames()
+        {
+            var clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AnimationClip>(IdleClipPath);
+
+            Assert.That(clip, Is.Not.Null, "клип покоя не найден");
+
+            var settings = UnityEditor.AnimationUtility.GetAnimationClipSettings(clip);
+            Assert.That(settings.loopTime, Is.True, "покой обязан быть зациклен");
+            Assert.That(
+                UnityEditor.AnimationUtility.GetObjectReferenceCurveBindings(clip).Length,
+                Is.EqualTo(1));
         }
 
         [Test]
@@ -110,8 +131,8 @@ namespace Woodberry.Tests.EditMode
         public void Animator_StaysInWalk_WithoutReEnteringTransition()
         {
             // Регрессия: переход из AnyState срабатывает и когда уже находишься
-            // в Walk, перезапуская блендинг каждый цикл. Персонаж едет, а ноги
-            // дрожат на месте — на скриншоте это не видно.
+            // в Walk, перезапуская блендинг каждый цикл. Персонаж едет, а
+            // картинка дрожит на месте — на скриншоте это не видно.
             Animator animator = CreatePlayer();
             animator.SetBool(IsMovingHash, true);
 
@@ -133,43 +154,41 @@ namespace Woodberry.Tests.EditMode
         }
 
         [Test]
-        public void WalkClip_Loops_AndKeepsMovingPastOneCycleLength()
+        public void WalkClip_Loops_AndKeepsSwappingSpritesPastOneCycleLength()
         {
             // Регрессия: клип без loopTime проигрывается один раз и замирает на
-            // последнем кадре. Персонаж отшагивает 0.7 с и встаёт с поднятой
+            // последнем кадре. Персонаж отшагивает цикл и встаёт с поднятой
             // ногой. Состояние при этом остаётся Walk, поэтому проверка
-            // «аниматор в Walk» такой отказ пропускает — нужен замер позы.
+            // «аниматор в Walk» такой отказ пропускает — нужен замер картинки.
             var clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AnimationClip>(WalkClipPath);
-            Assert.That(clip, Is.Not.Null, "Walk.anim не найден");
+            Assert.That(clip, Is.Not.Null, "клип ходьбы не найден");
 
             var settings = UnityEditor.AnimationUtility.GetAnimationClipSettings(clip);
             Assert.That(settings.loopTime, Is.True, "цикл ходьбы обязан быть зациклен");
 
             Animator animator = CreatePlayer();
-            var leg = animator.transform.Find("Visual/Body/LegBackLeft");
-            Assert.That(leg, Is.Not.Null, "левая нога не найдена в риге");
+            var renderer = animator.transform.Find("Visual").GetComponent<SpriteRenderer>();
+            Assert.That(renderer, Is.Not.Null, "на узле Visual нет SpriteRenderer");
 
             animator.SetBool(IsMovingHash, true);
 
-            float baseline = leg.localPosition.y;
-            bool movedAfterCycle = false;
+            var seenAfterCycle = new HashSet<string>();
 
-            // Well past one clip length: 0.7s clip vs 2.0s of playback.
+            // Заметно больше одного цикла: клип ~0.7 с против 2.0 с проигрывания.
             for (int i = 0; i < 40; i++)
             {
                 animator.Update(0.05f);
 
-                if (i * 0.05f > clip.length + 0.3f &&
-                    Mathf.Abs(leg.localPosition.y - baseline) > 0.02f)
+                if (i * 0.05f > clip.length + 0.3f && renderer.sprite != null)
                 {
-                    movedAfterCycle = true;
+                    seenAfterCycle.Add(renderer.sprite.name);
                 }
             }
 
             Assert.That(
-                movedAfterCycle,
-                Is.True,
-                "после первого цикла нога должна продолжать качаться, а не замереть");
+                seenAfterCycle.Count,
+                Is.GreaterThan(1),
+                "после первого цикла кадры должны продолжаться, а не замереть на одном");
         }
 
         private static void Advance(Animator animator, int frames)

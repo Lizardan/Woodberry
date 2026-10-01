@@ -73,25 +73,35 @@ namespace Woodberry.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator LateUpdate_WhenTargetMoves_CameraMovesTowardTarget()
+        public IEnumerator LateUpdate_WhenTargetMoves_CameraCatchesUp()
         {
             CreateRig(out _, out TopDownCameraRig rig);
             rig.SetTarget(_target.transform);
             yield return null;
 
-            Vector3 before = rig.transform.position;
-
             _target.transform.position = new Vector3(3f, 3f, 0f);
-            yield return null;
 
+            // Проверяем именно ДОГОН, а не «сдвинулась за кадр».
+            //
+            // Прежняя версия этого теста утверждала только «расстояние до цели
+            // уменьшилось» — и пропускала дефект, при котором камера делала
+            // один шаг и замирала, потому что мёртвая зона сравнивалась со
+            // смещением цели. Один шаг условие «сближается» выполняет, а
+            // следованием это не является.
             Vector3 desired = new Vector3(3f, 4f, 0f);
-            float distanceBefore = Vector3.Distance(before, desired);
-            float distanceAfter = Vector3.Distance(rig.transform.position, desired);
+            float timeout = 2f;
+
+            while (timeout > 0f
+                   && Vector3.Distance(rig.transform.position, desired) > 0.05f)
+            {
+                timeout -= Time.deltaTime;
+                yield return null;
+            }
 
             Assert.That(
-                distanceAfter,
-                Is.LessThan(distanceBefore),
-                "при смещении цели камера обязана сближаться с ней");
+                Vector3.Distance(rig.transform.position, desired),
+                Is.LessThan(0.05f),
+                "камера обязана доехать до цели, а не остановиться на полпути");
         }
 
         [UnityTest]
