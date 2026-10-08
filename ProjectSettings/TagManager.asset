@@ -8,11 +8,11 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - FL2DShadow
   - Water
   - UI
   - 
-  - 
+  - FL2DLight
   - Occluder
   - VisionMask
   - 

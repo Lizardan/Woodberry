@@ -2,7 +2,9 @@
     "name": "Woodberry.Gameplay",
     "rootNamespace": "Woodberry.Gameplay",
     "references": [
-        "Woodberry.Core"
+        "Woodberry.Core",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

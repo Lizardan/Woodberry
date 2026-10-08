@@ -3324,6 +3324,61 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!1 &516326761
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 516326763}
+  - component: {fileID: 516326762}
+  m_Layer: 0
+  m_Name: Light_Moon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &516326762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516326761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f1c78a248455c446a17a1cf37515292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Woodberry.Gameplay::Woodberry.Lighting.U2D.U2DLight2D
+  Shadows: 2
+  ShadowSmooth: 1
+  SmoothRadius: 16
+  LightVolume: 1
+  LightDistance: 13
+  DebugLight: 0
+  LightType: 0
+  Attenuation: -0.75
+  LightColor: {r: 0.66, g: 0.74, b: 0.92, a: 1}
+  Intensity: 2.4
+  LightTexture: {fileID: 0}
+--- !u!4 &516326763
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516326761}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.5, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &518458370
 GameObject:
   m_ObjectHideFlags: 0
@@ -5029,7 +5084,7 @@ Transform:
   m_GameObject: {fileID: 721143939}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2, y: 3.25, z: 0}
+  m_LocalPosition: {x: 1.73, y: 3.25, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5074,12 +5129,12 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 0.5}
-    newSize: {x: 7, y: 0.5}
+    newSize: {x: 7.54, y: 0.5}
     adaptiveTilingThreshold: 0.5
     drawMode: 2
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 7, y: 0.5}
+  m_Size: {x: 7.54, y: 0.5}
   m_EdgeRadius: 0
 --- !u!212 &721143942
 SpriteRenderer:
@@ -5135,7 +5190,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 7, y: 0.5}
+  m_Size: {x: 7.54, y: 0.5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -6980,7 +7035,7 @@ Transform:
   m_GameObject: {fileID: 922078797}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 4.75, y: 2.25, z: 0}
+  m_LocalPosition: {x: 4.75, y: 1.98, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7025,12 +7080,12 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 0.5}
-    newSize: {x: 2.5, y: 0.5}
+    newSize: {x: 3.04, y: 0.5}
     adaptiveTilingThreshold: 0.5
     drawMode: 2
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 2.5, y: 0.5}
+  m_Size: {x: 3.04, y: 0.5}
   m_EdgeRadius: 0
 --- !u!212 &922078800
 SpriteRenderer:
@@ -7086,7 +7141,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 2.5, y: 0.5}
+  m_Size: {x: 3.04, y: 0.5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -9060,7 +9115,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299549485}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: af679c5242f4b774b9c63f06ab63c36f, type: 3}
   m_Name: 
@@ -9073,11 +9128,13 @@ MonoBehaviour:
     m_Bits: 256
   _rayStepDegrees: 2
   _edgeEpsilonDegrees: 0.6
+  _falloffWidth: 0.42
+  _edgeSoftness: 0.06
   _maskHeight: 720
   _maskLayer: 9
   _maskMaterial: {fileID: 2100000, guid: e96df5e802a394d49ac3ebf27c128c45, type: 2}
   _overlayMaterial: {fileID: 2100000, guid: 19447e779ede1ae4791d14976444d375, type: 2}
-  _darkness: 0.965
+  _darkness: 0.97
 --- !u!4 &1299549487
 Transform:
   m_ObjectHideFlags: 0
@@ -9093,6 +9150,61 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1320858028
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1320858029}
+  - component: {fileID: 1320858030}
+  m_Layer: 0
+  m_Name: Light_Core
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1320858029
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1320858028}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2065453841}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1320858030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1320858028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f1c78a248455c446a17a1cf37515292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Woodberry.Gameplay::Woodberry.Lighting.U2D.U2DLight2D
+  Shadows: 2
+  ShadowSmooth: 1
+  SmoothRadius: 8
+  LightVolume: 0.45
+  LightDistance: 4
+  DebugLight: 0
+  LightType: 0
+  Attenuation: -0.15
+  LightColor: {r: 1, g: 0.88, b: 0.7, a: 1}
+  Intensity: 5.5
+  LightTexture: {fileID: 0}
 --- !u!1 &1327563703
 GameObject:
   m_ObjectHideFlags: 0
@@ -9120,7 +9232,7 @@ Transform:
   m_GameObject: {fileID: 1327563703}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.5, y: 3.25, z: 0}
+  m_LocalPosition: {x: -4.23, y: 3.25, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9165,12 +9277,12 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 0.5}
-    newSize: {x: 2, y: 0.5}
+    newSize: {x: 2.54, y: 0.5}
     adaptiveTilingThreshold: 0.5
     drawMode: 2
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 2, y: 0.5}
+  m_Size: {x: 2.54, y: 0.5}
   m_EdgeRadius: 0
 --- !u!212 &1327563706
 SpriteRenderer:
@@ -9226,7 +9338,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 2, y: 0.5}
+  m_Size: {x: 2.54, y: 0.5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -10061,7 +10173,7 @@ Transform:
   m_GameObject: {fileID: 1460154715}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 4.75, y: -2.25, z: 0}
+  m_LocalPosition: {x: 4.75, y: -1.98, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10106,12 +10218,12 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 0.5}
-    newSize: {x: 2.5, y: 0.5}
+    newSize: {x: 3.04, y: 0.5}
     adaptiveTilingThreshold: 0.5
     drawMode: 2
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 2.5, y: 0.5}
+  m_Size: {x: 3.04, y: 0.5}
   m_EdgeRadius: 0
 --- !u!212 &1460154718
 SpriteRenderer:
@@ -10167,7 +10279,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 2.5, y: 0.5}
+  m_Size: {x: 3.04, y: 0.5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -11933,6 +12045,61 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!1 &1685953927
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1685953928}
+  - component: {fileID: 1685953929}
+  m_Layer: 0
+  m_Name: Light_Glow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1685953928
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1685953927}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2065453841}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1685953929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1685953927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f1c78a248455c446a17a1cf37515292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Woodberry.Gameplay::Woodberry.Lighting.U2D.U2DLight2D
+  Shadows: 2
+  ShadowSmooth: 1
+  SmoothRadius: 14
+  LightVolume: 0.6
+  LightDistance: 8.5
+  DebugLight: 0
+  LightType: 0
+  Attenuation: -0.6
+  LightColor: {r: 1, g: 0.88, b: 0.7, a: 1}
+  Intensity: 2.3
+  LightTexture: {fileID: 0}
 --- !u!1 &1688031460
 GameObject:
   m_ObjectHideFlags: 0
@@ -14116,6 +14283,61 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!1 &2050387877
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2050387879}
+  - component: {fileID: 2050387878}
+  m_Layer: 0
+  m_Name: U2D Light System
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2050387878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2050387877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c88071c24150844fb44e8049d2205a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Woodberry.Gameplay::Woodberry.Lighting.U2D.U2DLightSystem
+  _settings:
+    _globalLight: {r: 0.1, g: 0.12, b: 0.16, a: 1}
+    _shadowCasterMask:
+      serializedVersion: 2
+      m_Bits: 256
+    _exposureLimit: -1
+    _shadowFloor: 0.26
+    _lightMapResolutionScale: 1
+    _lightMapFormat: 0
+    _shadowMapResolutionScale: 1
+    _shadowMapFormat: 16
+--- !u!4 &2050387879
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2050387877}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2063203318
 GameObject:
   m_ObjectHideFlags: 0
@@ -14262,11 +14484,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2406033100132620795, guid: e96f5b1486987a14fa7e1900df0f0015, type: 3}
       propertyPath: _radius
-      value: 3.4
+      value: 3.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 529157665459072129, guid: e96f5b1486987a14fa7e1900df0f0015, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1320858029}
+    - targetCorrespondingSourceObject: {fileID: 529157665459072129, guid: e96f5b1486987a14fa7e1900df0f0015, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1685953928}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e96f5b1486987a14fa7e1900df0f0015, type: 3}
 --- !u!4 &2065453841 stripped
@@ -14506,6 +14734,61 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!1 &2121809027
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2121809029}
+  - component: {fileID: 2121809028}
+  m_Layer: 0
+  m_Name: Light_Lamp
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &2121809028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2121809027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f1c78a248455c446a17a1cf37515292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Woodberry.Gameplay::Woodberry.Lighting.U2D.U2DLight2D
+  Shadows: 2
+  ShadowSmooth: 1
+  SmoothRadius: 10
+  LightVolume: 0.4
+  LightDistance: 5
+  DebugLight: 0
+  LightType: 0
+  Attenuation: -0.3
+  LightColor: {r: 1, g: 0.8, b: 0.55, a: 1}
+  Intensity: 3
+  LightTexture: {fileID: 0}
+--- !u!4 &2121809029
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2121809027}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.5, y: 1.8000001, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2139298197
 GameObject:
   m_ObjectHideFlags: 0
@@ -14701,3 +14984,6 @@ SceneRoots:
   - {fileID: 2065453840}
   - {fileID: 1299549487}
   - {fileID: 794106846}
+  - {fileID: 2050387879}
+  - {fileID: 2121809029}
+  - {fileID: 516326763}

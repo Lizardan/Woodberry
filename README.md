@@ -8,13 +8,31 @@ Unity `6000.6.3f1` · URP `17.6.0` · Input System · AI Navigation · Test Fram
 
 ## Статус проекта
 
-**Stage 0 — Foundation** готов к работе. Код ещё не написан, но инфраструктура
-проекта и OpenCode-слой развёрнуты.
+**Фундамент заложен и работает.** Слои, сборки, сцены, 2D-персонаж, камера,
+обзор и темнота — реализованы и протестированы (102 теста: 73 EditMode + 29
+PlayMode, все зелёные).
 
-Активный этап: [`docs/stages/stage-00-foundation.md`](docs/stages/stage-00-foundation.md)
+Что готово:
 
-Блокер для Stage 03: [ADR 0003 — выбор сетевого стека](docs/adr/0003-networking-stack.md)
-имеет статус `Proposed`. Нужно принять решение.
+| Что | Состояние |
+|---|---|
+| Слои, сборки, папки, сборка билда | Готово |
+| Три сцены, реестр сервисов, экран загрузки | Готово |
+| 2D-персонаж, покадровая анимация, игрок и камера | Готово |
+| Обзор и тьма: конус видимости, маска, свет | Готово (`adr/0008`, `adr/0010`) |
+| Демо-сцены освещения, меню | Готово |
+| Тесты | EditMode 73, PlayMode 29 — все зелёные |
+| Арт диалогов | 14 портретов и 6 фонов, стандарт размеров |
+
+**Чего нет:** ни одной игровой системы из GDD. Диалогов, жителей, угрозы,
+расследования, города, кооператива — ничего этого в коде пока не существует.
+
+**Следующий этап:** 07 «Диалог и приговор» — ядро игры: разговор с жителем
+и решение судьбы. Роадмап — `docs/gdd/08-scope-roadmap.md`.
+
+**Сетевой стек:** ADR 0003 принят (Netcode for GameObjects 2.6.0). Пакет
+не установлен — ставится на этапе 11. Сетевой seam (`INetworkService`)
+введён с первого дня, реализация — заглушка.
 
 ---
 
@@ -184,7 +202,7 @@ Woodberry/
 
 | Вопрос | Файл |
 |---|---|
-| Что это за проект? | [`docs/specs/game-vision.md`](docs/specs/game-vision.md) |
+| Что это за проект? | [`docs/gdd/00-vision.md`](docs/gdd/00-vision.md) |
 | Какие правила архитектуры? | [`AGENTS.md`](AGENTS.md) |
 | Что строим сейчас? | [`docs/stages/`](docs/stages/) |
 | Почему такой стек? | [`docs/adr/`](docs/adr/) |
@@ -195,6 +213,22 @@ Woodberry/
 | Как коммитить? | [`docs/runbooks/git-workflow.md`](docs/runbooks/git-workflow.md) |
 | Как собрать релиз? | [`docs/runbooks/build-and-release.md`](docs/runbooks/build-and-release.md) |
 | Ошибки компиляции? | [`docs/runbooks/incident-compile-errors.md`](docs/runbooks/incident-compile-errors.md) |
+
+### Геймдизайн (GDD)
+
+| Файл | О чём |
+|---|---|
+| [`docs/gdd/`](docs/gdd/README.md) | Замысел игры: что это за игра, петли, системы, мир, стадии |
+| [`00-vision.md`](docs/gdd/00-vision.md) | Высокий концепт, столпы, аудитория, тон |
+| [`01-core-loop.md`](docs/gdd/01-core-loop.md) | Петля города и деревни, дни, приговор, провал |
+| [`02-player.md`](docs/gdd/02-player.md) | Игрок: движение, ресурсы, смерть, экипировка, навыки |
+| [`03-threat.md`](docs/gdd/03-threat.md) | Угрозы деревни: бестиарий, культы, чума |
+| [`04-levels.md`](docs/gdd/04-levels.md) | Деревня, город, генерация, особые объекты |
+| [`05-coop.md`](docs/gdd/05-coop.md) | Кооп: общее и личное, разделённая информация |
+| [`06-world.md`](docs/gdd/06-world.md) | Мир, эпоха, орден, церковь, законы мира |
+| [`07-art-audio-ux.md`](docs/gdd/07-art-audio-ux.md) | Визуал, портреты, диалоги, звук, интерфейс |
+| [`08-scope-roadmap.md`](docs/gdd/08-scope-roadmap.md) | MVP, vertical slice, последовательность этапов |
+| [`99-open-questions.md`](docs/gdd/99-open-questions.md) | Открытые вопросы и журнал решений |
 
 ### Спецификации
 
@@ -212,10 +246,16 @@ Woodberry/
 | Файл | Решение | Статус |
 |---|---|---|
 | [ADR 0001](docs/adr/0001-layer-and-assembly-architecture.md) | Слои и asmdef | Accepted |
-| [ADR 0002](docs/adr/0002-save-data-format.md) | Формат сейвов | Proposed |
-| [ADR 0003](docs/adr/0003-networking-stack.md) | Сетевой стек | **Proposed — блокирует Stage 03** |
+| [ADR 0002](docs/adr/0002-save-data-format.md) | Формат сейвов | Accepted |
+| [ADR 0003](docs/adr/0003-networking-stack.md) | Сетевой стек | **Accepted** — NGO 2.6.0 |
 | [ADR 0004](docs/adr/0004-scriptable-objects-for-design-data.md) | SO для дизайн-данных | Accepted |
 | [ADR 0005](docs/adr/0005-input-abstraction.md) | `IInputReader` | Accepted |
+| [ADR 0006](docs/adr/0006-scene-architecture-and-service-registry.md) | Сцены и реестр сервисов | Accepted |
+| [ADR 0007](docs/adr/0007-2d-sprite-game.md) | 2D-спрайты | Accepted, частично отменён |
+| [ADR 0008](docs/adr/0008-visibility-and-darkness.md) | Обзор и темнота | Accepted |
+| [ADR 0009](docs/adr/0009-frame-based-character-sprites.md) | Покадровые спрайты | Accepted |
+| [ADR 0010](docs/adr/0010-2d-lighting.md) | 2D-освещение | Accepted |
+| [ADR 0011](docs/adr/0011-character-and-world-saves.md) | Два сейва: персонаж и мир | Accepted |
 
 ---
 

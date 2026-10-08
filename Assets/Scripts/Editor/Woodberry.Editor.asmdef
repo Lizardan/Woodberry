@@ -9,7 +9,9 @@
         "Woodberry.Save",
         "Woodberry.Net",
         "Woodberry.UI",
-        "Woodberry.AI"
+        "Woodberry.AI",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime"
     ],
     "includePlatforms": [
         "Editor"

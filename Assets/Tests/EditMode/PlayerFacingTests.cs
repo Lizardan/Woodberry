@@ -10,7 +10,7 @@ namespace Woodberry.Tests.EditMode
     /// Ошибка здесь не ломает движение: персонаж едет правильно, а смотрит
     /// не туда. Найти её можно только проверкой угла, поэтому тест сравнивает
     /// не «угол равен чему-то», а куда в итоге смотрит спрайт: он должен
-    /// смотреть в сторону движения.
+    /// смотреть в сторону движения — в любую, а не только в четыре стороны.
     /// </summary>
     public sealed class PlayerFacingTests
     {
@@ -83,14 +83,31 @@ namespace Woodberry.Tests.EditMode
         }
 
         [Test]
-        public void ComputeZRotation_ForDiagonals_SnapsToDominantAxis()
+        public void ComputeZRotation_ForDiagonals_PointsAlongTheDiagonal()
         {
-            // Диагональ обязана уйти в доминирующую ось, а не дать 45°:
-            // у спрайта всего четыре направления.
-            float degrees = PlayerFacing.ComputeZRotation(new Vector2(0.8f, 0.6f));
-            Vector2 forward = RotatedSpriteForward(degrees);
+            // Раньше угол округлялся до ближайших 90°, и диагональ уводило
+            // в ближайшую ось — персонаж смотрел мимо движения. Спрайт
+            // рисуется сверху, поэтому он обязан разворачиваться в саму
+            // диагональ, а не выбирать из четырёх сторон.
+            var diagonals = new[]
+            {
+                new Vector2(1f, 1f).normalized,
+                new Vector2(1f, -1f).normalized,
+                new Vector2(-1f, 1f).normalized,
+                new Vector2(-1f, -1f).normalized,
+                new Vector2(0.8f, 0.6f).normalized,
+            };
 
-            Assert.That(forward.x, Is.GreaterThan(0.99f));
+            foreach (Vector2 direction in diagonals)
+            {
+                float degrees = PlayerFacing.ComputeZRotation(direction);
+                Vector2 forward = RotatedSpriteForward(degrees);
+
+                Assert.That(
+                    Vector2.Angle(forward, direction),
+                    Is.LessThan(0.5f),
+                    "диагональ обязана разворачивать ровно по движению: " + direction);
+            }
         }
 
         [Test]
@@ -103,26 +120,38 @@ namespace Woodberry.Tests.EditMode
         }
 
         [Test]
-        public void Quantize_WhenDiagonal_PicksDominantAxis()
+        public void StepAngle_MovesTowardTargetWithoutOvershoot()
         {
-            Assert.That(PlayerFacing.Quantize(new Vector2(0.9f, 0.2f)), Is.EqualTo(Vector2.right));
-            Assert.That(PlayerFacing.Quantize(new Vector2(-0.9f, 0.2f)), Is.EqualTo(Vector2.left));
-            Assert.That(PlayerFacing.Quantize(new Vector2(0.2f, 0.9f)), Is.EqualTo(Vector2.up));
-            Assert.That(PlayerFacing.Quantize(new Vector2(0.2f, -0.9f)), Is.EqualTo(Vector2.down));
+            float stepped = PlayerFacing.StepAngle(0f, 90f, 10f);
+
+            Assert.That(stepped, Is.EqualTo(10f).Within(0.01f),
+                "за вызов угол не должен уходить дальше предела");
         }
 
         [Test]
-        public void Quantize_WhenExactlyDiagonal_PrefersHorizontal()
+        public void StepAngle_WhenTargetIsWithinReach_ReachesItExactly()
         {
-            // Ровно 45° — вырожденный случай; правило должно быть
-            // детерминированным, иначе персонаж дёргается на диагональном вводе.
-            Assert.That(PlayerFacing.Quantize(new Vector2(1f, 1f)), Is.EqualTo(Vector2.right));
+            float stepped = PlayerFacing.StepAngle(80f, 90f, 30f);
+
+            Assert.That(stepped, Is.EqualTo(90f).Within(0.01f));
         }
 
         [Test]
-        public void Quantize_WhenZero_ReturnsDown()
+        public void StepAngle_TakesTheShortWayAround()
         {
-            Assert.That(PlayerFacing.Quantize(Vector2.zero), Is.EqualTo(Vector2.down));
+            // От 350° к 10° ближе через ноль (+20°), а не назад через 340.
+            float stepped = PlayerFacing.StepAngle(350f, 10f, 5f);
+
+            Assert.That(stepped, Is.EqualTo(355f).Within(0.01f),
+                "поворот обязан идти по кратчайшей дуге, иначе персонаж крутится на 340°");
+        }
+
+        [Test]
+        public void StepAngle_WhenSpeedIsZero_KeepsCurrentAngle()
+        {
+            float stepped = PlayerFacing.StepAngle(42f, 90f, 0f);
+
+            Assert.That(stepped, Is.EqualTo(42f).Within(0.01f));
         }
     }
 }

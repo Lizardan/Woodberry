@@ -34,7 +34,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _Darkness: 0.965
-    - _EdgeSoftness: 0.12
+    - _EdgeSoftness: 0.08
     - _FogScale: 0.3
     - _FogStrength: 0.09
     m_Colors:

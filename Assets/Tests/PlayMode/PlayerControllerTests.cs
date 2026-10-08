@@ -236,7 +236,11 @@ namespace Woodberry.Tests.PlayMode
                      })
             {
                 input.Move = direction;
-                yield return WaitForPhysicsSteps(3);
+
+                // Поворот теперь плавный и идёт в Update, поэтому нужен запас
+                // кадров: за пару тиков спрайт не успевает довернуться, и тест
+                // падал бы на корректном поведении.
+                yield return WaitForPhysicsSteps(30);
                 seen.Add(visual.localEulerAngles.z);
             }
 

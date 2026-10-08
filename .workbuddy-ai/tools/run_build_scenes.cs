@@ -1,0 +1,2 @@
+BuildLightingScenes.Run();
+return "ok";

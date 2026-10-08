@@ -88,6 +88,61 @@ namespace Woodberry.Tests.EditMode
         }
 
         [Test]
+        public void CircleTangentPoints_ProducesTwoSymmetricTangents()
+        {
+            // Окружность радиуса 1 ровно над началом координат.
+            var sink = new List<Vector2>();
+            VisionPolygonBuilder.CircleTangentPoints(
+                Vector2.zero, new Vector2(0f, 5f), 1f, sink);
+
+            Assert.That(sink.Count, Is.EqualTo(2));
+
+            // Каждая точка лежит на окружности и симметрична второй.
+            Assert.That(sink[0].x, Is.EqualTo(-sink[1].x).Within(1e-3f));
+            Assert.That(sink[0].y, Is.EqualTo(sink[1].y).Within(1e-3f));
+
+            foreach (Vector2 point in sink)
+            {
+                Assert.That(Vector2.Distance(point, new Vector2(0f, 5f)),
+                    Is.EqualTo(1f).Within(1e-3f), "точка касания обязана лежать на окружности");
+            }
+        }
+
+        [Test]
+        public void CircleTangentPoints_RadiusIsPerpendicularToTheRay()
+        {
+            // Свойство касательной: радиус в точку касания перпендикулярен лучу.
+            var sink = new List<Vector2>();
+            Vector2 origin = new Vector2(-3f, 1f);
+            Vector2 center = new Vector2(2f, 4f);
+            const float radius = 1.5f;
+
+            VisionPolygonBuilder.CircleTangentPoints(origin, center, radius, sink);
+
+            Assert.That(sink.Count, Is.EqualTo(2));
+
+            foreach (Vector2 point in sink)
+            {
+                Vector2 ray = point - origin;
+                Vector2 spoke = point - center;
+                Assert.That(Vector2.Dot(ray.normalized, spoke.normalized),
+                    Is.EqualTo(0f).Within(1e-2f), "касательная обязана быть перпендикулярна радиусу");
+            }
+        }
+
+        [Test]
+        public void CircleTangentPoints_WhenOriginInsideCircle_AddsNothing()
+        {
+            var sink = new List<Vector2>();
+
+            VisionPolygonBuilder.CircleTangentPoints(
+                new Vector2(1f, 0f), Vector2.zero, 2f, sink);
+
+            Assert.That(sink, Is.Empty,
+                "из точки внутри окружности касательных нет — луч добавлять не из чего");
+        }
+
+        [Test]
         public void NormalizeAngles_SortsAscendingAndRemovesDuplicates()
         {
             var angles = new List<float> { 20f, -10f, 20.05f, 350f, 20f };

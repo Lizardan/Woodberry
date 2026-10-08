@@ -38,12 +38,19 @@ ADR пишется, когда решение:
 | Файл | Решение | Статус |
 |---|---|---|
 | `0001-layer-and-assembly-architecture.md` | Слои и asmdef как границы | Accepted |
-| `0002-save-data-format.md` | Формат сейвов | Proposed |
-| `0003-networking-stack.md` | Сетевой стек для кооператива | **Proposed — блокирует Stage 03** |
+| `0002-save-data-format.md` | Формат сейвов | Accepted |
+| `0003-networking-stack.md` | Сетевой стек для кооператива | **Accepted** — NGO 2.6.0 |
 | `0004-scriptable-objects-for-design-data.md` | SO для дизайн-данных | Accepted |
 | `0005-input-abstraction.md` | `IInputReader` как единственная точка ввода | Accepted |
 | `0006-scene-architecture-and-service-registry.md` | Три сцены + `ServiceRegistry` вместо межсценовых ссылок | Accepted |
-| `0007-2d-sprite-game.md` | Переход на 2D-спрайты: движение, камера, риг персонажа | Accepted |
+| `0007-2d-sprite-game.md` | Переход на 2D-спрайты: движение, камера, риг персонажа | Accepted, частично отменён |
+| `0008-visibility-and-darkness.md` | Обзор и темнота: конус видимости и маска | Accepted |
+| `0009-frame-based-character-sprites.md` | Покадровые спрайты персонажа | Accepted |
+| `0010-2d-lighting.md` | 2D-освещение | Accepted |
+| `0011-character-and-world-saves.md` | Два сейва: персонаж и мир | Accepted |
+
+**Список надо сверять с папкой.** Он уже отставал: `0008`–`0010` существовали,
+но в таблице их не было. При добавлении ADR — дописывать строку сюда.
 
 ## Правило
 

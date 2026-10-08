@@ -21,7 +21,7 @@ Shader "Woodberry/VisibilityOverlay"
         _FogColor ("Fog Color", Color) = (0.32, 0.37, 0.45, 1)
         _FogStrength ("Fog Strength", Range(0, 1)) = 0.09
         _FogScale ("Fog Scale", Float) = 0.30
-        _EdgeSoftness ("Edge Softness", Range(0.001, 0.9)) = 0.12
+        _EdgeSoftness ("Edge Softness", Range(0.001, 0.3)) = 0.02
     }
 
     SubShader
@@ -95,9 +95,19 @@ Shader "Woodberry/VisibilityOverlay"
             {
                 float mask = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, input.uv).r;
 
-                // Мягкая кромка обзора: без неё граница видимости — ступенька
-                // в один пиксель, и по экрану ползёт рваная пила.
-                float reveal = smoothstep(0.0, max(_EdgeSoftness, 0.001), mask);
+                // Яркость маски проходит в темноту КАК ЕСТЬ. Раньше здесь
+                // стоял smoothstep по узкой полосе, и он превращал плавный
+                // спад маски в ступеньку: любой тексель ярче порога давал
+                // полный свет, любой темнее — полную тьму. Градиент,
+                // который считает шейдер маски, до экрана не доходил,
+                // и мягкость приходилось делать в геометрии, где она
+                // получается полосатой.
+                //
+                // _EdgeSoftness оставлен: это сглаживание последнего
+                // пикселя кромки, защита от пилы по краю текселя. Он
+                // намеренно мал и на ширину спада не влияет.
+                float reveal = saturate(mask / max(_EdgeSoftness, 0.001));
+                reveal = saturate(reveal);
                 float darkness = saturate(_Darkness * (1.0 - reveal));
 
                 float fog = SAMPLE_TEXTURE2D(_FogTex, sampler_FogTex, input.fogUv).r;

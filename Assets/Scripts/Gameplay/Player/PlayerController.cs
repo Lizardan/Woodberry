@@ -42,10 +42,15 @@ namespace Woodberry.Gameplay.Player
         [SerializeField]
         private Animator _animator;
 
+        [Tooltip("Скорость доворота спрайта в сторону движения, градусы в секунду.")]
+        [SerializeField]
+        private float _turnSpeedDegrees = 720f;
+
         private Rigidbody2D _body;
         private IInputReader _input;
         private Transform _visual;
         private Vector2 _facing = Vector2.down;
+        private float _targetFacingDegrees;
         private bool _bodyMissing;
 
 #if UNITY_EDITOR
@@ -139,8 +144,8 @@ namespace Woodberry.Gameplay.Player
             if (displacement.sqrMagnitude > 0f)
             {
                 _facing = displacement.normalized;
+                _targetFacingDegrees = PlayerFacing.ComputeZRotation(_facing);
                 CurrentSpeed = speed;
-                ApplyFacing();
             }
             else
             {
@@ -151,27 +156,26 @@ namespace Woodberry.Gameplay.Player
         }
 
         /// <summary>
-        /// Разворачивает спрайт по направлению движения.
+        /// Плавно доворачивает спрайт к направлению движения.
         ///
-        /// Четыре направления: набор из восьми потребовал бы вдвое больше
-        /// графики, а четыре — минимум, при котором персонаж читается.
-        /// Влево и вправо — зеркальные, поэтому ассетов всего четыре.
-        ///
-        /// Поворот идёт на узле <c>Visual</c>, а не на корне: корень двигает
-        /// физическое тело, и его поворот утащил бы за собой кинематику.
+        /// Отдельно от <see cref="FixedUpdate"/>: движение считается по
+        /// физическому тику (так его потом переносить на сеть), а поворот —
+        /// косметика. Раз в кадр он выглядит плавно независимо от частоты
+        /// физики; в FixedUpdate на 50 Гц получался бы рваный доворот.
         /// </summary>
-        private void ApplyFacing()
+        private void Update()
         {
             if (_visual == null)
             {
                 return;
             }
 
-            // Сам угол считает чистая функция: её можно проверить тестом,
-            // а каскад условий здесь — нельзя, и именно в нём лево с правом
-            // однажды поменялись местами.
-            float degrees = PlayerFacing.ComputeZRotation(_facing);
-            _visual.localRotation = Quaternion.Euler(0f, 0f, degrees);
+            float next = PlayerFacing.StepAngle(
+                _visual.localEulerAngles.z,
+                _targetFacingDegrees,
+                _turnSpeedDegrees * Time.deltaTime);
+
+            _visual.localRotation = Quaternion.Euler(0f, 0f, next);
         }
 
         private void StopWalking()

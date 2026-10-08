@@ -48,6 +48,19 @@ namespace Woodberry.Gameplay.Perception
         /// </summary>
         private const int HitBufferSize = 16;
 
+        /// <summary>
+        /// Сколько полос градиента к темноте. Оставлено для совместимости
+        /// с прежними настройками сцены; на мягкость кромки больше не влияет.
+        ///
+        /// Раньше здесь строилось шесть колец вершин, и яркость задавалась
+        /// цветом вершины. Спад укладывался в шесть ступеней, и при большом
+        /// радиусе обзора относительно кадра ступени становились видны —
+        /// уход в темноту выглядел не плавным, а полосатым. Теперь спад
+        /// считает шейдер по интерполированному признаку, поэтому колец
+        /// достаточно двух: центр и дальний край.
+        /// </summary>
+        private const int GradientBands = 1;
+
         [Header("Композиция")]
         [Tooltip("Камера, поверх кадра которой кладётся темнота. Задаётся сценой.")]
         [SerializeField]
@@ -72,6 +85,17 @@ namespace Woodberry.Gameplay.Perception
         [Range(0.05f, 3f)]
         [SerializeField]
         private float _edgeEpsilonDegrees = 0.6f;
+
+        [Tooltip("Ширина зоны ухода в темноту, в долях радиуса. " +
+                 "Больше — граница мягче и пятно меньше.")]
+        [Range(0.05f, 1f)]
+        [SerializeField]
+        private float _falloffWidth = 0.3f;
+
+        [Tooltip("Ослабление яркости в последних процентах радиуса. Убирает резкую кромку.")]
+        [Range(0f, 0.5f)]
+        [SerializeField]
+        private float _edgeSoftness = 0.06f;
 
         [Tooltip("Высота маски в пикселях. Автоматически поднимается минимум до половины высоты экрана.")]
         [Range(64, 1080)]
@@ -98,11 +122,15 @@ namespace Woodberry.Gameplay.Perception
         private readonly List<IVisionSource> _visionSources = new List<IVisionSource>(4);
         private readonly List<float> _angles = new List<float>(512);
         private readonly List<float> _distances = new List<float>(512);
-        private readonly List<Vector2> _hitPoints = new List<Vector2>(64);
+        private readonly List<float> _sortedDistances = new List<float>(512);
+        private readonly List<Vector2> _obstaclePoints = new List<Vector2>(128);
         private readonly List<Vector2> _lastPoints = new List<Vector2>(512);
 
         /// <summary>Буфер под попадания лучей. Предвыделен: аллокаций в кадре нет.</summary>
         private readonly RaycastHit2D[] _hitBuffer = new RaycastHit2D[HitBufferSize];
+
+        /// <summary>Буфер под препятствия в радиусе обзора. Предвыделен.</summary>
+        private readonly Collider2D[] _colliderBuffer = new Collider2D[32];
         private readonly List<Vector3> _vertices = new List<Vector3>(1024);
         private readonly List<Color> _colors = new List<Color>(1024);
         private readonly List<int> _triangles = new List<int>(3072);
@@ -111,6 +139,14 @@ namespace Woodberry.Gameplay.Perception
         private RenderTexture _maskTexture;
         private Mesh _mesh;
         private Transform _quad;
+
+        // Ссылки на материалы, созданные самим компонентом. Без этих флагов
+        // OnDestroy уничтожал бы материалы-ассеты, если подготовка не успела
+        // выполниться (компонент отключён, камера не задана, сцена не игралась):
+        // Unity отвечает на это «Destroying assets is not permitted» и пишет
+        // предупреждение в консоль на каждой выгрузке сцены.
+        private bool _ownsMaskMaterial;
+        private bool _ownsOverlayMaterial;
 
         private int _lastScreenWidth;
         private int _lastScreenHeight;
@@ -193,6 +229,8 @@ namespace Woodberry.Gameplay.Perception
             // состояние между всеми, кто этот материал использует.
             _maskMaterial = InstantiateMaterial(_maskMaterial, "VisionMaskInstance");
             _overlayMaterial = InstantiateMaterial(_overlayMaterial, "VisibilityOverlayInstance");
+            _ownsMaskMaterial = _maskMaterial != null;
+            _ownsOverlayMaterial = _overlayMaterial != null;
 
             CreateMaskCamera();
             CreateOverlayQuad();
@@ -234,18 +272,22 @@ namespace Woodberry.Gameplay.Perception
                 _mesh = null;
             }
 
-            // Копии материалов живут только пока живёт компонент.
-            if (_maskMaterial != null)
+            // Копии материалов живут только пока живёт компонент. Уничтожаем
+            // ровно свои копии: если подготовка не выполнялась, в полях лежат
+            // материалы-ассеты, и Destroy по ним — запрещённая операция.
+            if (_ownsMaskMaterial && _maskMaterial != null)
             {
                 Destroy(_maskMaterial);
-                _maskMaterial = null;
             }
+            _maskMaterial = null;
+            _ownsMaskMaterial = false;
 
-            if (_overlayMaterial != null)
+            if (_ownsOverlayMaterial && _overlayMaterial != null)
             {
                 Destroy(_overlayMaterial);
-                _overlayMaterial = null;
             }
+            _overlayMaterial = null;
+            _ownsOverlayMaterial = false;
         }
 
         private void LateUpdate()
@@ -479,7 +521,24 @@ namespace Woodberry.Gameplay.Perception
 
         /// <summary>
         /// Строит один веер: вершина в точке обзора, дальний край — по попаданиям.
-        /// Цвет вершины задаёт затухание: у центра маска белая, у края гаснет.
+        ///
+        /// Вершина меша несёт не яркость, а два признака, по которым яркость
+        /// считает шейдер маски:
+        /// <list type="bullet">
+        /// <item><b>R</b> — доля пройденного пути от центра к дальнему краю.
+        /// Препятствие кладёт её в 1 ещё в глубине комнаты, поэтому рельеф
+        /// света не зависит от формы стен и не «прилипает» к ним светлым
+        /// пятном;</item>
+        /// <item><b>G</b> — насколько близко к кромке обзора стоит попадание.
+        /// Ровно на препятствии — 1, в стороне от него — 0. По этому признаку
+        /// шейдер гасит яркость в последних процентах радиуса, чтобы переход
+        /// в темноту был мягким, а не обрывом.</item>
+        /// </list>
+        ///
+        /// Сама форма обзора остаётся такой же: внешнее кольцо лежит ровно
+        /// на попаданиях (или на полном радиусе при промахе), и именно её
+        /// проверяют PlayMode-тесты. Изменилось только распределение яркости
+        /// внутри формы.
         /// </summary>
         private void AppendCone(VisionCone cone)
         {
@@ -489,66 +548,295 @@ namespace Woodberry.Gameplay.Perception
             }
 
             _angles.Clear();
-            _hitPoints.Clear();
 
             VisionFanBuilder.BuildAngles(cone, _rayStepDegrees, _angles);
 
-            if (_angles.Count == 0)
-            {
-                return;
-            }
+            // Лучи по настоящим углам препятствий. Без них кромка тени
+            // «плавает» между соседними лучами веера: при движении угол
+            // попадания перескакивает с луча на луч, и граница дрожит.
+            // Точный угол геометрии прибивает кромку к самому препятствию.
+            AppendObstacleAngles(cone.Origin, cone.Radius, _angles);
 
-            RaycastAngles(cone, _angles, _distances, _hitPoints);
-
-            // Уточняем границы по кромкам препятствий, затем досчитываем
-            // добавленные углы — иначе край тени «плывёт» между лучами.
-            VisionFanBuilder.AppendEdgeAngles(_angles, cone.Origin, _hitPoints, _edgeEpsilonDegrees);
-
-            // Сортировка и склейка дублей обесценивают прежние дистанции,
-            // поэтому веер после нормализации прогоняется заново.
+            // Сортировка и склейка дублей обесценивают прежние дистанции, но
+            // теперь рейкаст один: углы препятствий добавлены ДО него, а не
+            // после, поэтому второй проход больше не нужен.
             VisionPolygonBuilder.NormalizeAngles(_angles, _rayStepDegrees * 0.25f);
-            RaycastAngles(cone, _angles, _distances, null);
 
             if (_angles.Count < 2)
             {
                 return;
             }
 
+            RaycastAngles(cone, _angles, _distances);
+
             int originIndex = _vertices.Count;
             _vertices.Add(new Vector3(cone.Origin.x, cone.Origin.y, 0f));
-            _colors.Add(Color.white);
+            // Центр: путь не пройден, кромки нет.
+            _colors.Add(new Color(0f, 0f, 0f, 1f));
 
-            for (int i = 0; i < _angles.Count; i++)
+            int ringCount = _angles.Count;
+            int firstBandVertex = originIndex + 1;
+
+            // Кольцу задаётся доля РАДИУСА, а не яркость: яркость считает
+            // шейдер маски. Внутреннее кольцо стоит там, где начинается
+            // зона спада; всё до него шейдер держит ровно светлым.
+            //
+            // Признак нормируется по радиусу обзора, а не по дистанции до
+            // стены. Разница видна на открытом месте: там луч уходит на весь
+            // радиус, и если нормировать по попаданию, зона спада сама
+            // растянется вместе с лучом. Ширина спада должна быть
+            // одинаковой и в комнате, и в поле, иначе пятно то с резкой
+            // кромкой, то с размытой.
+            float radius = Mathf.Max(0.0001f, cone.Radius);
+            float innerT = Mathf.Clamp01(1f - _falloffWidth);
+
+            for (int band = 0; band <= GradientBands; band++)
             {
-                Vector2 point = VisionPolygonBuilder.PointAt(
-                    cone.Origin, _angles[i], _distances[i] < 0f ? cone.Radius : _distances[i]);
+                float t = band == 0 ? innerT : 1f;
 
-                _vertices.Add(new Vector3(point.x, point.y, 0f));
-                _colors.Add(new Color(0.55f, 0.55f, 0.55f, 1f));
-                _lastPoints.Add(point);
+                for (int i = 0; i < ringCount; i++)
+                {
+                    float reach = _distances[i] < 0f
+                        ? cone.Radius
+                        : Mathf.Min(_distances[i], cone.Radius);
+
+                    // Доля радиуса, на которой стоит вершина. Оба кольца
+                    // несут эту долю одинаково для всех лучей, поэтому
+                    // градиент вдоль луча не зависит от того, во что луч
+                    // упёрся.
+                    float radiusT = band == 0 ? t : 1f;
+
+                    // Позиция вершины — по фактическому попаданию: форма
+                    // обзора обязана совпадать со стенами. Признак и позиция
+                    // связаны не жёстко, и это намеренно.
+                    Vector2 point = VisionPolygonBuilder.PointAt(
+                        cone.Origin, _angles[i], reach * (band == 0 ? t : 1f));
+
+                    _vertices.Add(new Vector3(point.x, point.y, 0f));
+                    _colors.Add(new Color(radiusT, band == 0 ? 0f : 1f, 0f, 1f));
+
+                    if (band == GradientBands)
+                    {
+                        // Внешнее кольцо — фактическая граница обзора;
+                        // PlayMode-тесты проверяют именно её.
+                        _lastPoints.Add(point);
+                    }
+                }
             }
 
-            int firstRing = originIndex + 1;
-            int ringCount = _angles.Count;
-
+            // Вентилятор от центра к первому кольцу.
             for (int i = 0; i < ringCount - 1; i++)
             {
-                _triangles.Add(originIndex);
-                _triangles.Add(firstRing + i);
-                _triangles.Add(firstRing + i + 1);
+                AddTriangle(originIndex, firstBandVertex + i, firstBandVertex + i + 1);
+            }
+
+            // Полосы между кольцами.
+            for (int band = 0; band < GradientBands; band++)
+            {
+                int inner = firstBandVertex + band * ringCount;
+                int outer = inner + ringCount;
+
+                for (int i = 0; i < ringCount - 1; i++)
+                {
+                    AddTriangle(inner + i, outer + i, outer + i + 1);
+                    AddTriangle(inner + i, outer + i + 1, inner + i + 1);
+                }
             }
 
             // Круговой обзор замыкается: последний луч и первый — соседи по кругу.
             if (cone.IsOmnidirectional)
             {
-                _triangles.Add(originIndex);
-                _triangles.Add(firstRing + ringCount - 1);
-                _triangles.Add(firstRing);
+                int last = ringCount - 1;
+                AddTriangle(originIndex, firstBandVertex + last, firstBandVertex);
+
+                for (int band = 0; band < GradientBands; band++)
+                {
+                    int inner = firstBandVertex + band * ringCount;
+                    int outer = inner + ringCount;
+
+                    AddTriangle(inner + last, outer + last, outer);
+                    AddTriangle(inner + last, outer, inner);
+                }
             }
         }
 
-        private void RaycastAngles(VisionCone cone, List<float> angles, List<float> distances,
-                                   List<Vector2> hitPoints)
+        /// <summary>
+        /// Радиус, на котором стоит «огибающая» препятствий: медиана попавших
+        /// дистанций. По ней отличается кромка обзора двух разных природ.
+        ///
+        /// Внутри комнаты кромка почти у всех лучей одна и та же — это стена
+        /// вокруг игрока. На выходе через проём часть лучей уходит далеко.
+        /// Медиана держится за большинство, поэтому именно стена задаёт
+        /// масштаб, а одиночные длинные лучи не перетягивают его на себя.
+        ///
+        /// Медиана, а не среднее: один луч, улетевший на весь радиус, сдвинул
+        /// бы среднее и обесценил сравнение.
+        ///
+        /// Сейчас не вызывается: спад яркости привязан к радиусу, а не
+        /// к огибающей стен. Оставлено как готовый инструмент на случай,
+        /// если понадобится привязать подсветку к геометрии комнаты.
+        /// </summary>
+        private float FindWallEnvelope(float radius, IReadOnlyList<float> distances)
+        {
+            _sortedDistances.Clear();
+
+            for (int i = 0; i < distances.Count; i++)
+            {
+                if (distances[i] >= 0f)
+                {
+                    _sortedDistances.Add(distances[i]);
+                }
+            }
+
+            if (_sortedDistances.Count == 0)
+            {
+                return 0f;
+            }
+
+            _sortedDistances.Sort();
+
+            int middle = _sortedDistances.Count / 2;
+            float median = _sortedDistances.Count % 2 == 0
+                ? (_sortedDistances[middle - 1] + _sortedDistances[middle]) * 0.5f
+                : _sortedDistances[middle];
+
+            // Огибающая не может быть больше самого радиуса: за ним обзора нет.
+            return Mathf.Min(median, radius);
+        }
+
+        /// <summary>
+        /// Добавляет в веер лучи по углам препятствий в радиусе обзора.
+        ///
+        /// Углы берутся из геометрии коллайдеров, а не из попаданий веера:
+        /// попадание само лежит на сетке лучей, поэтому кромку не прибивает.
+        /// Прямоугольник даёт четыре угла, круг — две точки касания,
+        /// произвольный полигон — свои вершины.
+        /// </summary>
+        private void AppendObstacleAngles(Vector2 origin, float radius, List<float> angles)
+        {
+            var filter = new ContactFilter2D
+            {
+                useLayerMask = true,
+                layerMask = _occluderMask,
+            };
+
+            int count = Physics2D.OverlapCircle(origin, radius, filter, _colliderBuffer);
+
+            _obstaclePoints.Clear();
+
+            for (int i = 0; i < count; i++)
+            {
+                Collider2D collider = _colliderBuffer[i];
+
+                if (collider == null)
+                {
+                    continue;
+                }
+
+                switch (collider)
+                {
+                    case BoxCollider2D box:
+                        AppendBoxCorners(box, _obstaclePoints);
+                        break;
+                    case CircleCollider2D circle:
+                        AppendCircleTangents(circle, origin, _obstaclePoints);
+                        break;
+                    case CapsuleCollider2D capsule:
+                        AppendCapsuleTangents(capsule, origin, _obstaclePoints);
+                        break;
+                    case PolygonCollider2D polygon:
+                        AppendPolygonVertices(polygon, _obstaclePoints);
+                        break;
+                    case EdgeCollider2D edge:
+                        AppendEdgeVertices(edge, _obstaclePoints);
+                        break;
+                }
+            }
+
+            if (_obstaclePoints.Count == 0)
+            {
+                return;
+            }
+
+            VisionFanBuilder.AppendEdgeAngles(angles, origin, _obstaclePoints, _edgeEpsilonDegrees);
+        }
+
+        private static void AppendBoxCorners(BoxCollider2D box, List<Vector2> sink)
+        {
+            Vector2 half = box.size * 0.5f;
+            Vector2 center = box.offset;
+            Transform transform = box.transform;
+
+            sink.Add(transform.TransformPoint(new Vector2(center.x - half.x, center.y - half.y)));
+            sink.Add(transform.TransformPoint(new Vector2(center.x + half.x, center.y - half.y)));
+            sink.Add(transform.TransformPoint(new Vector2(center.x + half.x, center.y + half.y)));
+            sink.Add(transform.TransformPoint(new Vector2(center.x - half.x, center.y + half.y)));
+        }
+
+        private static void AppendCircleTangents(CircleCollider2D circle, Vector2 origin, List<Vector2> sink)
+        {
+            Vector2 center = circle.transform.TransformPoint(circle.offset);
+            Vector3 scale = circle.transform.lossyScale;
+            float radius = circle.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.y));
+
+            VisionPolygonBuilder.CircleTangentPoints(origin, center, radius, sink);
+        }
+
+        private static void AppendCapsuleTangents(CapsuleCollider2D capsule, Vector2 origin, List<Vector2> sink)
+        {
+            Vector2 center = capsule.transform.TransformPoint(capsule.offset);
+            Vector3 scale = capsule.transform.lossyScale;
+            Vector2 size = capsule.size;
+            bool horizontal = capsule.direction == CapsuleDirection2D.Horizontal;
+
+            // У капсулы 2D нет отдельного радиуса: есть только size и direction.
+            // Радиус — половина поперечного размера, длинная ось — по направлению.
+            float radius = (horizontal ? size.y : size.x) * 0.5f;
+            float halfLength = Mathf.Max(0f, (horizontal ? size.x : size.y) * 0.5f - radius);
+            radius *= Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.y));
+
+            Vector2 worldAxis = horizontal
+                ? ((Vector2)capsule.transform.right).normalized
+                : ((Vector2)capsule.transform.up).normalized;
+
+            VisionPolygonBuilder.CircleTangentPoints(origin, center + worldAxis * halfLength, radius, sink);
+            VisionPolygonBuilder.CircleTangentPoints(origin, center - worldAxis * halfLength, radius, sink);
+        }
+
+        private static void AppendPolygonVertices(PolygonCollider2D polygon, List<Vector2> sink)
+        {
+            Transform transform = polygon.transform;
+
+            for (int path = 0; path < polygon.pathCount; path++)
+            {
+                Vector2[] points = polygon.GetPath(path);
+
+                for (int i = 0; i < points.Length; i++)
+                {
+                    sink.Add(transform.TransformPoint(points[i]));
+                }
+            }
+        }
+
+        private static void AppendEdgeVertices(EdgeCollider2D edge, List<Vector2> sink)
+        {
+            Transform transform = edge.transform;
+            Vector2[] points = edge.points;
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                sink.Add(transform.TransformPoint(points[i]));
+            }
+        }
+
+        private void AddTriangle(int a, int b, int c)
+        {
+            _triangles.Add(a);
+            _triangles.Add(b);
+            _triangles.Add(c);
+        }
+
+        private void RaycastAngles(VisionCone cone, List<float> angles, List<float> distances)
         {
             distances.Clear();
 
@@ -566,12 +854,6 @@ namespace Woodberry.Gameplay.Perception
                 // этот коллайдер, а не то, что за ним. Отбросив попадание,
                 // мы потеряли бы всё, что стоит дальше, и обзор просвечивал
                 // бы сквозь стену.
-                //
-                // Попытка «перезапустить луч за коллайдером» по его границам
-                // выглядит разумно, но врёт: границы двумерного коллайдера
-                // имеют нулевую толщину по Z, и пересечение с лучом в плоскости
-                // XY считается неустойчиво. Проверка ловила это как «луч прошёл
-                // сквозь настоящее препятствие».
                 int count = Physics2D.RaycastNonAlloc(
                     cone.Origin, direction, _hitBuffer, cone.Radius, _occluderMask);
 
@@ -591,19 +873,21 @@ namespace Woodberry.Gameplay.Perception
                     }
                 }
 
-                if (nearest < 0)
-                {
-                    distances.Add(-1f);
-                    continue;
-                }
-
-                distances.Add(_hitBuffer[nearest].distance);
-                hitPoints?.Add(_hitBuffer[nearest].point);
+                distances.Add(nearest < 0 ? -1f : _hitBuffer[nearest].distance);
             }
         }
 
         private void ApplyOverlayProperties()
         {
+            // Свойства маски. Раньше их тут не было вовсе: материал маски
+            // брал значения из ассета, и правка в инспекторе компонента
+            // на картинку не влияла. Настраивать мягкость приходилось
+            // в двух местах, и они расходились.
+            if (_maskMaterial != null)
+            {
+                _maskMaterial.SetFloat(ShaderIds.FalloffWidth, _falloffWidth);
+            }
+
             if (_overlayMaterial == null || _maskTexture == null)
             {
                 return;
@@ -611,6 +895,8 @@ namespace Woodberry.Gameplay.Perception
 
             _overlayMaterial.SetTexture(ShaderIds.MaskTex, _maskTexture);
             _overlayMaterial.SetFloat(ShaderIds.Darkness, _darkness);
+            _overlayMaterial.SetFloat(ShaderIds.EdgeSoftness, _edgeSoftness);
+            _overlayMaterial.SetFloat(ShaderIds.FalloffWidth, _falloffWidth);
         }
 
         /// <summary>Идентификаторы свойств шейдера в одном месте, без строк в кадре.</summary>
@@ -618,6 +904,8 @@ namespace Woodberry.Gameplay.Perception
         {
             public static readonly int MaskTex = Shader.PropertyToID("_MaskTex");
             public static readonly int Darkness = Shader.PropertyToID("_Darkness");
+            public static readonly int EdgeSoftness = Shader.PropertyToID("_EdgeSoftness");
+            public static readonly int FalloffWidth = Shader.PropertyToID("_FalloffWidth");
         }
     }
 }

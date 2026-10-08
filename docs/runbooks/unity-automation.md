@@ -317,6 +317,39 @@ Roslyn лежит в `Assets/Plugins/Roslyn/` (5 DLL, у всех есть `.met
 
 ---
 
+## Если MCP не подключён как инструменты агента
+
+В сессии, где инструментов `unityMCP_*` в наборе не оказалось (например
+DSH-сессия), мост поднимается вручную — клиент лежит в
+`.workbuddy-ai/tools/unity_mcp_client.mjs`:
+
+```powershell
+$node = '<путь к node.exe>'
+& $node .workbuddy-ai/tools/unity_mcp_client.mjs calls.json out.json
+```
+
+`calls.json` — массив вызовов; каждая запись либо `{"tool": "...", "args": {...}}`,
+либо `{"method": "tools/list", "schema": true}`, либо `{"method": "sleep", "ms": N}`
+(пауза между вызовами — нужна, потому что скриншот и вход в Play Mode
+асинхронны). Поле `codeFile` подставляет содержимое файла в аргумент `code`
+для `execute_code`: так удобнее писать длинный C#, чем возиться с экранированием
+JSON.
+
+Что проверено этим клиентом: `tools/list` (47 инструментов),
+`execute_code` (компилятор `roslyn`; тело метода, `using` недопустим —
+только полные имена), `manage_scene`, `manage_camera(action: "screenshot")`,
+`run_tests` + `get_test_job`, `read_console`.
+
+Две ловушки, на которые уже наступили:
+
+- **`execute_menu_item` не ждёт компиляции.** После правки исходника первый
+  прогон генератора сцен выполнился старым кодом, хотя `refresh_unity` уже
+  вернул управление. Признак готовности — предупреждения компилятора в консоли.
+- **`manage_scene(action: "load")` в Play Mode падает.** Сначала
+  `manage_editor(action: "stop")`, потом загрузка сцены.
+
+---
+
 ## Правила
 
 | Правило | Почему |

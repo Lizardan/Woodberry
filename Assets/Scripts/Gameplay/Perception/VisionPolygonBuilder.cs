@@ -53,6 +53,52 @@ namespace Woodberry.Gameplay.Perception
         }
 
         /// <summary>
+        /// Считает две точки касания лучей из <paramref name="origin"/> к окружности.
+        ///
+        /// Нужно, чтобы кромка тени от круглого препятствия (дерева) не
+        /// «плавала»: без них силуэт круга приближается сеткой лучей веера,
+        /// и при движении граница перескакивает между соседними лучами
+        /// на несколько градусов — это и есть дрожание кромки.
+        ///
+        /// Касательные — это точный силуэт круга из данной точки, поэтому лучи
+        /// по ним прибивают кромку к настоящей геометрии. Если точка внутри
+        /// окружности или на её центре, касательных нет — ничего не добавляем.
+        /// </summary>
+        public static void CircleTangentPoints(Vector2 origin, Vector2 center,
+                                               float radius, List<Vector2> sink)
+        {
+            if (sink == null)
+            {
+                return;
+            }
+
+            float r = Mathf.Max(0f, radius);
+            Vector2 delta = center - origin;
+            float distanceSquared = delta.sqrMagnitude;
+
+            if (r <= 0f || distanceSquared <= r * r)
+            {
+                return;
+            }
+
+            float distance = Mathf.Sqrt(distanceSquared);
+
+            // Угол при центре между направлением на origin и точкой касания.
+            float atCenter = Mathf.Acos(Mathf.Clamp(r / distance, 0f, 1f));
+
+            // Направление из центра на origin в системе обзора (0 — вверх).
+            float toOrigin = Mathf.Atan2(-delta.x, -delta.y);
+
+            float first = toOrigin + atCenter;
+            float second = toOrigin - atCenter;
+
+            sink.Add(new Vector2(center.x + Mathf.Sin(first) * r,
+                                 center.y + Mathf.Cos(first) * r));
+            sink.Add(new Vector2(center.x + Mathf.Sin(second) * r,
+                                 center.y + Mathf.Cos(second) * r));
+        }
+
+        /// <summary>
         /// Убирает дубли углов с точностью до <paramref name="toleranceDegrees"/>.
         ///
         /// Дубли появляются из-за того, что лучи по краям попаданий добавляются
