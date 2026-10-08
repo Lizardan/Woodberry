@@ -52,11 +52,18 @@ def destination(asset_id: str) -> tuple[str, str]:
     """Путь назначения и роль («character» / «background») для id стенда."""
     if asset_id.startswith("p_"):
         _, group, pool, letter = asset_id.split("_")
-        if letter not in ("a", "b"):
+        # БУКВА — НОМЕР КАДРА В ПУЛЕ, И ЕЁ МОЖЕТ БЫТЬ СКОЛЬКО УГОДНО.
+        # Раньше здесь стояло `"01" if letter == "a" else "02"`, и третьего
+        # кадра роль физически не могла получить: c, d и e тоже стали бы
+        # _02 и затёрли бы друг друга. Теперь a→01, b→02, c→03, ... Пулы,
+        # где кадр уже был, заказывают не с `a`, и тогда первый полученный
+        # кадр обязан стать своим номером, а не _01.
+        if len(letter) != 1 or not letter.isalpha():
             raise ValueError(f"неизвестная буква варианта: {asset_id}")
-        # a — первый кадр пула, b — второй. Пулы, где кадр уже был,
-        # заказывают только b, и он обязан стать _02, а не _01.
-        number = "01" if letter == "a" else "02"
+        index = ord(letter.lower()) - ord("a") + 1
+        if not 1 <= index <= 99:
+            raise ValueError(f"вариант вне диапазона 01..99: {asset_id}")
+        number = f"{index:02d}"
         name = f"{pool}_{number}_{STYLE.capitalize()}.png"
         return os.path.join(DST_ROOT, "Portraits", group, pool, name), "character"
 
