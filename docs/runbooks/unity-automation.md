@@ -6,12 +6,13 @@ Unity MCP установлен и проверен фактическими вы
 
 | Параметр | Значение |
 |---|---|
-| Пакет | `com.coplaydev.unity-mcp` (`CoplayDev/unity-mcp`, MIT) |
-| Резолв в lockfile | `30d22075093d1d35dfb0091c1c7550e9ad948577` |
-| Python-сервер | `mcpforunityserver==10.2.0`, транспорт `stdio` |
+| Пакет | `com.coplaydev.unity-mcp` `10.3.0` (`CoplayDev/unity-mcp`, MIT) |
+| Зависимость | ветка `#main` — версия плавает, фиксирует её только lockfile |
+| Резолв в lockfile | `aa5fc638d623f56178d50329d9ad8c541a57fe66` |
+| Python-сервер | `mcpforunityserver==10.3.0`, транспорт `stdio` |
 | Конфиг | `opencode.json` → секция `mcp.unityMCP` (в репозитории) |
-| Инстанс | `Woodberry@93447b6f`, порт `6400` |
-| Unity | `6000.6.3f1` |
+| Инстанс | `Woodberry@93447b6f`, порт `6400` (клиент ищет порт сам) |
+| Unity | `6000.6.5f1` |
 | Активная сцена | `Assets/Scenes/Bootstrap.unity` |
 
 ---

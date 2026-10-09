@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML
+    xmlns:ui="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements">
+    <ui:Style src="ArtStudio.uss" />
+
+    <ui:VisualElement class="root">
+
+        <uie:Toolbar class="toolbar">
+            <uie:ToolbarButton name="refresh" text="Обновить" />
+            <uie:ToolbarButton name="driverButton" text="Драйвер: поднять" />
+            <uie:ToolbarButton name="serverButton" text="ComfyUI: не поднят" />
+            <uie:ToolbarSearchField name="search" class="grow" />
+            <uie:ToolbarMenu name="statusFilter" text="Статус: все" />
+            <uie:ToolbarMenu name="kindFilter" text="Все кадры" />
+            <uie:ToolbarToggle name="onlyRegenerable" text="Только сгенерированные" />
+        </uie:Toolbar>
+
+        <ui:VisualElement class="body">
+
+            <ui:VisualElement class="panel-left">
+                <ui:Button name="reviewSection" text="На ревью" class="category-button review-section" />
+                <ui:Label text="Категории" class="panel-header" />
+                <ui:ScrollView name="categories" class="fill categories" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="panel-center">
+
+                <ui:VisualElement name="catalogPanel" class="panel-column">
+                    <ui:Label name="framesHeader" class="panel-header" text="В проекте" />
+
+                    <ui:VisualElement name="addRow" class="add-row">
+                        <ui:Label text="＋" class="add-plus" />
+                        <ui:VisualElement class="add-text">
+                            <ui:Label text="Добавить кадры" class="frame-name" />
+                            <ui:Label name="addHint" text="новые варианты этого пула" class="frame-sub" />
+                        </ui:VisualElement>
+                        <ui:IntegerField name="addCount" value="1" class="add-count" />
+                        <ui:Button name="addButton" text="Сгенерировать" class="action primary" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="generationRow" class="generation-row">
+                        <ui:VisualElement class="generation-head">
+                            <ui:Label name="generationTitle" text="Генерация" class="frame-name" />
+                            <ui:Label name="generationStatus" text="" class="frame-sub generation-status" />
+                        </ui:VisualElement>
+                        <ui:ProgressBar name="generationBar" class="generation-bar" />
+                    </ui:VisualElement>
+
+                    <ui:ListView name="frames" class="fill" />
+                </ui:VisualElement>
+
+                <ui:VisualElement name="reviewPanel" class="panel-column">
+                    <ui:Label name="reviewHeader" class="panel-header" text="Кандидаты на ревью" />
+                    <ui:ScrollView name="reviewGrid" class="review-grid" />
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+
+            <ui:VisualElement name="panelRight" class="panel-right">
+                <ui:Label name="detailHeader" class="panel-header" text="Ничего не выбрано" />
+                <ui:VisualElement name="previewHolder" class="preview-holder">
+                    <ui:Image name="preview" class="preview" />
+                </ui:VisualElement>
+
+                <ui:Label name="frameTitle" class="row-title" text="—" />
+                <ui:Label name="frameId" class="row-path" text="—" />
+                <ui:Label name="framePath" class="row-path" text="—" />
+                <ui:Label name="frameStatus" class="row-status" text="—" />
+                <ui:Label name="frameCoverage" class="row-path" text="" />
+
+                <ui:VisualElement name="candidateActions" class="action-group">
+                    <ui:Button name="accept" text="Принять в проект" class="action primary" />
+                    <ui:Button name="rejectCandidate" text="Отклонить и перегенерировать" class="action reject" />
+                </ui:VisualElement>
+
+                <ui:VisualElement name="frameActions" class="action-group">
+                    <ui:Button name="approve" text="Отметить принятым" class="action" />
+                    <ui:Button name="reject" text="Пометить браком" class="action reject" />
+                    <ui:Button name="openFolder" text="Открыть папку" class="action secondary" />
+                </ui:VisualElement>
+
+                <ui:VisualElement name="rejectComment" class="action-group">
+                    <ui:Label text="Почему брак" class="panel-header" />
+                    <ui:TextField name="comment" multiline="true" class="comment" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
+        <ui:VisualElement class="bottom-panel">
+
+            <ui:VisualElement name="placesPanel" class="places-panel">
+                <ui:Label text="Новое место фона" class="panel-header" />
+                <ui:ScrollView name="placeList" class="extra-list" />
+                <ui:VisualElement class="places-form">
+                    <ui:DropdownField name="placeGroup" label="группа" class="place-field" />
+                    <ui:TextField name="placeId" label="место" class="place-field" />
+                    <ui:TextField name="placeLabel" label="название" class="place-field" />
+                    <ui:TextField name="placeScene" label="сцена" multiline="true" class="place-scene" />
+                    <ui:Button name="placeAdd" text="Добавить место" class="action" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="bottom-bar">
+                <ui:Button name="regenMarked" text="Перегенерировать помеченное" class="action primary" />
+                <ui:Button name="placesToggle" text="Доп. места (фоны)" class="action secondary" />
+                <ui:Label name="status" class="statusbar" text="—" />
+            </ui:VisualElement>
+
+            <ui:Label name="problems" class="problems" text="" />
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

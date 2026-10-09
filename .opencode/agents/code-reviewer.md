@@ -21,6 +21,19 @@ permission:
     "*": deny
     "code-review-checklist": allow
     "git-diff-analysis": allow
+tools:
+  unityMCP_manage_*: false
+  unityMCP_execute_*: false
+  unityMCP_batch_execute: false
+  unityMCP_generate_*: false
+  unityMCP_import_*: false
+  unityMCP_create_script: false
+  unityMCP_delete_script: false
+  unityMCP_apply_text_edits: false
+  unityMCP_script_apply_edits: false
+  unityMCP_refresh_unity: false
+  unityMCP_run_tests: false
+  unityMCP_set_active_instance: false
 ---
 
 You are the code reviewer for the **Woodberry** project — a cooperative top-down horror

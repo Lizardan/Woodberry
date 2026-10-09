@@ -3,7 +3,12 @@
     "instructions": [
         "AGENTS.md",
         "instructions/*.md",
-        "docs/specs/*.md"
+        "docs/specs/game-vision.md",
+        "docs/specs/core-gameplay.md",
+        "docs/specs/coop-networking.md",
+        "docs/specs/save-system.md",
+        "docs/specs/performance-budget.md",
+        "docs/specs/code-review-flow.md"
     ],
     "model": "opencode/big-pickle",
     "mcp": {
@@ -12,7 +17,7 @@
             "command": [
                 "uvx",
                 "--from",
-                "mcpforunityserver==10.2.0",
+                "mcpforunityserver==10.3.0",
                 "mcp-for-unity",
                 "--transport",
                 "stdio"
@@ -83,6 +88,20 @@
         },
         "plan": {
             "max_tokens": 16000,
+            "tools": {
+                "unityMCP_manage_*": false,
+                "unityMCP_execute_*": false,
+                "unityMCP_batch_execute": false,
+                "unityMCP_generate_*": false,
+                "unityMCP_import_*": false,
+                "unityMCP_create_script": false,
+                "unityMCP_delete_script": false,
+                "unityMCP_apply_text_edits": false,
+                "unityMCP_script_apply_edits": false,
+                "unityMCP_refresh_unity": false,
+                "unityMCP_run_tests": false,
+                "unityMCP_set_active_instance": false
+            },
             "permission": {
                 "edit": "deny",
                 "task": {

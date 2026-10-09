@@ -6,7 +6,7 @@
 
 ## Prerequisites
 
-- Unity Editor `6000.6.3f1`
+- Unity Editor `6000.6.5f1`
 - Все тесты проходят
 - `read_console(action: "get", types: ["error"])` чист
 - Сцена добавлена в Build Settings

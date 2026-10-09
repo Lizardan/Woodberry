@@ -1,0 +1,546 @@
+.root {
+    flex-grow: 1;
+    flex-direction: column;
+    background-color: rgb(32, 32, 32);
+}
+
+.toolbar {
+    flex-direction: row;
+    align-items: center;
+    padding: 2px 4px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(20, 20, 20);
+}
+
+.grow {
+    flex-grow: 1;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+/* flex-basis: 0 обязателен. Правая панель держит кадр с ЯВНОЙ высотой (её
+   считает PreviewFit), и базовая высота тела становилась равна содержимому
+   правой панели — больше тысячи пикселей. Нижняя панель тогда сжималась с 60
+   до 37 px, и её кнопки с текстом раздавливало. С базой 0 тело растёт в
+   свободное место, а низ получает свою естественную высоту. */
+.body {
+    flex-direction: row;
+    flex-grow: 1;
+    flex-basis: 0;
+    min-height: 200px;
+}
+
+/* Левая колонка — только выбор пула. Действия пула стоят под деревом, рядом
+   с тем, что выбирают: «Сгенерировать» относится к пулу, а не к кадру, и
+   раньше стояло в правой панели среди действий кадра. */
+/* Шире прежнего: в дереве теперь три уровня (Портреты → тип → пул) плюс
+   очередь ревью, и в 220 px подписи не помещались. */
+.panel-left {
+    width: 250px;
+    min-width: 200px;
+    flex-direction: column;
+    border-right-width: 1px;
+    border-right-color: rgb(20, 20, 20);
+}
+
+.panel-center {
+    flex-grow: 1;
+    min-width: 240px;
+    flex-direction: column;
+}
+
+/* Центр — две взаимоисключающие страницы: каталог кадров и очередь ревью.
+   flex-basis: 0 и min-height: 0, иначе ListView/ScrollView внутри не сжимаются
+   и вылезают за окно. */
+.panel-column {
+    flex-direction: column;
+    flex-grow: 1;
+    flex-basis: 0;
+    min-height: 0;
+}
+
+/* Правая панель — доля ширины окна, а не фиксированные 430 px:
+   при ресайзе шире/уже становится вместе с превью. min-width держит
+   кнопки читаемыми, потолка нет — на широком мониторе панель шире. */
+/* Ширину правого блока считает окно (`PreviewFit`): она равна ширине кадра
+   плюс отступы панели (6+6 и рамка — итого 13, число живёт в
+   `ArtStudioWindow.RightPanelChrome` и обязано совпадать с этим блоком).
+   Кадр держит пропорцию, поэтому его ширина — функция высоты, а не ширины
+   окна: доля окна оставляла кадр висеть в пустом поле. Здесь — только
+   стартовое значение до первого замера; `min-width` — тот же пол, что и в
+   `PreviewFit.MinPanelWidth`. */
+.panel-right {
+    width: 380px;
+    min-width: 160px;
+    flex-direction: column;
+    padding: 6px;
+    border-left-width: 1px;
+    border-left-color: rgb(20, 20, 20);
+}
+
+.fill {
+    flex-grow: 1;
+}
+
+.categories {
+    padding: 2px;
+    min-height: 120px;
+}
+
+.category-foldout {
+    margin-bottom: 2px;
+}
+
+/* Верхний уровень дерева: «Портреты», «Фоны», «На ревью». Отличается от
+   уровня типов, чтобы три уровня читались, а не сливались в один список. */
+.kind-foldout {
+    margin-bottom: 4px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(26, 26, 26);
+}
+
+.category-button {
+    -unity-text-align: middle-left;
+    height: 20px;
+    margin: 0;
+    padding: 0 6px;
+    font-size: 11px;
+    background-color: rgb(45, 45, 45);
+    border-width: 0;
+}
+
+.category-button:hover {
+    background-color: rgb(60, 60, 60);
+}
+
+.category-button-nocatalog {
+    color: rgb(160, 140, 100);
+}
+
+/* Подсветка выбранного пула или группы: без неё непонятно, почему в списке
+   кадров именно эти кадры. */
+.category-button-selected {
+    background-color: rgb(58, 74, 95);
+    color: rgb(220, 232, 255);
+}
+
+.panel-header {
+    -unity-font-style: bold;
+    font-size: 11px;
+    color: rgb(180, 180, 180);
+    padding: 4px 6px;
+    margin-top: 4px;
+}
+
+/* Очередь ревью — САМЫЙ ВЕРХНИЙ раздел левой панели, отдельной кнопкой, а не
+   фолдаутом: клик не раскрывает список (он мелкий и узкий), а открывает
+   кандидатов в центральной панели плитками с кнопкой «Принять» под каждым.
+   Наверх — потому что это самое срочное решение, и оно не должно тонуть под
+   сотней пулов дерева. */
+.review-section {
+    flex-shrink: 0;
+    height: 26px;
+    font-size: 12px;
+    margin: 4px;
+    padding: 0 8px;
+}
+
+/* Есть кандидаты, но очередь не открыта: кнопку видно и без разворота центра. */
+.review-has-items {
+    color: rgb(170, 200, 245);
+}
+
+/* Плитки кандидатов в центре. Ширина 2:3 держится картинкой (128×192), сам
+   контейнер чуть шире — вокруг рамка и отступы кнопок. */
+.review-grid {
+    flex-grow: 1;
+    padding: 4px;
+}
+
+.review-tile {
+    width: 152px;
+    flex-direction: column;
+    align-items: center;
+    margin: 4px;
+    padding: 6px;
+    background-color: rgb(38, 38, 38);
+    border-width: 1px;
+    border-color: rgb(60, 60, 60);
+}
+
+.review-tile-selected {
+    background-color: rgb(43, 51, 64);
+    border-color: rgb(90, 120, 160);
+}
+
+.review-tile-holder {
+    width: 128px;
+    height: 192px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(20, 20, 20);
+    border-width: 1px;
+    border-color: rgb(60, 60, 60);
+}
+
+.review-tile-image {
+    width: 128px;
+    height: 192px;
+}
+
+.review-tile-name {
+    width: 128px;
+    font-size: 13px;
+    color: rgb(220, 220, 220);
+    margin-top: 4px;
+    -unity-text-align: middle-center;
+}
+
+.review-tile-sub {
+    width: 128px;
+    font-size: 10px;
+    color: rgb(140, 140, 140);
+    margin-bottom: 4px;
+    -unity-text-align: middle-center;
+    -unity-text-overflow-position: end;
+}
+
+.review-tile .action {
+    width: 136px;
+    margin-bottom: 3px;
+}
+
+.review-empty {
+    font-size: 11px;
+    color: rgb(140, 140, 140);
+    padding: 6px 4px;
+    white-space: normal;
+}
+
+.frame-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 2px 4px;
+}
+
+.frame-row:hover {
+    background-color: rgb(48, 48, 48);
+}
+
+/* Миниатюра кадра — 2:3, как сам кадр (портрет 480×720, фон 856×480), и
+   показывается ЦЕЛИКОМ: раньше это был квадрат 48×48 с обрезкой по центру, и
+   портрет терял голову. Ширина 96 = вдвое против прежнего.
+   Масштаб задан в C# (`Image.scaleMode = ScaleToFit`): USS-свойства для него
+   в этой версии Unity нет, а незнакомое свойство молча игнорировалось. */
+.frame-thumb {
+    width: 96px;
+    height: 144px;
+    margin-right: 10px;
+}
+
+.frame-thumb-frame {
+    width: 96px;
+    height: 144px;
+    margin-right: 10px;
+    background-color: rgb(20, 20, 20);
+    border-width: 1px;
+    border-color: rgb(60, 60, 60);
+}
+
+.frame-text {
+    flex-grow: 1;
+}
+
+.frame-name {
+    font-size: 14px;
+    color: rgb(220, 220, 220);
+}
+
+.frame-sub {
+    font-size: 11px;
+    color: rgb(140, 140, 140);
+}
+
+.frame-badge {
+    font-size: 11px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 2px;
+    margin-left: 6px;
+}
+
+.badge-new {
+    color: rgb(150, 150, 150);
+}
+
+.badge-approved {
+    color: rgb(120, 200, 120);
+    background-color: rgb(35, 60, 35);
+}
+
+.badge-rejected {
+    color: rgb(235, 130, 130);
+    background-color: rgb(70, 35, 35);
+}
+
+.badge-nocatalog {
+    color: rgb(200, 180, 110);
+    background-color: rgb(60, 52, 30);
+}
+
+/* Кандидат — не кадр проекта: у него свой цвет бейджа, чтобы в одном списке
+   две сущности не читались как одна. */
+.badge-candidate {
+    color: rgb(160, 190, 235);
+    background-color: rgb(35, 48, 68);
+}
+
+/* Кадр всегда в своих пропорциях: 480x720 у портрета, 856x480 у фона.
+   Размер считает окно (`PreviewFit`) — ширину задаёт высота этого места.
+   Поэтому при ресайзе окно растёт и вбок, а не только вверх, и кадр не
+   растягивается; `min-height` держит пол: ниже кадр упёрся бы в высоту. */
+.preview-holder {
+    flex-grow: 1;
+    min-height: 220px;
+    margin-bottom: 6px;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview {
+    background-color: rgb(20, 20, 20);
+    border-width: 1px;
+    border-color: rgb(60, 60, 60);
+}
+
+.row-title {
+    font-size: 13px;
+    color: rgb(230, 230, 230);
+    margin-bottom: 2px;
+}
+
+.row-path {
+    font-size: 10px;
+    color: rgb(150, 150, 150);
+    margin-bottom: 2px;
+    -unity-text-overflow-position: end;
+}
+
+.row-status {
+    font-size: 11px;
+    color: rgb(190, 190, 190);
+    margin-bottom: 8px;
+}
+
+/* Группа действий = одно решение об одном объекте. Разделы отделены
+   заголовком, поэтому «Сгенерировать» (пул) не читается как «Одобрить» (кадр). */
+.action-group {
+    flex-direction: column;
+}
+
+.action {
+    margin-bottom: 4px;
+    height: 22px;
+}
+
+.action.primary {
+    background-color: rgb(58, 74, 95);
+}
+
+.reject {
+    background-color: rgb(90, 40, 40);
+}
+
+.secondary {
+    background-color: rgb(55, 55, 55);
+}
+
+.comment {
+    min-height: 60px;
+    font-size: 11px;
+}
+
+/* Нижняя панель — общие действия. Они не относятся ни к одному объекту в
+   списке, поэтому их место здесь, а не в панели выбранного кадра: помечают
+   несколько разных, а перегенерируют одним нажатием. */
+.bottom-panel {
+    flex-direction: column;
+    flex-shrink: 0;
+    border-top-width: 1px;
+    border-top-color: rgb(20, 20, 20);
+    padding: 0 6px;
+}
+
+.bottom-bar {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 4px 2px;
+}
+
+/* Область доп. мест раскрывается кнопкой в нижней панели и лежит НАД строкой
+   кнопок. Отдельная область, а не Foldout внутри строки: фолдаут в строке
+   растягивал её и налезал на кнопки. */
+.places-panel {
+    flex-direction: column;
+    flex-shrink: 0;
+    padding: 2px 0 4px 0;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(20, 20, 20);
+}
+
+.places-form {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.places-form .place-field {
+    width: 200px;
+    margin-right: 6px;
+    margin-bottom: 4px;
+}
+
+.statusbar {
+    flex-grow: 1;
+    padding: 3px 6px;
+    font-size: 11px;
+    color: rgb(200, 200, 200);
+    -unity-text-align: middle-right;
+}
+
+/* Плитка «＋ добавить кадры» — продолжение списка кадров пула, а не отдельная
+   форма: раньше добавление жило в левой панели полем «буквы», и было
+   непонятно, что это и к чему относится. */
+.add-row {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    height: 54px;
+    padding: 3px 4px;
+    border-top-width: 1px;
+    border-top-color: rgb(20, 20, 20);
+    background-color: rgb(38, 38, 38);
+}
+
+.add-plus {
+    width: 48px;
+    height: 48px;
+    margin-right: 8px;
+    font-size: 26px;
+    color: rgb(150, 190, 240);
+    -unity-text-align: middle-center;
+    background-color: rgb(28, 32, 38);
+    border-width: 1px;
+    border-color: rgb(70, 90, 115);
+}
+
+/* Группа стоит слева, а не разъезжается по всей ширине: с flex-grow подпись
+   уходила влево, а поле с кнопкой — за километр вправо, и строка читалась как
+   сломанная. */
+.add-text {
+    flex-grow: 0;
+    margin-right: 12px;
+}
+
+.add-count {
+    width: 58px;
+    margin-right: 6px;
+    margin-bottom: 0;
+}
+
+/* У поля количества нет подписи, но её элемент всё равно занимает место —
+   между текстом и полем оставалась щель. */
+.add-count .unity-base-field__label {
+    display: none;
+}
+
+/* Строка прогресса занимает место плитки «＋ Добавить кадры» на время
+   генерации. Устройство то же (строка над списком), поэтому кадры под ней не
+   прыгают. Высотой не даём сжиматься: иначе список выдавит её. */
+.generation-row {
+    flex-direction: column;
+    flex-shrink: 0;
+    padding: 6px 6px 8px 6px;
+    background-color: rgb(38, 38, 38);
+    border-top-width: 1px;
+    border-top-color: rgb(20, 20, 20);
+}
+
+.generation-head {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.generation-status {
+    flex-grow: 1;
+    -unity-text-align: middle-right;
+}
+
+.generation-bar {
+    height: 16px;
+}
+
+/* ProgressBar рисует свою полосу отдельным элементом; без явной ширины у
+   заголовка («0 %») место съедалось бы им целиком. */
+.generation-bar .unity-progress-bar__title {
+    min-width: 40px;
+    -unity-text-align: middle-center;
+}
+
+.problems {
+    padding: 0px 6px 4px 6px;
+    font-size: 10px;
+    color: rgb(230, 160, 120);
+    white-space: normal;
+}
+
+.extra-list {
+    max-height: 90px;
+}
+
+.extra-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 1px 2px;
+}
+
+.extra-row-name {
+    flex-grow: 1;
+    font-size: 10px;
+    color: rgb(200, 200, 200);
+    white-space: normal;
+}
+
+.extra-row-remove {
+    height: 18px;
+    font-size: 10px;
+    padding: 0 6px;
+    margin-left: 4px;
+    background-color: rgb(90, 40, 40);
+}
+
+.extra-row-generate {
+    height: 18px;
+    font-size: 10px;
+    padding: 0 6px;
+    margin-left: 4px;
+}
+
+.extra-empty {
+    font-size: 10px;
+    color: rgb(140, 140, 140);
+    padding: 2px;
+}
+
+.place-field {
+    margin-bottom: 2px;
+}
+
+.place-scene {
+    min-height: 54px;
+    font-size: 10px;
+    margin-bottom: 4px;
+}
+

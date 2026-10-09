@@ -8,7 +8,7 @@
 
 | Что | Версия | Как проверить |
 |---|---|---|
-| Unity Editor | `6000.6.3f1` | `ProjectSettings/ProjectVersion.txt` |
+| Unity Editor | `6000.6.5f1` | `ProjectSettings/ProjectVersion.txt` |
 | Unity Hub | любая актуальная | — |
 | Git | любая | `git --version` |
 | OpenCode | актуальная | `opencode --version` |
