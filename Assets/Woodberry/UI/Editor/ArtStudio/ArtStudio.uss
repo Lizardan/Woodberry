@@ -4,12 +4,213 @@
     background-color: rgb(32, 32, 32);
 }
 
+/* Верхняя строка окна — действия и фильтры. Стала выше и крупнее: это
+   первое, что видит человек, и раньше кнопки в 11 px было трудно читать. */
 .toolbar {
     flex-direction: row;
     align-items: center;
-    padding: 2px 4px;
+    padding: 4px 6px;
+    min-height: 32px;
     border-bottom-width: 1px;
     border-bottom-color: rgb(20, 20, 20);
+}
+
+.toolbar .unity-btn,
+.toolbar .unity-toolbar-button {
+    height: 26px;
+    font-size: 13px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.toolbar .unity-toolbar-menu,
+.toolbar .unity-toolbar-toggle {
+    height: 26px;
+    font-size: 12px;
+}
+
+.toolbar-search-field {
+    height: 24px;
+}
+
+.toolbar-sep {
+    width: 1px;
+    height: 20px;
+    margin: 0 6px;
+    background-color: rgb(58, 58, 58);
+}
+
+/* Точка состояния рядом с кнопкой: цвет говорит «подключён / нет» быстрее,
+   чем текст кнопки, которую надо прочитать. */
+.status-dot {
+    width: 10px;
+    height: 10px;
+    margin-left: 4px;
+    margin-right: 2px;
+    border-radius: 5px;
+    background-color: rgb(90, 90, 90);
+}
+
+.status-dot.is-on {
+    background-color: rgb(90, 200, 110);
+}
+
+.status-dot.is-busy {
+    background-color: rgb(230, 190, 90);
+}
+
+.status-dot.is-off {
+    background-color: rgb(190, 90, 90);
+}
+
+/* Кнопка «Генератор» — единственное, что осталось в верхней строке: она
+   открывает страницу генератора справа, где живут кнопки драйвера и сервера,
+   состояние стенда, прогресс и фильтры каталога. Крупнее прочих кнопок
+   тулбара: на неё теперь приходится весь вход в управление прогоном. */
+.generator-button {
+    height: 26px;
+    font-size: 13px;
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+/* Открытая страница генератора: кнопка показывает это состоянием, а не
+   позицией, — иначе непонятно, куда вернуться. */
+.generator-button-active {
+    background-color: rgb(58, 74, 95);
+    color: rgb(225, 235, 255);
+}
+
+/* Правая панель — две взаимоисключающие страницы: выбранный объект и
+   генератор. Обе занимают всю высоту блока, поэтому у обеих flex-grow. */
+.right-page {
+    flex-direction: column;
+    flex-grow: 1;
+    flex-basis: 0;
+    min-height: 0;
+}
+
+/* Страница генератора прокручивается: разделов пять, и на низком окне они
+   не помещаются. Объект прокручивать не нужно — там кадр и четыре подписи. */
+.generator-page {
+    flex-direction: column;
+}
+
+/* Раздел страницы генератора: заголовок плюс содержимое одной темы.
+   Разделы отделены рамкой — иначе список из десятка подписей читается
+   как одна простыня, и непонятно, где кончается прогресс и начинается
+   справочная сводка. */
+.gen-section {
+    flex-direction: column;
+    flex-shrink: 0;
+    padding: 6px 6px 8px 6px;
+    margin-bottom: 6px;
+    background-color: rgb(38, 38, 38);
+    border-width: 1px;
+    border-color: rgb(52, 52, 52);
+    border-radius: 3px;
+}
+
+.gen-section-title {
+    -unity-font-style: bold;
+    font-size: 11px;
+    color: rgb(170, 185, 210);
+    margin-bottom: 5px;
+    padding-bottom: 3px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(52, 52, 52);
+}
+
+.gen-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+/* Кнопки драйвера и сервера на странице — во всю ширину и крупнее тулбарных:
+   это первое, что читают, и текст в них длиннее («ComfyUI: не поднят»). */
+.gen-button {
+    flex-grow: 1;
+    height: 24px;
+    font-size: 12px;
+}
+
+/* Подпись над полосой прогресса: «Вся заявка» и «Текущий кадр». Без неё две
+   полосы подряд читаются как одна сломанная. */
+.gen-caption {
+    font-size: 11px;
+    color: rgb(170, 178, 190);
+    margin-top: 4px;
+    margin-bottom: 1px;
+}
+
+.gen-line {
+    font-size: 12px;
+    color: rgb(200, 200, 200);
+    margin-bottom: 3px;
+    white-space: normal;
+}
+
+/* Модель — то, чем рисуется кадр: её видно сразу, без чтения всей сводки. */
+.gen-strong {
+    font-size: 13px;
+    color: rgb(228, 232, 240);
+}
+
+.gen-wide {
+    margin-bottom: 4px;
+    height: 24px;
+    font-size: 12px;
+}
+
+.gen-search {
+    height: 24px;
+    margin-bottom: 0;
+}
+
+/* Оценка остатка — число, которое меняется постоянно и живёт отдельной
+   строкой от подписи фазы: смешивать их значило бы перерисовывать фазу
+   на каждой смене оценки. */
+.gen-eta {
+    font-size: 11px;
+    color: rgb(160, 180, 205);
+    margin-top: 2px;
+}
+
+.gen-title {
+    font-size: 13px;
+    color: rgb(228, 232, 240);
+    margin-bottom: 5px;
+    white-space: normal;
+}
+
+/* Строка «что происходит»: ошибка важнее лога, поэтому цвет читается как
+   предупреждение, а текст переносится — обрезанная причина хуже пустой. */
+.gen-activity {
+    font-size: 11px;
+    color: rgb(190, 205, 225);
+    white-space: normal;
+}
+
+/* Технический поток не должен конкурировать с текущей фазой. Показываем
+   только одну последнюю диагностическую строку, приглушённо и с переносом. */
+.gen-log {
+    font-size: 10px;
+    color: rgb(135, 145, 160);
+    white-space: normal;
+    margin-top: 2px;
+}
+
+/* Обёртка полосы прогресса: три полосы стоят в ряд в одном столбце, поэтому
+   обёртка просто держит высоту и отступ. Бегущей подсветки поверх полосы
+   больше нет — «работа идёт» показывает само плавное движение процента, а
+   второе движение поверх него было шумом. */
+.generation-bar-wrap {
+    flex-direction: row;
+    height: 18px;
+    margin-bottom: 2px;
 }
 
 .grow {
@@ -362,12 +563,17 @@
 
 /* Нижняя панель — общие действия. Они не относятся ни к одному объекту в
    списке, поэтому их место здесь, а не в панели выбранного кадра: помечают
-   несколько разных, а перегенерируют одним нажатием. */
+   несколько разных, а перегенерируют одним нажатием.
+
+   Живёт ВНУТРИ центрального блока, а не отдельной полосой окна: раньше она
+   тянулась под всеми тремя колонками и читалась как чужая створка. Теперь
+   она шириной ровно с центр, и правый кадр с левым деревом её не касаются. */
 .bottom-panel {
     flex-direction: column;
     flex-shrink: 0;
     border-top-width: 1px;
     border-top-color: rgb(20, 20, 20);
+    background-color: rgb(36, 36, 36);
     padding: 0 6px;
 }
 
@@ -455,31 +661,25 @@
     display: none;
 }
 
-/* Строка прогресса занимает место плитки «＋ Добавить кадры» на время
-   генерации. Устройство то же (строка над списком), поэтому кадры под ней не
-   прыгают. Высотой не даём сжиматься: иначе список выдавит её. */
-.generation-row {
-    flex-direction: column;
-    flex-shrink: 0;
-    padding: 6px 6px 8px 6px;
-    background-color: rgb(38, 38, 38);
-    border-top-width: 1px;
-    border-top-color: rgb(20, 20, 20);
-}
-
-.generation-head {
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 4px;
-}
-
-.generation-status {
-    flex-grow: 1;
-    -unity-text-align: middle-right;
-}
-
+/* Полоса прогресса — ОДНА на окно. Раньше их было две (в центре и в верхней
+   панели), и человек видел два разных числа об одном и том же прогоне. */
 .generation-bar {
+    flex-grow: 1;
     height: 16px;
+}
+
+/* Все три полосы — одной высоты. Тонкая третья выглядела «деталью внутри
+   кадра», но три разные высоты подряд читались как три разных прибора, и
+   глаз переставал доверять цифре у самой мелкой. Различать их — подписью и
+   порядком, а не размером. */
+
+/* Подпись фазы кадра: «шаг 4/10». Отдельной строкой под полосой, потому что
+   это самая изменчивая часть, и втискивать её в строку статуса значило бы
+   дёргать заголовок на каждом шаге сэмплера. */
+.generation-phase {
+    font-size: 12px;
+    color: rgb(165, 190, 225);
+    margin-top: 3px;
 }
 
 /* ProgressBar рисует свою полосу отдельным элементом; без явной ширины у
@@ -489,11 +689,175 @@
     -unity-text-align: middle-center;
 }
 
+/* ------------------------------------------------------- ВКЛАДКИ СПРАВА
+   Три вкладки делят одну колонку, поэтому выглядят как сегменты одного
+   переключателя: нет рамок между ними, общая нижняя линия, и активный
+   заливается. По отдельности закруглённая кнопка на каждой шаге читалась
+   бы как три кнопки, а не как один переключатель. */
+.right-tabs {
+    flex-direction: row;
+    margin: 0px 0px 4px 0px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(58, 66, 80);
+}
+
+.right-tab {
+    flex-grow: 1;
+    height: 24px;
+    margin: 0px;
+    border-radius: 0px;
+    border-width: 0px;
+    background-color: rgba(0, 0, 0, 0);
+    color: rgb(150, 162, 180);
+    font-size: 11px;
+}
+
+.right-tab:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+.right-tab.is-active {
+    background-color: rgba(255, 255, 255, 0.07);
+    color: rgb(235, 240, 250);
+}
+
+/* --------------------------------------------------- СТРАНИЦА «ПРОМПТЫ» */
+.prompts-page {
+    padding: 0px 6px 6px 6px;
+}
+
+.prompts-toolbar {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.prompts-search {
+    flex-grow: 1;
+}
+
+.prompts-search .unity-base-text-field__input {
+    font-size: 11px;
+}
+
+.prompts-refresh {
+    width: 78px;
+    margin-left: 4px;
+    font-size: 11px;
+}
+
+/* Группа раскрывается целиком: 112 персонажей нельзя показывать списком,
+   а искать по одной группе удобнее, чем по всему дереву. */
+.prompt-group-title {
+    font-size: 11px;
+    color: rgb(150, 162, 180);
+    margin-top: 6px;
+    margin-bottom: 2px;
+    -unity-font-style: bold;
+}
+
+.prompt-item-title {
+    font-size: 11px;
+    color: rgb(215, 225, 240);
+    margin-top: 4px;
+}
+
+.prompt-item-meta {
+    font-size: 10px;
+    color: rgb(130, 145, 165);
+}
+
+.prompt-item-text {
+    font-size: 11px;
+    color: rgb(185, 198, 216);
+    white-space: normal;
+    margin-left: 6px;
+    padding-left: 6px;
+    border-left-width: 2px;
+    border-left-color: rgb(64, 74, 90);
+}
+
+.prompt-copy {
+    margin: 2px 0px 2px 0px;
+    font-size: 10px;
+    align-self: flex-start;
+}
+
+/* Сводка стенда: по строке на «Модель: …», «LoRA: …». Раньше это был один
+   Label со склейкой через «·» — пять длинных описаний в одну строку, в
+   которой не найти нужное. */
+.gen-model-list {
+    margin-bottom: 2px;
+}
+
+.gen-model-line {
+    font-size: 11px;
+    color: rgb(200, 212, 228);
+    white-space: normal;
+}
+
+.gen-model-empty {
+    font-size: 11px;
+    color: rgb(150, 162, 180);
+    font-style: italic;
+}
+
 .problems {
     padding: 0px 6px 4px 6px;
     font-size: 10px;
     color: rgb(230, 160, 120);
     white-space: normal;
+}
+
+/* Список кадров заявки. Слева — точка состояния, дальше подпись кадра и
+   его процент. Точка нужна, чтобы «ждёт» и «рисуется» читались с одного
+   взгляда, а не по оттенку серого. */
+.job-list {
+    margin-top: 4px;
+    padding: 0px 6px 2px 6px;
+}
+
+.job-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 1px 0px;
+}
+
+.job-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    margin-right: 6px;
+    background-color: rgb(110, 125, 145);
+}
+
+.job-row-current .job-dot {
+    background-color: rgb(235, 190, 110);
+}
+
+.job-row-done .job-dot {
+    background-color: rgb(130, 200, 140);
+}
+
+.job-row-failed .job-dot {
+    background-color: rgb(230, 120, 110);
+}
+
+.job-name {
+    flex-grow: 1;
+    font-size: 11px;
+    color: rgb(200, 212, 228);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.job-row-current .job-name {
+    color: rgb(245, 232, 200);
+}
+
+.job-state {
+    font-size: 10px;
+    color: rgb(150, 165, 185);
 }
 
 .extra-list {

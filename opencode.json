@@ -11,20 +11,6 @@
         "docs/specs/code-review-flow.md"
     ],
     "model": "opencode/big-pickle",
-    "mcp": {
-        "unityMCP": {
-            "type": "local",
-            "command": [
-                "uvx",
-                "--from",
-                "mcpforunityserver==10.3.0",
-                "mcp-for-unity",
-                "--transport",
-                "stdio"
-            ],
-            "enabled": true
-        }
-    },
     "permission": {
         "skill": {
             "*": "deny",

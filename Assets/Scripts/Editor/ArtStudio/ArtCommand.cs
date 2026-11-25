@@ -23,6 +23,13 @@ namespace Woodberry.Editor.ArtStudio
         public const string ServerStart = "server_start";
         public const string ServerStop = "server_stop";
         public const string Catalog = "catalog";
+
+        /// <summary>
+        /// Запрос промптов стенда для вкладки «Промпты». Отдельная команда,
+        /// а не часть каталога: промпты весят заметно больше каталога и нужны
+        /// не всегда.
+        /// </summary>
+        public const string Prompts = "prompts";
         public const string Generate = "generate";
         public const string Approve = "approve";
         public const string Reject = "reject";

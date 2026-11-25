@@ -29,6 +29,61 @@ namespace Woodberry.Editor.ArtStudio
         public string LastLog { get; private set; }
 
         /// <summary>
+        /// Сводка стенда из <c>driver_info</c>: модель, энкодер, VAE, сэмплер.
+        /// Пусто, пока ни один прогон не отдал свою шапку.
+        /// </summary>
+        public string StandInfo { get; private set; }
+
+        /// <summary>
+        /// Сводка стенда по строкам: «Модель: …», «LoRA: …», «Энкодер: …».
+        ///
+        /// Склеенная в одну строку через «·» версия нечитаема: пять длинных
+        /// описаний в одну строку — это простыня, в которой не найти нужное.
+        /// Новый драйвер присылает готовый JSON-массив; старый присылает только
+        /// склейку, и тогда она режется по «·» — приёмлемо, потому что сами
+        /// значения не содержат этого символа.
+        /// </summary>
+        public string[] StandInfoLines { get; private set; } = Array.Empty<string>();
+
+        /// <summary>
+        /// Промпты стенда последним ответом на команду <c>prompts</c>. Строка
+        /// JSON, а не разобранный объект: разбор принадлежит вкладке, и в
+        /// состоянии драйвера ему не место. Пусто — стенд ещё не спрашивали
+        /// или он не ответил.
+        /// </summary>
+        public string PromptsJson { get; private set; }
+
+        /// <summary>
+        /// Этап работы прогона, который кадру не принадлежит: вырезка фона,
+        /// проверка, приёмка. Именно эти этапы раньше были «молчанием» на
+        /// десятки секунд, и без них прогресс выглядел зависшим.
+        /// </summary>
+        public string StandStage { get; private set; }
+
+        /// <summary>Сколько единиц текущего этапа прогона сделано.</summary>
+        public int StandStageDone { get; private set; }
+
+        /// <summary>Сколько единиц в текущем этапе прогона всего.</summary>
+        public int StandStageTotal { get; private set; }
+
+        /// <summary>Пояснение к этапу: имя файла или кадра.</summary>
+        public string StandStageText { get; private set; }
+
+        /// <summary>
+        /// Новая заявка — значит этапа прогона пока нет. Без сброса окно
+        /// показало бы «Вырезка фона: 118 из 118» секунду после старта новой
+        /// генерации: события от прошлого прогона живут в состоянии, а не
+        /// приходят заново.
+        /// </summary>
+        public void ResetStandStage()
+        {
+            StandStage = null;
+            StandStageDone = 0;
+            StandStageTotal = 0;
+            StandStageText = null;
+        }
+
+        /// <summary>
         /// Пути, перенесённые драйвером в проект с прошлого опроса. Окно по ним
         /// обновляет ассеты И отмечает кадры принятыми: раз человек кадр
         /// принял, отдельная кнопка «одобрить» ему уже не нужна.
@@ -110,18 +165,44 @@ namespace Woodberry.Editor.ArtStudio
                     ApplyCatalog(ev.detail);
                     break;
 
+                case ArtEvent.Prompts:
+                    PromptsJson = ev.detail;
+                    break;
+
                 case ArtEvent.ItemAdded:
                     Jobs.Enqueue(ev.id, ev.pool, KindOf(ev.pool, ev.id), ev.label);
                     break;
 
                 case ArtEvent.ItemProgress:
-                    // Драйвер генерирует последовательно. Первое событие
-                    // прогресса означает, что задание встало в работу.
-                    if (Jobs.Running == null)
+                    // Задание встаёт в работу САМО, по своему stand-id. Раньше
+                    // здесь стояло `if (Jobs.Running == null) StartNext()`:
+                    // текущим объявлялся первый незанятый кадр, а не тот, за
+                    // которым стенд реально рисует, — и полоса текущего кадра
+                    // прибивалась к первому кадру на весь прогон.
+                    Jobs.SetProgress(ev.id, ev.percent, ev.text, ev.stage);
+                    break;
+
+                case ArtEvent.ItemDrawn:
+                    Jobs.MarkDrawn(ev.id);
+                    break;
+
+                case ArtEvent.ItemStage:
+                    StandStage = ev.stage;
+                    StandStageDone = ev.done;
+                    StandStageTotal = ev.total;
+                    StandStageText = ev.text;
+                    break;
+
+                case ArtEvent.DriverInfo:
+                    // Сводка стенда: модель, кодировщик, сэмплер. Показывается
+                    // в панели состояния, чтобы человек видел, ЧЕМ рисуется
+                    // кадр, не открывая лог стенда.
+                    if (!string.IsNullOrEmpty(ev.text))
                     {
-                        Jobs.StartNext();
+                        StandInfo = ev.text;
                     }
-                    Jobs.SetProgress(ev.id, ev.percent);
+
+                    StandInfoLines = ParseInfoLines(ev.detail, ev.text);
                     break;
 
                 case ArtEvent.ItemDone:
@@ -235,6 +316,53 @@ namespace Woodberry.Editor.ArtStudio
             }
         }
 
+        /// <summary>
+        /// Строки сводки стенда. Новый драйвер присылает JSON-массив, старый —
+        /// одну склейку через «·». Оба приводятся к списку строк, потому что
+        /// окно показывает их по одной.
+        /// </summary>
+        private static string[] ParseInfoLines(string detail, string text)
+        {
+            if (!string.IsNullOrWhiteSpace(detail))
+            {
+                try
+                {
+                    var wrapper = JsonUtility.FromJson<DriverInfoDto>(
+                        "{\"lines\":" + detail + "}");
+                    if (wrapper?.lines != null)
+                    {
+                        return wrapper.lines;
+                    }
+                }
+                catch (Exception)
+                {
+                    // Ниже есть запасной путь — резать склейку.
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return Array.Empty<string>();
+            }
+
+            // Обрезка обязательна: стенд склеивает через «·» с пробелами, и без
+            // неё каждая строка панели начиналась бы с отступа, а сравнение
+            // «Энкодер: …» с эталоном не проходило.
+            string[] parts = text.Split(new[] { "·" },
+                StringSplitOptions.RemoveEmptyEntries);
+            var lines = new List<string>();
+            foreach (string part in parts)
+            {
+                string trimmed = part.Trim();
+                if (trimmed.Length > 0)
+                {
+                    lines.Add(trimmed);
+                }
+            }
+
+            return lines.ToArray();
+        }
+
         private static ArtAssetKind KindOf(string pool, string id)
         {
             string probe = !string.IsNullOrEmpty(pool) ? pool : id;
@@ -250,6 +378,12 @@ namespace Woodberry.Editor.ArtStudio
             public string kind;
             public string[] all;
             public string[] free;
+        }
+
+        [Serializable]
+        private sealed class DriverInfoDto
+        {
+            public string[] lines;
         }
 
         [Serializable]

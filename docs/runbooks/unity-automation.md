@@ -10,7 +10,7 @@ Unity MCP установлен и проверен фактическими вы
 | Зависимость | ветка `#main` — версия плавает, фиксирует её только lockfile |
 | Резолв в lockfile | `aa5fc638d623f56178d50329d9ad8c541a57fe66` |
 | Python-сервер | `mcpforunityserver==10.3.0`, транспорт `stdio` |
-| Конфиг | `opencode.json` → секция `mcp.unityMCP` (в репозитории) |
+| Конфиг | глобальный `~/.config/opencode/opencode.json` → `mcp.unityMCP` |
 | Инстанс | `Woodberry@93447b6f`, порт `6400` (клиент ищет порт сам) |
 | Unity | `6000.6.5f1` |
 | Активная сцена | `Assets/Scenes/Bootstrap.unity` |

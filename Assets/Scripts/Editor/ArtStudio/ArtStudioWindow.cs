@@ -94,8 +94,7 @@ namespace Woodberry.Editor.ArtStudio
         private Button _refreshButton;
         private ScrollView _categories;
         private ListView _frames;
-        private ToolbarButton _driverButton;
-        private ToolbarButton _serverButton;
+        private ToolbarButton _standButton;
         private Button _regenButton;
         private VisualElement _addRow;
         private Label _addHint;
@@ -206,11 +205,143 @@ namespace Woodberry.Editor.ArtStudio
         private Label _reviewHeader;
         private ScrollView _reviewGrid;
 
-        /// <summary>Строка прогресса генерации: занимает место плитки добавления.</summary>
-        private VisualElement _generationRow;
+        /// <summary>Полоса прогресса ВСЕЙ заявки.</summary>
         private ProgressBar _generationBar;
+
+        /// <summary>Полоса прогресса ТЕКУЩЕГО КАДРА. Вторая, а не вторая по счёту:
+        /// на четырёх кадрах общий процент идёт рывками по 25, и без отдельной
+        /// полосы кадра видно только эти рывки. Сбрасывается в ноль на каждом
+        /// новом кадре — прогон обязан пройти её от 0 до 100 столько раз,
+        /// сколько кадров заказано.</summary>
+        private ProgressBar _frameBar;
+
+        /// <summary>Полоса прогресса ТЕКУЩЕГО ЭТАПА: вырезка, проверка,
+        /// приёмка. Этап — самый мелкий шаг, и именно он раньше был молчанием
+        /// на десятки секунд.</summary>
+        private ProgressBar _stageBar;
+
         private Label _generationTitle;
         private Label _generationStatus;
+        private Label _generationLog;
+        private Label _generationPhase;
+        private Label _generationEta;
+        private Label _overallCaption;
+        private Label _frameCaption;
+        private Label _stageCaption;
+
+        /// <summary>
+        /// Список кадров заявки со статусами. Полосы показывают числа, а не
+        /// ответ на вопрос «что сейчас рисуется, а что ещё ждёт», — а это
+        /// ровно то, чего не хватало, чтобы прогон не выглядел зависшим.
+        /// </summary>
+        private VisualElement _jobList;
+
+        /// <summary>
+        /// Метка последнего события ЭТАПА. Отдельно от <c>_progressSignature</c>:
+        /// смена этапа обнуляет отсчёт молчания, иначе новый этап стартовал бы
+        /// с подписи «подвисает».
+        /// </summary>
+        private string _stageSignature;
+
+        private double _stageChangedAt;
+
+        // ---- страница «Генератор» в правой панели ----
+        // Кнопки драйвера и сервера, состояние стенда, прогресс и фильтры
+        // Правая панель — три вкладки, а не две страницы. Раньше генератор
+        // открывался кнопкой в шапке ОКНА, а внутри колонки жили только
+        // «объект» и «генератор»; промпты, ради которых человек и открывает
+        // студию, показывать было негде. Вкладки стоят в колонке, которой и
+        // принадлежат: они переключают её содержимое, а не всё окно.
+
+        private Button _tabObject;
+        private Button _tabPrompts;
+        private Button _tabGenerator;
+        private VisualElement _detailPanel;
+        private VisualElement _promptsPanel;
+        private VisualElement _generatorPanel;
+
+        private VisualElement _promptsTree;
+        private TextField _promptsSearch;
+        private Button _promptsRefresh;
+        private Label _promptsStatus;
+
+        /// <summary>Промпты стенда, разобранные из ответа драйвера.</summary>
+        private ArtPrompts _prompts;
+
+        /// <summary>
+        /// Подпись последнего разобранного JSON. Промпты весят ~60 КБ, и
+        /// разбирать их на каждом опросе (раз в 150 мс) означало бы жечь
+        /// время впустую: стенд отвечает только по запросу.
+        /// </summary>
+        private string _promptsSignature;
+
+        /// <summary>Правая панель открыта на странице генератора, а не объекта.</summary>
+        private bool _generatorOpen => _rightPage == RightPage.Generator;
+
+        /// <summary>Какая вкладка правой панели открыта.</summary>
+        private RightPage _rightPage = RightPage.Object;
+
+        /// <summary>
+        /// Три вкладки правой панели. Перечисление, а не три bool: состояние
+        /// «открыты две сразу» при трёх флагах не выражается, а выглядит
+        /// именно так при первой же правке.
+        /// </summary>
+        private enum RightPage
+        {
+            Object,
+            Prompts,
+            Generator,
+        }
+
+        private VisualElement _driverDot;
+        private VisualElement _serverDot;
+        private Label _infoDriver;
+        private Label _infoServer;
+        private VisualElement _infoModel;
+        private Label _infoStyle;
+        private Label _infoPools;
+        private Label _infoFree;
+        private Label _infoPoolFree;
+        private Label _infoQueue;
+        private Label _infoActivity;
+
+        /// <summary>
+        /// Когда прогресс текущего кадра сменился последний раз. По этому
+        /// времени окно понимает, идёт ли работа «внутри шага» (загрузка
+        /// моделей, шаг сэмплера) и надо ли показать бегущую подсветку полосы.
+        /// </summary>
+        private double _progressChangedAt;
+
+        /// <summary>Подпись последнего известного прогресса — по ней ловим смену.</summary>
+        private string _progressSignature;
+
+        /// <summary>
+        /// Видимое значение полосы «Текущий этап». Настоящий процент живёт в
+        /// состоянии, а полоса едет к нему плавно — см. <see cref="GenerationProgress.Eased"/>.
+        /// </summary>
+        private float _shownOverall;
+
+        private float _shownFrame;
+        private float _shownStage;
+
+        /// <summary>
+        /// Кадр, для которого считается плавное значение. При смене кадра
+        /// показанные значения обнуляются мгновенно: анимация нужна внутри
+        /// кадра, а перенос процентов предыдущего кадра на новый читался бы
+        /// как «почти готов» до того, как стенд к нему приступил.
+        /// </summary>
+        private string _shownFrameId;
+
+        private string _shownStageKey;
+
+        /// <summary>Настоящие значения, к которым едут видимые полосы.</summary>
+        private float _overallTarget;
+
+        private float _frameTarget;
+        private float _stageTarget;
+
+        /// <summary>Метка прошлого тика — из неё берётся шаг плавности.</summary>
+        private double _lastTickAt = -1;
 
         /// <summary>Было ли в прошлом опросе живое задание — ловим переход «идёт → готово».</summary>
         private bool _wasGenerating;
@@ -224,6 +355,16 @@ namespace Woodberry.Editor.ArtStudio
         /// исчез — человек не успел бы увидеть, что прогон кончился успешно.
         /// </summary>
         private double _generationLingerUntil;
+
+        /// <summary>
+        /// Что делает кнопка «Стенд»: ничего, поднимает, работает, гасит.
+        /// Переходы считает <see cref="StandControl"/> — здесь только память
+        /// о текущем состоянии и сроке.
+        /// </summary>
+        private StandPhase _standPhase = StandPhase.Down;
+
+        /// <summary>Срок текущего перехода (время редактора). 0 — бессрочно.</summary>
+        private double _standDeadline;
 
         [MenuItem("Woodberry/Art Studio")]
         internal static void Open()
@@ -302,8 +443,7 @@ namespace Woodberry.Editor.ArtStudio
             _refreshButton = rootVisualElement.Q<Button>("refresh");
             _categories = rootVisualElement.Q<ScrollView>("categories");
             _frames = rootVisualElement.Q<ListView>("frames");
-            _driverButton = rootVisualElement.Q<ToolbarButton>("driverButton");
-            _serverButton = rootVisualElement.Q<ToolbarButton>("serverButton");
+            _standButton = rootVisualElement.Q<ToolbarButton>("standButton");
             _regenButton = rootVisualElement.Q<Button>("regenMarked");
             _addRow = rootVisualElement.Q<VisualElement>("addRow");
             _addHint = rootVisualElement.Q<Label>("addHint");
@@ -314,10 +454,45 @@ namespace Woodberry.Editor.ArtStudio
             _reviewPanel = rootVisualElement.Q<VisualElement>("reviewPanel");
             _reviewHeader = rootVisualElement.Q<Label>("reviewHeader");
             _reviewGrid = rootVisualElement.Q<ScrollView>("reviewGrid");
-            _generationRow = rootVisualElement.Q<VisualElement>("generationRow");
             _generationBar = rootVisualElement.Q<ProgressBar>("generationBar");
+            _frameBar = rootVisualElement.Q<ProgressBar>("frameBar");
+            _stageBar = rootVisualElement.Q<ProgressBar>("stageBar");
             _generationTitle = rootVisualElement.Q<Label>("generationTitle");
             _generationStatus = rootVisualElement.Q<Label>("generationStatus");
+            _generationLog = rootVisualElement.Q<Label>("generationLog");
+            _generationPhase = rootVisualElement.Q<Label>("generationPhase");
+            _generationEta = rootVisualElement.Q<Label>("generationEta");
+            _overallCaption = rootVisualElement.Q<Label>("overallCaption");
+            _frameCaption = rootVisualElement.Q<Label>("frameCaption");
+            _stageCaption = rootVisualElement.Q<Label>("stageCaption");
+            _jobList = rootVisualElement.Q<VisualElement>("jobList");
+
+            _tabObject = rootVisualElement.Q<Button>("tabObject");
+            _tabPrompts = rootVisualElement.Q<Button>("tabPrompts");
+            _tabGenerator = rootVisualElement.Q<Button>("tabGenerator");
+            _detailPanel = rootVisualElement.Q<VisualElement>("detailPanel");
+            _promptsPanel = rootVisualElement.Q<VisualElement>("promptsPanel");
+            _generatorPanel = rootVisualElement.Q<VisualElement>("generatorPanel");
+            _promptsTree = rootVisualElement.Q<VisualElement>("promptsTree");
+            _promptsSearch = rootVisualElement.Q<TextField>("promptsSearch");
+            _promptsRefresh = rootVisualElement.Q<Button>("promptsRefresh");
+            _promptsStatus = rootVisualElement.Q<Label>("promptsStatus");
+            if (_promptsSearch != null)
+            {
+                _promptsSearch.tooltip = "Поиск по всем разделам промптов";
+            }
+
+            _driverDot = rootVisualElement.Q<VisualElement>("driverDot");
+            _serverDot = rootVisualElement.Q<VisualElement>("serverDot");
+            _infoDriver = rootVisualElement.Q<Label>("infoDriver");
+            _infoServer = rootVisualElement.Q<Label>("infoServer");
+            _infoModel = rootVisualElement.Q<VisualElement>("infoModel");
+            _infoStyle = rootVisualElement.Q<Label>("infoStyle");
+            _infoPools = rootVisualElement.Q<Label>("infoPools");
+            _infoFree = rootVisualElement.Q<Label>("infoFree");
+            _infoPoolFree = rootVisualElement.Q<Label>("infoPoolFree");
+            _infoQueue = rootVisualElement.Q<Label>("infoQueue");
+            _infoActivity = rootVisualElement.Q<Label>("infoActivity");
             _placesPanel = rootVisualElement.Q<VisualElement>("placesPanel");
             _placesToggle = rootVisualElement.Q<Button>("placesToggle");
             _placeList = rootVisualElement.Q<ScrollView>("placeList");
@@ -331,8 +506,16 @@ namespace Woodberry.Editor.ArtStudio
         private void WireEvents()
         {
             _refreshButton.clicked += LoadState;
-            _driverButton.clicked += ToggleDriver;
-            _serverButton.clicked += ToggleServer;
+            _standButton.clicked += ToggleStand;
+            _tabObject.clicked += () => SetRightPage(RightPage.Object);
+            _tabPrompts.clicked += () => SetRightPage(RightPage.Prompts);
+            _tabGenerator.clicked += () => SetRightPage(RightPage.Generator);
+            _promptsRefresh.clicked += RequestPromptsNow;
+            if (_promptsSearch != null)
+            {
+                _promptsSearch.RegisterValueChangedCallback(_ =>
+                    RenderPrompts(_promptsSearch.value));
+            }
             _addButton.clicked += AddVariants;
             _regenButton.clicked += RegenerateMarked;
             _regenButton.SetEnabled(false);
@@ -416,8 +599,392 @@ namespace Woodberry.Editor.ArtStudio
             _generationBar.lowValue = 0f;
             _generationBar.highValue = 100f;
             _generationBar.value = 0f;
-            _generationRow.style.display = DisplayStyle.None;
+            _frameBar.lowValue = 0f;
+            _frameBar.highValue = 100f;
+            _frameBar.value = 0f;
+            _stageBar.lowValue = 0f;
+            _stageBar.highValue = 100f;
+            _stageBar.value = 0f;
             _reviewPanel.style.display = DisplayStyle.None;
+
+            // По умолчанию правая панель показывает объект: с него начинается
+            // работа, а генератор и промпты открывают вкладками.
+            SetRightPage(RightPage.Object);
+
+            // Полосы движются планировщиком окна: UI Toolkit сам не анимирует,
+            // а держать для этого отдельный поток незачем.
+            rootVisualElement.schedule.Execute(TickBars).Every(80);
+        }
+
+        /// <summary>
+        /// Переключает вкладку правой панели.
+        ///
+        /// Вкладки взаимоисключающие и занимают одну колонку: держать их
+        /// рядом значило бы делить высоту, которой и так не хватает на кадр.
+        /// Заголовок вкладки подсвечивается, а не меняет текст на «назад» —
+        /// переключатель с именами вкладок читается однозначнее кнопки,
+        /// которая называет действие.
+        /// </summary>
+        private void SetRightPage(RightPage page)
+        {
+            _rightPage = page;
+
+            _detailPanel.style.display =
+                page == RightPage.Object ? DisplayStyle.Flex : DisplayStyle.None;
+            _promptsPanel.style.display =
+                page == RightPage.Prompts ? DisplayStyle.Flex : DisplayStyle.None;
+            _generatorPanel.style.display =
+                page == RightPage.Generator ? DisplayStyle.Flex : DisplayStyle.None;
+
+            _tabObject.EnableInClassList("is-active", page == RightPage.Object);
+            _tabPrompts.EnableInClassList("is-active", page == RightPage.Prompts);
+            _tabGenerator.EnableInClassList("is-active", page == RightPage.Generator);
+
+            // Вернулись к объекту — обновляем его описание: пока показывали
+            // генератор, выбор мог измениться (или он пуст).
+            if (page == RightPage.Object)
+            {
+                UpdateDetailPanel();
+            }
+
+            if (page == RightPage.Prompts)
+            {
+                // Промпты спрашиваются у стенда, а не лежат в проекте: иначе
+                // вкладка показывала бы то, чем рисует ВЧЕРА. Запрашиваем при
+                // каждом входе — стенд ответит мгновенно, а данные всегда свежие.
+                RequestPromptsNow();
+            }
+
+            LayoutPreview();
+        }
+
+        /// <summary>Просит у драйвера промпты стенда.</summary>
+        private void RequestPromptsNow()
+        {
+            _promptsSignature = null;
+            if (_client != null)
+            {
+                _client.RequestPrompts();
+            }
+
+            SetPromptStatus("Запрашиваю промпты у стенда…");
+        }
+
+        private void SetPromptStatus(string text)
+        {
+            if (_promptsStatus != null && _promptsStatus.text != text)
+            {
+                _promptsStatus.text = text;
+            }
+        }
+
+        /// <summary>
+        /// Разбирает ответ стенда и рисует страницу промптов.
+        ///
+        /// Вызывается на каждом опросе, но разбирает только когда ответ
+        /// изменился: стенд не шлёт промпты сам, а JSON весит ~60 КБ, и
+        /// разбор на каждом тике (раз в 150 мс) жег бы время впустую.
+        /// </summary>
+        private void UpdatePrompts(ArtDriverState state)
+        {
+            string json = state.PromptsJson;
+            if (string.IsNullOrEmpty(json))
+            {
+                return;
+            }
+
+            if (json == _promptsSignature)
+            {
+                return;
+            }
+
+            _promptsSignature = json;
+
+            if (!ArtPrompts.TryParse(json, out ArtPrompts prompts))
+            {
+                _prompts = null;
+                SetPromptStatus("Стенд ответил промптами, которые не разобрались");
+                RenderPrompts(null);
+                return;
+            }
+
+            _prompts = prompts;
+            SetPromptStatus(string.Empty);
+            RenderPrompts(_promptsSearch != null ? _promptsSearch.value : string.Empty);
+        }
+
+        /// <summary>
+        /// Рисует промпты по разделам. Раскладка повторяет `scene.py`: стиль,
+        /// свет, негатив, персонажи, места, параметры — те же разрезы, по
+        /// которым промпт собирается на стенде.
+        ///
+        /// Списки свёрнуты в группы: 112 персонажей это не «посмотреть», а
+        /// «найти одного». Поиск раскрывает группы с совпадением и прячет
+        /// остальные — иначе на 112 записях он бесполезен.
+        /// </summary>
+        private void RenderPrompts(string query)
+        {
+            if (_promptsTree == null)
+            {
+                return;
+            }
+
+            _promptsTree.Clear();
+
+            if (_prompts == null)
+            {
+                var empty = new Label(
+                    "Промпты не загружены. Открой вкладку «Промпты», когда драйвер поднят.");
+                empty.AddToClassList("prompt-item-text");
+                _promptsTree.Add(empty);
+                return;
+            }
+
+            string filter = (query ?? string.Empty).Trim();
+            bool filtering = filter.Length > 0;
+
+            // --- Стиль
+            var styleGroup = BeginGroup("Стиль рисунка", filtering);
+            foreach (PromptStyle style in _prompts.Styles)
+            {
+                if (filtering && !Matches(filter, style.key, style.text))
+                {
+                    continue;
+                }
+
+                styleGroup.Add(PromptText($"{style.key}\n{style.text}", style.key));
+            }
+            EndGroup(styleGroup, filtering, "Стиль");
+
+            // --- Свет
+            var lightGroup = BeginGroup("Свет", filtering);
+            foreach (PromptLight light in _prompts.Lights)
+            {
+                if (filtering && !Matches(filter, light.key, light.text))
+                {
+                    continue;
+                }
+
+                lightGroup.Add(PromptText($"{light.key}\n{light.text}", light.key));
+            }
+            EndGroup(lightGroup, filtering, "Свет");
+
+            // --- Негатив
+            var negGroup = BeginGroup("Негативный промпт", filtering);
+            if (!filtering
+                || Matches(filter, "общий", _prompts.NegativeCommon))
+            {
+                negGroup.Add(PromptText(_prompts.NegativeCommon, "негатив общий"));
+            }
+            if (!filtering
+                || Matches(filter, "фон", _prompts.NegativeBackground))
+            {
+                negGroup.Add(PromptText(
+                    _prompts.NegativeBackground, "негатив фонов"));
+            }
+            EndGroup(negGroup, filtering, "Негатив");
+
+            // --- Персонажи
+            var charGroup = BeginGroup(
+                $"Персонажи ({_prompts.Characters.Length})", filtering);
+            foreach (PromptCharacter ch in _prompts.Characters)
+            {
+                if (filtering && !Matches(filter, ch.id, ch.name, ch.light,
+                        ch.pose, ch.subject))
+                {
+                    continue;
+                }
+
+                charGroup.Add(PromptItemTitle($"{ch.name} · {ch.id}", ch.light));
+                charGroup.Add(PromptText(ch.pose, $"{ch.id}: поза"));
+                charGroup.Add(PromptText(ch.subject, $"{ch.id}: описание"));
+            }
+            EndGroup(charGroup, filtering, "Персонажи");
+
+            // --- Места
+            var bgGroup = BeginGroup($"Места ({_prompts.Backgrounds.Length})", filtering);
+            foreach (PromptBackground bg in _prompts.Backgrounds)
+            {
+                if (filtering && !Matches(filter, bg.id, bg.name, bg.scene))
+                {
+                    continue;
+                }
+
+                bgGroup.Add(PromptItemTitle($"{bg.name} · {bg.id}", bg.light));
+                bgGroup.Add(PromptText(bg.scene, $"{bg.id}: сцена"));
+            }
+            EndGroup(bgGroup, filtering, "Места");
+
+            // --- Параметры
+            var genGroup = BeginGroup("Параметры генерации", filtering);
+            if (_prompts.Gen != null && (!filtering
+                || Matches(filter, "параметры генерации", DescribeGen(_prompts.Gen))))
+            {
+                foreach (string line in DescribeGen(_prompts.Gen).Split('\n'))
+                {
+                    genGroup.Add(PromptItemTitle(line.Trim(), null));
+                }
+            }
+            EndGroup(genGroup, filtering, "Параметры");
+
+            if (filtering && _promptsTree.childCount == 0)
+            {
+                var none = new Label($"Ничего не нашлось: «{filter}»");
+                none.AddToClassList("prompt-item-text");
+                _promptsTree.Add(none);
+            }
+        }
+
+        private static string DescribeGen(PromptGen gen)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.Append("шагов: ").Append(gen.steps).Append('\n');
+            sb.Append("CFG: ").Append(gen.cfg).Append('\n');
+            sb.Append("планировщик: ").Append(gen.scheduler).Append('\n');
+            sb.Append("база сида: ").Append(gen.seed_base).Append('\n');
+            sb.Append("кадр персонажа: ").Append(Size(gen.subject_size)).Append('\n');
+            sb.Append("кадр фона: ").Append(Size(gen.background_size)).Append('\n');
+            sb.Append("хрома: ").Append(Size(gen.chroma));
+            return sb.ToString();
+        }
+
+        private static string Size(int[] value)
+        {
+            return value == null || value.Length == 0
+                ? "—"
+                : string.Join("×", value);
+        }
+
+        private static bool Matches(string filter, params string[] fields)
+        {
+            if (fields == null)
+            {
+                return false;
+            }
+
+            foreach (string field in fields)
+            {
+                if (!string.IsNullOrEmpty(field)
+                    && field.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Создаёт группу. При поиске группа создаётся раскрытой и останется
+        /// раскрытой: иначе фильтр отработал бы, а человек увидел бы пустоту.
+        /// </summary>
+        private Foldout BeginGroup(string title, bool filtering)
+        {
+            var foldout = new Foldout { text = title, value = filtering };
+            _promptsTree.Add(foldout);
+            return foldout;
+        }
+
+        private void EndGroup(Foldout group, bool filtering, string title)
+        {
+            if (filtering && group.childCount == 0)
+            {
+                // Пустая группа при поиске — шум: человек не знает, что
+                // раздела нет или что в нём нет совпадений.
+                group.RemoveFromHierarchy();
+            }
+        }
+
+        private static Label PromptText(string body, string tooltip)
+        {
+            var label = new Label(string.IsNullOrEmpty(body) ? "—" : body);
+            label.AddToClassList("prompt-item-text");
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                label.tooltip = tooltip;
+            }
+
+            return label;
+        }
+
+        private static Label PromptItemTitle(string body, string meta)
+        {
+            var label = new Label(body);
+            label.AddToClassList("prompt-item-title");
+            if (!string.IsNullOrEmpty(meta))
+            {
+                label.tooltip = meta;
+            }
+
+            return label;
+        }
+
+        /// <summary>
+        /// Сводка стенда по строке на пункт: «Модель: …», «LoRA: …»,
+        /// «Энкодер: …». Раньше это был один Label со склейкой через «·», то
+        /// есть пять длинных описаний в одну строку, где нужное не найти.
+        ///
+        /// Пустая строка до первого прогона объясняется словами, а не тире:
+        /// тире выглядит как сломанная панель, а на самом деле сводка просто
+        /// приходит из шапки `shoot.py` при первом прогоне.
+        /// </summary>
+        private void RenderStandInfo(string[] lines)
+        {
+            if (_infoModel == null)
+            {
+                return;
+            }
+
+            _infoModel.Clear();
+
+            if (lines == null || lines.Length == 0)
+            {
+                var empty = new Label("сводка придёт с первым прогоном");
+                empty.AddToClassList("gen-model-empty");
+                _infoModel.Add(empty);
+                return;
+            }
+
+            foreach (string line in lines)
+            {
+                if (string.IsNullOrEmpty(line))
+                {
+                    continue;
+                }
+
+                var label = new Label(line.Trim());
+                label.AddToClassList("gen-model-line");
+                _infoModel.Add(label);
+            }
+        }
+
+        /// <summary>
+        /// Плавное движение полос к настоящим процентам. Идёт раз в 80 мс:
+        /// UI Toolkit сам не анимирует, а держать для этого отдельный поток
+        /// незачем.
+        ///
+        /// Раньше здесь ездила бегущая подсветка «работа идёт». Её убрали:
+        /// второе движение поверх первого — это шум, и «работа идёт» уже видно
+        /// по тому, что полоса ползёт.
+        /// </summary>
+        private void TickBars()
+        {
+            if (_generationBar == null || _frameBar == null || _stageBar == null)
+            {
+                return;
+            }
+
+            _shownOverall = GenerationProgress.Eased(_shownOverall, _overallTarget,
+                _lastTickAt < 0 ? 0 : EditorApplication.timeSinceStartup - _lastTickAt);
+            _shownFrame = GenerationProgress.Eased(_shownFrame, _frameTarget,
+                _lastTickAt < 0 ? 0 : EditorApplication.timeSinceStartup - _lastTickAt);
+            _shownStage = GenerationProgress.Eased(_shownStage, _stageTarget,
+                _lastTickAt < 0 ? 0 : EditorApplication.timeSinceStartup - _lastTickAt);
+            _lastTickAt = EditorApplication.timeSinceStartup;
+
+            _generationBar.value = _shownOverall;
+            _frameBar.value = _shownFrame;
+            _stageBar.value = _shownStage;
         }
 
         // ------------------------------------------------------------- состояние
@@ -1212,6 +1779,13 @@ namespace Woodberry.Editor.ArtStudio
             }
 
             _selected = entry;
+
+            // Клик по кадру НЕ переключает вкладку. Раньше возвращал на
+            // «Объект»: мол, человек выбрал кадр, значит надо его показать.
+            // На деле это мешало — щёлкаешь по кадрам, пока смотришь промпты
+            // или прогресс, и каждый раз выкидывает на другую вкладку.
+            // Выбор обновляет содержимое панели объекта, а вкладкой человек
+            // управляет сам.
             UpdateDetailPanel();
         }
 
@@ -1314,7 +1888,14 @@ namespace Woodberry.Editor.ArtStudio
 
         private void OnPreviewHolderResized(GeometryChangedEvent evt)
         {
-            _previewBox = evt.newRect;
+            // Скрытая страница объекта даёт нулевую высоту: это не замер, а
+            // отсутствие раскладки. Запомнить его — значит потерять ширину
+            // правого блока и вернуть его узким после закрытия генератора.
+            if (evt.newRect.height > 1f)
+            {
+                _previewBox = evt.newRect;
+            }
+
             LayoutPreview();
         }
 
@@ -1616,7 +2197,28 @@ namespace Woodberry.Editor.ArtStudio
             _client.RequestCatalog();
         }
 
-        private void ToggleDriver()
+        /// <summary>
+        /// Одна кнопка на драйвер и ComfyUI.
+        ///
+        /// ПОЧЕМУ ОДНА. Драйвер и сервер — не два решения, а два шага одного:
+        /// без сервера драйвер не нарисует кадр, без драйвера сервер никто не
+        /// спросит. Две кнопки требовали помнить порядок нажатий и допускали
+        /// половинчатое состояние «драйвер поднят, сервер забыт». Порядок
+        /// знает кнопка.
+        ///
+        /// ПОДЪЁМ. Сначала драйвер, потом `server_start`: ComfyUI поднимает
+        /// драйвер и владеет его жизненным циклом — окно не должно запускать
+        /// сервер в обход. Пока идёт переход, кнопка ПОГАШЕНА и называет фазу:
+        /// иначе второе нажатие запускало бы второй подъём поверх первого.
+        ///
+        /// ОСТАНОВКА. <see cref="ArtDriverClient.StopEverything"/> гасит драйвер
+        /// (тот сам снимает ComfyUI деревом процессов) и дополнительно
+        /// проверяет порт: если сервер пережил драйвер, его добивают по
+        /// маркеру. Требование «чтобы не висело процессов» — не косметика:
+        /// осиротевший ComfyUI держит 10 ГБ VRAM, и следующий прогон встаёт к
+        /// нему в очередь (README стенда: «60+ с/шаг»).
+        /// </summary>
+        private void ToggleStand()
         {
             if (_client == null)
             {
@@ -1625,35 +2227,28 @@ namespace Woodberry.Editor.ArtStudio
                 return;
             }
 
-            if (_client.IsDriverAlive)
+            double now = EditorApplication.timeSinceStartup;
+            _client.ClearProblems();
+
+            if (_standPhase == StandPhase.Up)
             {
-                _client.StopDriver();
+                _client.StopEverything();
+                _standPhase = StandPhase.Stopping;
+                _standDeadline = StandControl.Deadline(StandPhase.Stopping, now);
             }
             else
             {
+                // `StartDriver` идемпотентен: живой драйвер он не трогает и не
+                // сбрасывает состояние — поднимается только то, чего нет.
                 _client.StartDriver();
                 _client.Ping();
                 _client.RequestCatalog();
+                _client.ServerStart();
+                _standPhase = StandPhase.Starting;
+                _standDeadline = StandControl.Deadline(StandPhase.Starting, now);
             }
 
             PollDriver();
-        }
-
-        private void ToggleServer()
-        {
-            if (_client == null)
-            {
-                return;
-            }
-
-            if (_client.State.ServerState == "готов")
-            {
-                _client.ServerStop();
-            }
-            else
-            {
-                _client.ServerStart();
-            }
         }
 
         /// <summary>
@@ -1823,6 +2418,16 @@ namespace Woodberry.Editor.ArtStudio
             {
                 _client.Ping();
                 _client.RequestCatalog();
+
+                // `server_start` летит тем же порядком и теряется так же:
+                // кнопка «Стенд» поднимает драйвер и сразу просит сервер, а
+                // команда ложится в файл раньше, чем драйвер откроет чтение.
+                // Без повтора сервер не поднимался ВООБЩЕ, и кнопка навсегда
+                // оставалась серой «Поднимается: сервер…» — проверено живьём.
+                if (_standPhase == StandPhase.Starting)
+                {
+                    _client.ServerStart();
+                }
             }
 
             _wasDriverConnected = _client.State.DriverConnected;
@@ -1863,17 +2468,22 @@ namespace Woodberry.Editor.ArtStudio
         {
             ArtDriverState state = _client.State;
 
-            _driverButton.text = state.DriverConnected
-                ? "Драйвер: подключён"
-                : "Драйвер: поднять";
-            _serverButton.text = $"ComfyUI: {state.ServerState}";
+            UpdateStandButton(state);
+
+            // Промпты разбираются только когда стенд ответил новым: сам он их
+            // не шлёт, а JSON большой и разбирать его на каждом опросе — впустую.
+            UpdatePrompts(state);
 
             // Пока идёт прогон, плитка добавления уступает место прогрессу.
             // Заодно это единственное место, которое знает, что генерация
             // жива, — им же гасится «Перегенерировать» ниже.
             UpdateGeneration(state);
+            UpdateStatusBar(state);
 
-            _addButton.SetEnabled(state.DriverConnected && SelectedPoolPrefix() != null);
+            // Прогон идёт — кнопка погашена: второй `generate` поверх первого
+            // работу не ускоряет, а складывается с ней.
+            _addButton.SetEnabled(
+                state.DriverConnected && SelectedPoolPrefix() != null && !_generationRunning);
 
             // В подсказке — размер пула, а не «свободно N»: свободных может
             // быть ноль (всё уже сделано или ждёт ревью), и это читалось бы
@@ -1900,25 +2510,184 @@ namespace Woodberry.Editor.ArtStudio
         }
 
         /// <summary>
-        /// Прогресс генерации. Проценты считает очередь (<see cref="JobQueue"/>),
-        /// окно их только показывает: процент текущего кадра и процент всей
-        /// заявки — разные числа, и человеку нужны оба.
+        /// Кнопка «Стенд»: надпись, доступность и переходы автомата.
         ///
-        /// ПЛИТКА ДОБАВЛЕНИЯ НА ВРЕМЯ ПРОГОНА ГАСНЕТ, а на её месте — прогресс.
-        /// Это не косметика: второй `generate` поверх первого работу не ускоряет,
-        /// а складывается с ней (очередь стенда линейная), и кнопка, которая это
-        /// позволяет, — ловушка. Раньше окно молчало о прогоне совсем, и увидеть
-        /// его можно было только по появлению кандидатов через минуту.
+        /// Срок перехода проверяется здесь, а не отдельным таймером: опрос идёт
+        /// раз в 150 мс, и этого достаточно, чтобы заметить «не поднялось за
+        /// 180 с». Отдельный таймер пришлось бы останавливать вручную при
+        /// каждом переходе — и однажды забыть.
+        /// </summary>
+        private void UpdateStandButton(ArtDriverState state)
+        {
+            bool driverAlive = _client.IsDriverAlive;
+            bool serverReady = IsServerReady(state.ServerState);
+            double now = EditorApplication.timeSinceStartup;
+
+            StandPhase resolved = StandControl.Resolve(
+                _standPhase, driverAlive, serverReady, now, _standDeadline);
+
+            if (resolved != _standPhase)
+            {
+                // Сорвавшийся переход обязан назвать причину: молча вернуться
+                // в «не поднят» значит соврать, что ничего и не начиналось.
+                string problem = StandControl.TimeoutProblem(
+                    _standPhase, now, _standDeadline);
+                if (!string.IsNullOrEmpty(problem))
+                {
+                    _loadProblems.Add(problem);
+                }
+
+                _standPhase = resolved;
+                if (resolved == StandPhase.Down || resolved == StandPhase.Up)
+                {
+                    _standDeadline = 0;
+                }
+            }
+
+            SetText(_standButton, StandControl.Label(
+                _standPhase, driverAlive, state.ServerState));
+            _standButton.SetEnabled(StandControl.CanPress(_standPhase));
+        }
+
+        private static bool IsServerReady(string serverState)
+        {
+            return !string.IsNullOrEmpty(serverState) && serverState.Contains("готов");
+        }
+
+        /// <summary>
+        /// Прогресс генерации — ЕДИНСТВЕННОЕ место, где он рисуется.
+        ///
+        /// ПОЧЕМУ ДВЕ ПОЛОСЫ. Одна не отвечает на вопрос «сколько осталось».
+        /// На заявке из четырёх кадров общий процент идёт рывками по 25, а на
+        /// одном кадре совпадает с кадровым — то есть либо не движется, либо
+        /// не говорит ничего нового. Поэтому полос две: ВСЯ заявка (сколько
+        /// кадров готово) и ТЕКУЩИЙ кадр (что происходит прямо сейчас). Числа
+        /// стоят в подписях над полосами: полоса без числа заставляет гадать.
+        ///
+        /// ПОЧЕМУ ПРОЦЕНТ КАДРА НЕ РАВЕН ПРОЦЕНТУ ШАГОВ. Стенд шлёт только
+        /// шаги сэмплера, а подготовка кадра (загрузка 10 ГБ весов, энкодинг)
+        /// и постобработка (декод, запись, проверка) событий не дают вовсе —
+        /// а на холодном сервере подготовка одна занимает десятки секунд.
+        /// Шкала кадра разбита на три полосы, и в крайних значение растёт по
+        /// времени: см. <see cref="GenerationProgress.FramePercent"/>.
+        ///
+        /// ЗАЧЕМ БЕГУЩАЯ ПОДСВЕТКА. Загрузка моделей занимает до 410 с и не
+        /// даёт ни одного события прогресса — по логу стенда это самая долгая
+        /// операция прогона. Стоящая полоса в это время неотличима от
+        /// зависания, поэтому при молчании прогресса включается движение
+        /// (см. <see cref="GenerationProgress.StaleSeconds"/>). Подсветка идёт
+        /// по полосе КАДРА: молчит именно кадр, а не заявка.
+        ///
+        /// Плитка добавления на время прогона ГАСНЕТ, но остаётся на месте:
+        /// второй `generate` поверх первого работу не ускоряет, а складывается
+        /// с ней (очередь стенда линейная). Это не косметика — кнопка, которая
+        /// такое позволяет, ловушка.
         ///
         /// Переход «идёт → готово» держится на экране небольшую задержку
         /// (<see cref="_generationLingerUntil"/>): опрос идёт раз в 150 мс, и без
         /// неё готовый результат мелькнул бы и исчез.
         /// </summary>
+        /// <summary>
+        /// Статус кадра для списка заявки. Короткий и однозначный: человек
+        /// должен отличить «рисуется» от «нарисован, ждёт приёмки», а эти
+        /// два состояния на полосах выглядят почти одинаково.
+        /// </summary>
+        private static string JobStateText(GenerationJob job, bool isCurrent)
+        {
+            if (job.State == JobState.Done)
+            {
+                return "готов";
+            }
+
+            if (job.State == JobState.Failed)
+            {
+                return "не прошёл проверку";
+            }
+
+            if (job.State == JobState.Cancelled)
+            {
+                return "отменён";
+            }
+
+            if (job.Drawn)
+            {
+                return "нарисован, ждёт приёмки";
+            }
+
+            if (isCurrent)
+            {
+                return $"рисует · {GenerationProgress.FramePercent(job, 0)}%";
+            }
+
+            return "ждёт";
+        }
+
+        private static string JobStateClass(GenerationJob job, bool isCurrent)
+        {
+            if (job.State == JobState.Done)
+            {
+                return "job-row-done";
+            }
+
+            if (job.State == JobState.Failed || job.State == JobState.Cancelled)
+            {
+                return "job-row-failed";
+            }
+
+            return isCurrent ? "job-row-current" : null;
+        }
+
+        /// <summary>
+        /// Перестраивает список кадров заявки. Узлов мало (единицы), а опрос
+        /// идёт раз в 150 мс, поэтому пересборка дешевле, чем обновлять
+        /// существующие строки поштучно: список и так меняется на каждом шаге
+        /// сэмплера.
+        /// </summary>
+        private void RenderJobList(JobQueue jobs, GenerationJob current)
+        {
+            if (_jobList == null)
+            {
+                return;
+            }
+
+            _jobList.Clear();
+
+            for (int i = 0; i < jobs.Jobs.Count; i++)
+            {
+                GenerationJob job = jobs.Jobs[i];
+                bool isCurrent = ReferenceEquals(job, current);
+
+                var row = new VisualElement();
+                row.AddToClassList("job-row");
+
+                string stateClass = JobStateClass(job, isCurrent);
+                if (stateClass != null)
+                {
+                    row.AddToClassList(stateClass);
+                }
+
+                var dot = new VisualElement();
+                dot.AddToClassList("job-dot");
+                row.Add(dot);
+
+                var name = new Label(GenerationProgress.JobLabel(job));
+                name.AddToClassList("job-name");
+                row.Add(name);
+
+                var state = new Label(JobStateText(job, isCurrent));
+                state.AddToClassList("job-state");
+                row.Add(state);
+
+                _jobList.Add(row);
+            }
+        }
+
         private void UpdateGeneration(ArtDriverState state)
         {
             JobQueue jobs = state.Jobs;
             bool hasJobs = jobs.Total > 0;
             _generationRunning = hasJobs && !jobs.IsIdle;
+            bool justStarted = _generationRunning && !_wasGenerating;
 
             if (_generationRunning)
             {
@@ -1946,25 +2715,97 @@ namespace Woodberry.Editor.ArtStudio
                 }
             }
 
-            _generationRow.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
-
-            // Плитка добавления видна только у выбранного пула И только когда
-            // ничего не генерируется.
-            _addRow.style.display = show || _selectedPool == null
+            // Плитка добавления видна только у выбранного пула и только когда
+            // прогона нет; во время прогона она есть, но погашена.
+            _addRow.style.display = _selectedPool == null
                 ? DisplayStyle.None
                 : DisplayStyle.Flex;
 
-            if (!show)
+            GenerationJob current = jobs.Running;
+
+            // Список кадров: без него четыре одинаковых процента полос не
+            // отвечают на вопрос «что рисуется, а что ждёт».
+            RenderJobList(jobs, current);
+
+            // Смена подписи прогресса = работа сдвинулась. Это же единственный
+            // способ отличить «считает шаг» от «молчит 400 секунд».
+            string signature = current == null
+                ? null
+                : $"{current.StandId}:{current.Percent}:{current.ProgressText}";
+            if (signature != _progressSignature)
             {
-                return;
+                _progressSignature = signature;
+                _progressChangedAt = EditorApplication.timeSinceStartup;
             }
 
-            int overall = Mathf.Clamp((int)Math.Round(jobs.OverallPercent), 0, 100);
-            _generationBar.value = _generationRunning ? overall : 100;
+            double stallSeconds = EditorApplication.timeSinceStartup - _progressChangedAt;
+            int overall = GenerationProgress.Overall(jobs, current, stallSeconds);
+            int frame = GenerationProgress.FramePercent(current, stallSeconds);
+
+            // ТРЕТЬЯ ПОЛОСА — ЭТАП. Этапы прогона (вырезка, проверка, приёмка)
+            // важнее этапа кадра: именно они раньше шли молча минутами.
+            if (justStarted)
+            {
+                state.ResetStandStage();
+            }
+
+            string stageSignature = null;
+            if (!string.IsNullOrEmpty(state.StandStage))
+            {
+                stageSignature =
+                    $"run:{state.StandStage}:{state.StandStageDone}/{state.StandStageTotal}";
+            }
+            else if (current != null && !string.IsNullOrEmpty(current.Stage))
+            {
+                stageSignature = $"job:{current.Stage}:{current.Percent}";
+            }
+
+            if (stageSignature != _stageSignature)
+            {
+                _stageSignature = stageSignature;
+                _stageChangedAt = EditorApplication.timeSinceStartup;
+            }
+
+            // Смена кадра обнуляет ВИДИМОЕ значение, а не настоящее.
+            // Анимация нужна внутри кадра; перенести проценты предыдущего на
+            // новый значит показать «почти готов» до начала работы над ним.
+            string frameId = current?.StandId;
+            if (!string.Equals(_shownFrameId, frameId, StringComparison.Ordinal))
+            {
+                _shownFrameId = frameId;
+                _shownFrame = 0f;
+            }
+
+            if (!string.Equals(_shownStageKey, stageSignature, StringComparison.Ordinal))
+            {
+                _shownStageKey = stageSignature;
+                _shownStage = 0f;
+            }
+
+            double stageStall = EditorApplication.timeSinceStartup - _stageChangedAt;
+            int stage = 0;
+            if (!string.IsNullOrEmpty(state.StandStage))
+            {
+                stage = GenerationProgress.StagePercent(state.StandStage,
+                    state.StandStageDone, state.StandStageTotal, stageStall);
+            }
+            else if (current != null && !string.IsNullOrEmpty(current.Stage))
+            {
+                stage = GenerationProgress.StagePercent(current.Stage, 0, 0,
+                    stageStall);
+            }
+
+            string stageCaptionText = GenerationProgress.StandStageText(
+                state.StandStage, state.StandStageDone, state.StandStageTotal,
+                state.StandStageText);
+            if (string.IsNullOrEmpty(stageCaptionText) && current != null
+                && !string.IsNullOrEmpty(current.Stage))
+            {
+                stageCaptionText = GenerationProgress.StageTitle(current.Stage);
+            }
 
             if (_generationRunning)
             {
-                GenerationJob current = jobs.Running;
                 int index = 0;
                 for (int i = 0; i < jobs.Jobs.Count; i++)
                 {
@@ -1975,26 +2816,170 @@ namespace Woodberry.Editor.ArtStudio
                     }
                 }
 
-                _generationTitle.text = $"Генерация · кадр {index} из {jobs.Total}";
+                int ok = jobs.Finished - jobs.Failed;
 
-                // Подпись задания приходит из события `item_added`; если
-                // драйвер её не дал, показываем stand-id — пустая строка перед
-                // «%» читалась бы как сломанный интерфейс.
-                string label = current == null
-                    ? null
-                    : string.IsNullOrEmpty(current.Label) ? current.StandId : current.Label;
-                _generationStatus.text = string.IsNullOrEmpty(label)
-                    ? $"в очереди · всего {overall}%"
-                    : $"{label} · {current.Percent}% · всего {overall}%";
+                _overallTarget = overall;
+                _generationTitle.text = $"Генерация · кадр {index} из {jobs.Total}";
+                SetText(_overallCaption, $"Вся заявка · {overall}%");
+                _generationStatus.text = jobs.Failed > 0
+                    ? $"готово {ok} из {jobs.Total} · сбоев {jobs.Failed}"
+                    : $"готово {ok} из {jobs.Total}";
+
+                _frameTarget = frame;
+                SetText(_frameCaption,
+                    $"Текущий кадр · {GenerationProgress.JobLabel(current)} · {frame}%");
+                _stageTarget = stage;
+                SetText(_stageCaption, stageCaptionText);
+                _generationPhase.text = GenerationProgress.PhaseText(current, stallSeconds);
+                _generationEta.text = GenerationProgress.EtaText(jobs, current);
             }
-            else
+            else if (show)
             {
                 int ok = jobs.Finished - jobs.Failed;
+                _overallTarget = 100;
+                _frameTarget = 100;
+                _stageTarget = 100;
                 _generationTitle.text = "Генерация завершена";
+                SetText(_overallCaption, "Вся заявка · 100%");
+                SetText(_frameCaption, "Текущий кадр · готов");
+                SetText(_stageCaption, "Все этапы пройдены");
                 _generationStatus.text = jobs.Failed > 0
                     ? $"готово {ok} из {jobs.Total}, сбоев {jobs.Failed}"
                     : $"готово {ok} из {jobs.Total} — кадры ждут в «На ревью»";
+                _generationPhase.text = string.Empty;
+                _generationEta.text = string.Empty;
             }
+            else
+            {
+                _overallTarget = 0;
+                _frameTarget = 0;
+                _stageTarget = 0;
+                _generationTitle.text = "Генерация не запущена";
+                SetText(_overallCaption, "Вся заявка");
+                SetText(_frameCaption, "Текущий кадр");
+                SetText(_stageCaption, "Текущий этап");
+                _generationStatus.text =
+                    "выбери пул в дереве, укажи количество и нажми «Сгенерировать»";
+                _generationPhase.text = string.Empty;
+                _generationEta.text = string.Empty;
+            }
+
+            // Прогон начался — открываем вкладку генератора сама. Иначе полоса
+            // живёт на неактивной вкладке, и второе нажатие «Сгенерировать»
+            // выглядит как «ничего не произошло».
+            if (justStarted)
+            {
+                SetRightPage(RightPage.Generator);
+            }
+
+            // Прогресс в заголовке вкладки виден, даже когда она закрыта:
+            // раньше это показывала подпись кнопки в тулбаре, которой больше нет.
+            _tabGenerator.text = _generationRunning && _rightPage != RightPage.Generator
+                ? $"Генератор · {overall}%"
+                : "Генератор";
+        }
+
+
+        /// <summary>
+        /// Страница «Генератор»: точки состояния, сводка по стенду и строка
+        /// «что происходит сейчас».
+        ///
+        /// ПОЧЕМУ ВСЁ В ОДНОМ АДРЕСЕ. Раньше состояние было размазано: точки и
+        /// кнопки — в верхней строке, сводка — во второй её строке, прогресс —
+        /// в центре. Одно и то же приходилось читать в двух местах, и они
+        /// расходились. Теперь у состояния ровно один адрес.
+        /// </summary>
+        private void UpdateStatusBar(ArtDriverState state)
+        {
+            SetDot(_driverDot, state.ProtocolMismatch
+                ? "is-busy"
+                : state.DriverConnected ? "is-on" : "is-off");
+
+            string server = state.ServerState ?? "—";
+            SetDot(_serverDot,
+                server.Contains("готов") ? "is-on"
+                : server.Contains("поднима") ? "is-busy"
+                : "is-off");
+
+            SetText(_infoDriver, state.DriverConnected
+                ? $"драйвер: подключён · протокол v{state.DriverProtocol}"
+                : "драйвер: не подключён");
+            SetText(_infoServer, $"сервер: {server}");
+            RenderStandInfo(state.StandInfoLines);
+            SetText(_infoStyle, _settings == null
+                ? "стиль: —"
+                : $"стиль: {_settings.Style} · свет: {(_settings.Light ?? "по кадру")}");
+            // Счётчики стоят в секции «Что можно сгенерировать», а подписи называют
+            // смысл. «Пулов на стенде: 81» отвечало на вопрос, которого никто
+            // не задавал; полезны две другие вещи — сколько групп можно выбрать
+            // и сколько кадров добавлю ВСЕГО ОДИН.
+            string selectedPrefix = SelectedPoolPrefix();
+            DriverPool selectedPool = state.FindPool(selectedPrefix);
+
+            SetText(_infoPools, $"групп кадров на стенде: {state.Pools.Count}");
+            _infoPools.tooltip =
+                "Пул — это именованная группа кадров: City_GuildClerk, "
+                + "Craftsmen_Potter, Roles_Priest. Из них выбираешь, что рисовать.";
+
+            SetText(_infoFree, $"свободно во всех группах: {state.FreeFrames}");
+            _infoFree.tooltip =
+                "Сумма незаполненных слотов по всем группам сразу. Сколько "
+                + "кадров осталось нарисовать ВООБЩЕ, а не в выбранной.";
+
+            SetText(_infoPoolFree, selectedPool == null
+                ? "свободно в выбранном пуле: —"
+                : $"свободно в пуле {selectedPool.Prefix}: {selectedPool.Free.Count}");
+            _infoPoolFree.tooltip =
+                "Это то, что нужно при выборе пула: сколько кадров можно "
+                + "добавить прямо сейчас.";
+
+            JobQueue jobs = state.Jobs;
+            SetText(_infoQueue, _generationRunning
+                ? $"очередь: идёт {jobs.Finished}/{jobs.Total}"
+                : jobs.Total > 0
+                    ? $"очередь: {jobs.Finished}/{jobs.Total}"
+                    : "очередь: пусто");
+
+            // Разделяем смысл и шум. «Что происходит» показывает только
+            // ошибку — это то, на что человек обязан отреагировать. Поток
+            // строк `shoot.py` (сотни технических сообщений за прогон) уходит
+            // в приглушённую строку «последняя диагностика»: раньше он шёл
+            // сюда же и превращал раздел в бегущую консоль.
+            SetText(_infoActivity, !string.IsNullOrEmpty(state.LastError)
+                ? state.LastError
+                : "—");
+            SetText(_generationLog, !string.IsNullOrEmpty(state.LastLog)
+                ? "последняя диагностика: " + state.LastLog
+                : string.Empty);
+        }
+
+        /// <summary>
+        /// Ставит текст, только если он изменился.
+        ///
+        /// ЗАЧЕМ. Опрос идёт раз в 150 мс, а подписей на странице десяток.
+        /// Присваивание одного и того же текста каждый раз помечает элемент
+        /// изменённым и гонит раскладку всего окна — на прогоне это видно как
+        /// подёргивание интерфейса редактора.
+        /// </summary>
+        private static void SetText(TextElement label, string text)
+        {
+            string value = text ?? string.Empty;
+            if (label != null && label.text != value)
+            {
+                label.text = value;
+            }
+        }
+
+        private static void SetDot(VisualElement dot, string stateClass)
+        {
+            if (dot == null)
+            {
+                return;
+            }
+
+            dot.EnableInClassList("is-on", stateClass == "is-on");
+            dot.EnableInClassList("is-busy", stateClass == "is-busy");
+            dot.EnableInClassList("is-off", stateClass == "is-off");
         }
 
         /// <summary>
@@ -2340,6 +3325,9 @@ namespace Woodberry.Editor.ArtStudio
             _frames.ClearSelection();
 
             RenderLeftPanel();
+
+            // Выбор кандидата тоже не переключает вкладку — по той же
+            // причине, что и выбор кадра: человек вправе остаться там, где смотрит.
             UpdateDetailPanel();
         }
 

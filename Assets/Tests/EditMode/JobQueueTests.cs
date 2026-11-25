@@ -131,31 +131,35 @@ namespace Woodberry.Tests.EditMode
         }
 
         [Test]
-        public void OverallPercent_WhenNothingStarted_IsZero()
+        public void Enqueue_WhenSameStandIdTwice_ReusesJobInsteadOfDuplicating()
         {
             var queue = new JobQueue();
-            queue.Enqueue("a", "A", ArtAssetKind.Portrait, "a");
-            queue.Enqueue("b", "B", ArtAssetKind.Portrait, "b");
+            GenerationJob first = queue.Enqueue("a", "A", ArtAssetKind.Portrait, "первый");
+            queue.StartNext();
+            queue.SetProgress("a", 70);
 
-            Assert.That(queue.OverallPercent, Is.EqualTo(0d));
+            GenerationJob second = queue.Enqueue("a", "A", ArtAssetKind.Portrait, "повтор");
+
+            Assert.That(second, Is.SameAs(first), "второе задание сломало бы поиск по id");
+            Assert.That(queue.Total, Is.EqualTo(1));
+            Assert.That(second.State, Is.EqualTo(JobState.Queued));
+            Assert.That(second.Percent, Is.EqualTo(0), "кадр делается заново, а не с середины");
+            Assert.That(second.Elapsed, Is.EqualTo(0d));
+            Assert.That(second.Message, Is.Null, "старый вердикт не должен пережить перезаказ");
         }
 
         [Test]
-        public void OverallPercent_AveragesAllJobsNotOnlyRunning()
+        public void Enqueue_AfterSameIdFinished_JobBecomesQueuedAgain()
         {
             var queue = new JobQueue();
             queue.Enqueue("a", "A", ArtAssetKind.Portrait, "a");
-            queue.Enqueue("b", "B", ArtAssetKind.Portrait, "b");
-            queue.Enqueue("c", "C", ArtAssetKind.Portrait, "c");
-
             queue.StartNext();
-            queue.SetProgress("a", 50);
-
-            // 50 из 100 у первого, остальные не начаты: 50 / 3.
-            Assert.That(queue.OverallPercent, Is.EqualTo(50d / 3d).Within(0.001));
-
             queue.Finish("a", success: true, message: null);
-            Assert.That(queue.OverallPercent, Is.EqualTo(100d / 3d).Within(0.001));
+
+            GenerationJob again = queue.Enqueue("a", "A", ArtAssetKind.Portrait, "a");
+
+            Assert.That(again.State, Is.EqualTo(JobState.Queued));
+            Assert.That(queue.IsIdle, Is.False, "повторный заказ обязан вернуть очередь в работу");
         }
 
         [Test]

@@ -6,17 +6,12 @@
 
     <ui:VisualElement class="root">
 
-        <uie:Toolbar class="toolbar">
-            <uie:ToolbarButton name="refresh" text="Обновить" />
-            <uie:ToolbarButton name="driverButton" text="Драйвер: поднять" />
-            <uie:ToolbarButton name="serverButton" text="ComfyUI: не поднят" />
-            <uie:ToolbarSearchField name="search" class="grow" />
-            <uie:ToolbarMenu name="statusFilter" text="Статус: все" />
-            <uie:ToolbarMenu name="kindFilter" text="Все кадры" />
-            <uie:ToolbarToggle name="onlyRegenerable" text="Только сгенерированные" />
-        </uie:Toolbar>
+        <!-- Верхней строки-тулбара больше нет. Кнопка «Генератор» была единственным
+         её содержимым, и после появления вкладок она стала лишней: генератор —
+         это раздел ПРАВОЙ панели, а не всего окна, и ставить его навигацию в
+         шапку окна значило бы врать о принадлежности. -->
 
-        <ui:VisualElement class="body">
+    <ui:VisualElement class="body">
 
             <ui:VisualElement class="panel-left">
                 <ui:Button name="reviewSection" text="На ревью" class="category-button review-section" />
@@ -39,14 +34,6 @@
                         <ui:Button name="addButton" text="Сгенерировать" class="action primary" />
                     </ui:VisualElement>
 
-                    <ui:VisualElement name="generationRow" class="generation-row">
-                        <ui:VisualElement class="generation-head">
-                            <ui:Label name="generationTitle" text="Генерация" class="frame-name" />
-                            <ui:Label name="generationStatus" text="" class="frame-sub generation-status" />
-                        </ui:VisualElement>
-                        <ui:ProgressBar name="generationBar" class="generation-bar" />
-                    </ui:VisualElement>
-
                     <ui:ListView name="frames" class="fill" />
                 </ui:VisualElement>
 
@@ -55,60 +42,196 @@
                     <ui:ScrollView name="reviewGrid" class="review-grid" />
                 </ui:VisualElement>
 
+                <ui:VisualElement class="bottom-panel">
+
+                    <ui:VisualElement name="placesPanel" class="places-panel">
+                        <ui:Label text="Новое место фона" class="panel-header" />
+                        <ui:ScrollView name="placeList" class="extra-list" />
+                        <ui:VisualElement class="places-form">
+                            <ui:DropdownField name="placeGroup" label="группа" class="place-field" />
+                            <ui:TextField name="placeId" label="место" class="place-field" />
+                            <ui:TextField name="placeLabel" label="название" class="place-field" />
+                            <ui:TextField name="placeScene" label="сцена" multiline="true" class="place-scene" />
+                            <ui:Button name="placeAdd" text="Добавить место" class="action" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="bottom-bar">
+                        <ui:Button name="regenMarked" text="Перегенерировать помеченное" class="action primary" />
+                        <ui:Button name="placesToggle" text="Доп. места (фоны)" class="action secondary" />
+                        <ui:Label name="status" class="statusbar" text="—" />
+                    </ui:VisualElement>
+
+                    <ui:Label name="problems" class="problems" text="" />
+
+                </ui:VisualElement>
+
             </ui:VisualElement>
 
             <ui:VisualElement name="panelRight" class="panel-right">
-                <ui:Label name="detailHeader" class="panel-header" text="Ничего не выбрано" />
-                <ui:VisualElement name="previewHolder" class="preview-holder">
-                    <ui:Image name="preview" class="preview" />
+
+                <!-- ТРИ ВКЛАДКИ ПРАВОЙ ПАНЕЛИ. Объект, промпты и генератор —
+                     три разных вопроса об одном кадре, и раньше два из трёх
+                     жили в шапке окна, а третий был сам собой. Вкладки стоят
+                     внутри колонки, а не в тулбаре: переключают они именно её
+                     содержимое.
+
+                     Порядок — по ходу работы: посмотрел кадр → прочитал, чем
+                     он нарисован → сгенерировал. Поэтому «Объект» слева, а
+                     «Генератор» справа: он и раньше открывался последним. -->
+                <ui:VisualElement name="rightTabs" class="right-tabs">
+                    <ui:Button name="tabObject" text="Объект" class="right-tab" />
+                    <ui:Button name="tabPrompts" text="Промпты" class="right-tab" />
+                    <ui:Button name="tabGenerator" text="Генератор" class="right-tab" />
                 </ui:VisualElement>
 
-                <ui:Label name="frameTitle" class="row-title" text="—" />
-                <ui:Label name="frameId" class="row-path" text="—" />
-                <ui:Label name="framePath" class="row-path" text="—" />
-                <ui:Label name="frameStatus" class="row-status" text="—" />
-                <ui:Label name="frameCoverage" class="row-path" text="" />
+                <!-- Страница 1: выбранный объект. Решения о нём живут только
+                     здесь, а заголовок называет объект. -->
+                <ui:VisualElement name="detailPanel" class="right-page">
+                    <ui:Label name="detailHeader" class="panel-header" text="Ничего не выбрано" />
+                    <ui:VisualElement name="previewHolder" class="preview-holder">
+                        <ui:Image name="preview" class="preview" />
+                    </ui:VisualElement>
 
-                <ui:VisualElement name="candidateActions" class="action-group">
-                    <ui:Button name="accept" text="Принять в проект" class="action primary" />
-                    <ui:Button name="rejectCandidate" text="Отклонить и перегенерировать" class="action reject" />
+                    <ui:Label name="frameTitle" class="row-title" text="—" />
+                    <ui:Label name="frameId" class="row-path" text="—" />
+                    <ui:Label name="framePath" class="row-path" text="—" />
+                    <ui:Label name="frameStatus" class="row-status" text="—" />
+                    <ui:Label name="frameCoverage" class="row-path" text="" />
+
+                    <ui:VisualElement name="candidateActions" class="action-group">
+                        <ui:Button name="accept" text="Принять в проект" class="action primary" />
+                        <ui:Button name="rejectCandidate" text="Отклонить и перегенерировать" class="action reject" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="frameActions" class="action-group">
+                        <ui:Button name="approve" text="Отметить принятым" class="action" />
+                        <ui:Button name="reject" text="Пометить браком" class="action reject" />
+                        <ui:Button name="openFolder" text="Открыть папку" class="action secondary" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="rejectComment" class="action-group">
+                        <ui:Label text="Почему брак" class="panel-header" />
+                        <ui:TextField name="comment" multiline="true" class="comment" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
 
-                <ui:VisualElement name="frameActions" class="action-group">
-                    <ui:Button name="approve" text="Отметить принятым" class="action" />
-                    <ui:Button name="reject" text="Пометить браком" class="action reject" />
-                    <ui:Button name="openFolder" text="Открыть папку" class="action secondary" />
-                </ui:VisualElement>
+                <!-- Страница 2: промпты стенда. Стоит рядом с объектом не
+                     случайно: человек смотрит кадр и хочет знать, ЧЕМ он
+                     нарисован, а лезть за этим в `scene.py` на другом диске
+                     он не станет. Содержимое — живое: спрашивается у драйвера,
+                     а не хранится в проекте копией.
 
-                <ui:VisualElement name="rejectComment" class="action-group">
-                    <ui:Label text="Почему брак" class="panel-header" />
-                    <ui:TextField name="comment" multiline="true" class="comment" />
-                </ui:VisualElement>
+                     Поиск сверху, группы под ним. Группы свёрнуты: 112
+                     персонажей — это не «посмотреть», это «найти нужного». -->
+                <ui:ScrollView name="promptsPanel" class="right-page prompts-page">
+                    <ui:Label name="promptsHeader" class="panel-header" text="Промпты стенда" />
+                    <ui:VisualElement class="prompts-toolbar">
+                        <ui:TextField name="promptsSearch" class="prompts-search" />
+                        <ui:Button name="promptsRefresh" text="Обновить" class="prompts-refresh" />
+                    </ui:VisualElement>
+                    <ui:Label name="promptsStatus" class="gen-line" text="" />
+                    <ui:VisualElement name="promptsTree" class="prompts-tree" />
+                </ui:ScrollView>
+
+                <!-- Страница 3: генератор. Открывается кнопкой вверху: сам
+                     прогон, чем он рисуется, и фильтры каталога — всё рядом,
+                     потому что «что происходит» и «что этим запускать» — одна
+                     задача, разнесённая по двум разным местам раньше. -->
+                <ui:ScrollView name="generatorPanel" class="right-page generator-page">
+
+                    <ui:VisualElement class="gen-section">
+                        <ui:Label text="Драйвер и стенд" class="gen-section-title" />
+                        <!-- ОДНА кнопка на драйвер и ComfyUI. Точки остались
+                             раздельными: «драйвер жив» и «сервер готов» —
+                             разные факты, и по ним видно, на чём именно
+                             застрял подъём. -->
+                        <ui:VisualElement class="gen-row">
+                            <ui:VisualElement name="driverDot" class="status-dot" />
+                            <ui:VisualElement name="serverDot" class="status-dot" />
+                            <uie:ToolbarButton name="standButton" text="Поднять стенд" class="gen-button" />
+                        </ui:VisualElement>
+                        <ui:Button name="refresh" text="Обновить каталог проекта" class="action secondary gen-wide" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="gen-section">
+                        <ui:Label text="Прогресс" class="gen-section-title" />
+                        <ui:Label name="generationTitle" class="gen-title" text="Генерация не запущена" />
+
+                        <!-- ТРИ полосы, три разных вопроса. Одна полоса не отвечает
+                             ни на один: на четырёх кадрах общий процент идёт
+                             рывками по 25, а этапы вырезки и проверки без
+                             отдельной шкалы читаются как зависание. -->
+                        <ui:Label name="overallCaption" class="gen-caption" text="Вся заявка" />
+                        <ui:VisualElement class="generation-bar-wrap">
+                            <ui:ProgressBar name="generationBar" class="generation-bar" />
+                        </ui:VisualElement>
+                        <ui:Label name="generationStatus" class="gen-line" text="" />
+                        <ui:Label name="generationLog" class="gen-log" text="" />
+
+                        <ui:Label name="frameCaption" class="gen-caption" text="Текущий кадр" />
+                        <ui:VisualElement class="generation-bar-wrap">
+                            <ui:ProgressBar name="frameBar" class="generation-bar" />
+                        </ui:VisualElement>
+                        <ui:Label name="generationPhase" class="generation-phase" text="" />
+                        <ui:Label name="generationEta" class="gen-eta" text="" />
+
+                        <ui:Label name="stageCaption" class="gen-caption" text="Текущий этап" />
+                        <ui:VisualElement class="generation-bar-wrap">
+                            <ui:ProgressBar name="stageBar" class="generation-bar generation-bar-stage" />
+                        </ui:VisualElement>
+
+                        <!-- Список кадров заявки. Полосы не отвечают на вопрос
+                             «где прогресс, а где просто ждёт»: без списка это
+                             четыре одинаковых процента и никакого понятия,
+                             что стенд рисует кадр №2 из 4. -->
+                        <ui:VisualElement name="jobList" class="job-list" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="gen-section">
+                        <ui:Label text="Что происходит" class="gen-section-title" />
+                        <ui:Label name="infoActivity" class="gen-activity" text="—" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="gen-section">
+                        <ui:Label text="Чем рисуется" class="gen-section-title" />
+                        <!-- Сводка стенда — СПИСКОМ, по строке на «Модель: …»,
+                             «LoRA: …», «Энкодер: …». Одной строкой через «·»
+                             пять длинных описаний нечитаемы. -->
+                        <ui:VisualElement name="infoModel" class="gen-model-list" />
+                        <ui:Label name="infoStyle" class="gen-line" text="стиль: —" />
+                        <ui:Label name="infoDriver" class="gen-line" text="драйвер: —" />
+                        <ui:Label name="infoServer" class="gen-line" text="сервер: —" />
+                    </ui:VisualElement>
+
+                    <!-- Счётчики каталога ЖИВУТ ЗДЕСЬ, А НЕ В «Чем рисуется».
+                         Раньше «пулы» и «свободно кадров» стояли среди модели и
+                         сервера, и два числа без заголовка читались как часть
+                         описания рисунка — то есть как «модель из 81 пулов».
+
+                         «Свободно в пуле» добавлено потому, что «свободно
+                         всего» отвечает на вопрос, которого человек не задавал:
+                        выбирая пул, он спрашивает «сколько добавлю», а не
+                         «сколько есть вообще». -->
+                    <ui:VisualElement class="gen-section">
+                        <ui:Label text="Что можно сгенерировать" class="gen-section-title" />
+                        <ui:Label name="infoPools" class="gen-line" text="групп кадров на стенде: —" />
+                        <ui:Label name="infoFree" class="gen-line" text="свободно во всех группах: —" />
+                        <ui:Label name="infoPoolFree" class="gen-line" text="свободно в выбранном пуле: —" />
+                        <ui:Label name="infoQueue" class="gen-line" text="очередь: —" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="gen-section">
+                        <ui:Label text="Что показывать в каталоге" class="gen-section-title" />
+                        <uie:ToolbarMenu name="statusFilter" text="Статус: все" class="gen-wide" />
+                        <uie:ToolbarMenu name="kindFilter" text="Все кадры" class="gen-wide" />
+                        <uie:ToolbarToggle name="onlyRegenerable" text="Только сгенерированные" class="gen-wide" />
+                        <uie:ToolbarSearchField name="search" class="gen-search" />
+                    </ui:VisualElement>
+
+                </ui:ScrollView>
+
             </ui:VisualElement>
-
-        </ui:VisualElement>
-
-        <ui:VisualElement class="bottom-panel">
-
-            <ui:VisualElement name="placesPanel" class="places-panel">
-                <ui:Label text="Новое место фона" class="panel-header" />
-                <ui:ScrollView name="placeList" class="extra-list" />
-                <ui:VisualElement class="places-form">
-                    <ui:DropdownField name="placeGroup" label="группа" class="place-field" />
-                    <ui:TextField name="placeId" label="место" class="place-field" />
-                    <ui:TextField name="placeLabel" label="название" class="place-field" />
-                    <ui:TextField name="placeScene" label="сцена" multiline="true" class="place-scene" />
-                    <ui:Button name="placeAdd" text="Добавить место" class="action" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-
-            <ui:VisualElement class="bottom-bar">
-                <ui:Button name="regenMarked" text="Перегенерировать помеченное" class="action primary" />
-                <ui:Button name="placesToggle" text="Доп. места (фоны)" class="action secondary" />
-                <ui:Label name="status" class="statusbar" text="—" />
-            </ui:VisualElement>
-
-            <ui:Label name="problems" class="problems" text="" />
 
         </ui:VisualElement>
 

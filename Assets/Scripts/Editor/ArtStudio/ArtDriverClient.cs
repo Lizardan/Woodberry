@@ -161,7 +161,13 @@ namespace Woodberry.Editor.ArtStudio
 
             Send(ArtCommand.Create(ArtCommand.Stop));
 
-            for (int i = 0; i < 20 && IsDriverAlive; i++)
+            // Пауза ограничена тремя секундами, и это не произвольное число:
+            // ожидание блокирует поток редактора, то есть окно студии всё это
+            // время не рисуется. Драйвер отвечает на `stop` в пределах одного
+            // опроса (150 мс), а его команда отмены рвёт дочерний `shoot.py`
+            // целым деревом процессов. Если этого не случилось за 3 с —
+            // лучше снять процесс, чем держать редактор.
+            for (int i = 0; i < 30 && IsDriverAlive; i++)
             {
                 System.Threading.Thread.Sleep(100);
             }
@@ -181,6 +187,169 @@ namespace Woodberry.Editor.ArtStudio
             catch (Exception)
             {
                 // Процесс уже умер между проверкой и Kill — это норма.
+            }
+        }
+
+        /// <summary>
+        /// Погасить ВСЁ: драйвер и ComfyUI, без оставшихся процессов.
+        ///
+        /// ПОЧЕМУ ОДНОЙ ОПЕРАЦИЕЙ, А НЕ ДВУМЯ КОМАНДАМИ. Штатно драйвер гасит
+        /// ComfyUI сам (его `stop` снимает сервер деревом процессов). Но если
+        /// драйвер пришлось снять силой — он не успел, и сервер остаётся
+        /// держать 10 ГБ VRAM. Тогда следующий прогон встаёт в очередь к
+        /// нему, и кадры идут в разы медленнее (README стенда: «60+ с/шаг →
+        /// ищи осиротевший процесс»). Поэтому после драйвера окно проверяет
+        /// порт и добивает сервер по маркеру.
+        /// </summary>
+        public void StopEverything()
+        {
+            StopDriver();
+            KillLingeringServer();
+        }
+
+        /// <summary>Отвечает ли ComfyUI на своём порту. Проверка — открытие порта.</summary>
+        public bool IsServerUp
+        {
+            get
+            {
+                string host = _settings == null || string.IsNullOrEmpty(_settings.ComfyHost)
+                    ? ArtSettings.DefaultComfyHost
+                    : _settings.ComfyHost;
+                string[] parts = host.Split(':');
+                string name = parts[0];
+                int port = parts.Length > 1 && int.TryParse(parts[1], out int parsed)
+                    ? parsed
+                    : 8188;
+
+                try
+                {
+                    using (var client = new System.Net.Sockets.TcpClient())
+                    {
+                        System.Threading.Tasks.Task task = client.ConnectAsync(name, port);
+                        return task.Wait(400) && client.Connected;
+                    }
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Добивает ComfyUI, если он пережил драйвер. Молча ничего не делает,
+        /// когда порт молчит — это нормальный случай.
+        /// </summary>
+        private void KillLingeringServer()
+        {
+            if (!IsServerUp)
+            {
+                return;
+            }
+
+            int pid = ReadComfyPid();
+            if (pid <= 0)
+            {
+                _problems.Add("ComfyUI всё ещё отвечает, а его pid неизвестен — погаси вручную");
+                return;
+            }
+
+            // Страховка от переиспользования pid: маркер переживает перезапуск
+            // Windows, и за это время номер мог достаться совсем другому
+            // процессу. Снимаем только python — сервер стенда всегда он.
+            string name = ProcessNameOf(pid);
+            if (!string.Equals(name, "python", StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(name, "pythonw", StringComparison.OrdinalIgnoreCase))
+            {
+                _problems.Add($"порт занят процессом {name} (pid {pid}) — это не ComfyUI, не трогаю");
+                return;
+            }
+
+            try
+            {
+                var info = new ProcessStartInfo
+                {
+                    FileName = "taskkill",
+                    Arguments = $"/PID {pid} /T /F",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                };
+                using (Process kill = Process.Start(info))
+                {
+                    kill?.WaitForExit(5000);
+                }
+            }
+            catch (Exception e)
+            {
+                _problems.Add($"не удалось снять ComfyUI (pid {pid}): {e.Message}");
+                return;
+            }
+
+            for (int i = 0; i < 20 && IsServerUp; i++)
+            {
+                System.Threading.Thread.Sleep(100);
+            }
+
+            if (IsServerUp)
+            {
+                _problems.Add($"ComfyUI (pid {pid}) не погас — проверь лишние python.exe");
+            }
+        }
+
+        private int ReadComfyPid()
+        {
+            if (File.Exists(DriverInfoPath))
+            {
+                try
+                {
+                    DriverInfoDto dto = JsonUtility.FromJson<DriverInfoDto>(
+                        File.ReadAllText(DriverInfoPath));
+                    if (dto != null && dto.comfyPid > 0)
+                    {
+                        return dto.comfyPid;
+                    }
+                }
+                catch (Exception)
+                {
+                    // Битого driver.json достаточно, чтобы перейти к маркеру.
+                }
+            }
+
+            // Маркер стенда — общий файл: его пишет и драйвер, и `run.py`.
+            string standDir = _settings?.StandDir;
+            if (string.IsNullOrEmpty(standDir))
+            {
+                return -1;
+            }
+
+            string marker = Path.Combine(standDir, ".comfy_pid");
+            if (!File.Exists(marker))
+            {
+                return -1;
+            }
+
+            try
+            {
+                return int.TryParse(File.ReadAllText(marker).Trim(), out int pid) ? pid : -1;
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+        }
+
+        private static string ProcessNameOf(int pid)
+        {
+            try
+            {
+                using (Process process = Process.GetProcessById(pid))
+                {
+                    return process.ProcessName;
+                }
+            }
+            catch (Exception)
+            {
+                return string.Empty;
             }
         }
 
@@ -207,6 +376,11 @@ namespace Woodberry.Editor.ArtStudio
         public void RequestCatalog()
         {
             Send(ArtCommand.Create(ArtCommand.Catalog));
+        }
+
+        public void RequestPrompts()
+        {
+            Send(ArtCommand.Create(ArtCommand.Prompts));
         }
 
         public void Generate(string poolPrefix, int count)
@@ -309,6 +483,7 @@ namespace Woodberry.Editor.ArtStudio
         {
             public int pid;
             public int protocol;
+            public int comfyPid;
         }
     }
 }
